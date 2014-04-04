@@ -1,4 +1,9 @@
-v6.7.2
+v 6.7.3
+  - Fix the merge notification email not being sent (Pierre de La Morinerie)
+  - Drop all tables before restoring a Postgres backup
+  - Remove yanked modernizr gem
+
+v 6.7.2
   - Fix upgrader script
 
 v6.7.1
