@@ -1,5 +1,8 @@
+v 7.0.1
+  - Fix 404 for invited (shared) projects
+
 v 7.0.0
-  - Fix: empty brand images are displayed as empty image_tag on login page (Marvin Frick, sponsored by SinnerSchrader) 
+  - Fix: empty brand images are displayed as empty image_tag on login page (Marvin Frick, sponsored by SinnerSchrader)
 
 v 6.9.4
   - Fix bug in JIRA Issue closing triggered by commit messages
