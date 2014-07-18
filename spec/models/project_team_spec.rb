@@ -68,10 +68,10 @@ describe ProjectTeam do
     let(:project) { create(:empty_project) }
 
     before do
-      project.project_group_links.create(
-        group: group,
-        group_access: Gitlab::Access::DEVELOPER
-      )
+      group_link = project.project_group_links.new
+      group_link.group = group
+      group_link.group_access = Gitlab::Access::DEVELOPER
+      group_link.save
 
       group.add_user(master, Gitlab::Access::MASTER)
       group.add_user(reporter, Gitlab::Access::REPORTER)
