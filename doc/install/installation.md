@@ -49,7 +49,7 @@ up-to-date and install it.
 
 Install the required packages (needed to compile Ruby and native extensions to Ruby gems):
 
-    sudo apt-get install -y build-essential zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server redis-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils cmake
+    sudo apt-get install -y build-essential zlib1g-dev libyaml-dev libssl-dev libgdbm-dev libreadline-dev libncurses5-dev libffi-dev curl openssh-server redis-server checkinstall libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev logrotate python-docutils pkg-config cmake
 
 Make sure you have the right version of Git installed
 
@@ -141,12 +141,12 @@ We recommend using a PostgreSQL database. For MySQL check [MySQL setup guide](da
 ### Clone the Source
 
     # Clone GitLab repository
-    sudo -u git -H git clone https://gitlab.com/subscribers/gitlab-ee.git -b 7-1-stable-ee gitlab
+    sudo -u git -H git clone https://gitlab.com/subscribers/gitlab-ee.git -b 7-2-stable-ee gitlab
 
     # Go to gitlab dir
     cd /home/git/gitlab
 
-**Note:** You can change `7-1-stable-ee` to `master` if you want the *bleeding edge* version, but never install master on a production server!
+**Note:** You can change `7-2-stable-ee` to `master` if you want the *bleeding edge* version, but never install master on a production server!
 
 ### Configure it
 
@@ -238,7 +238,7 @@ GitLab Shell is an SSH access and repository management software developed speci
     cd /home/git/gitlab
 
     # Run the installation task for gitlab-shell (replace `REDIS_URL` if needed):
-    sudo -u git -H bundle exec rake gitlab:shell:install[v1.9.6] REDIS_URL=redis://localhost:6379 RAILS_ENV=production
+    sudo -u git -H bundle exec rake gitlab:shell:install[v1.9.7] REDIS_URL=redis://localhost:6379 RAILS_ENV=production
 
     # By default, the gitlab-shell config is generated from your main gitlab config.
     #
