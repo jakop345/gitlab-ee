@@ -1,3 +1,6 @@
+v 7.3.1
+  - Merge community edition changes for version 7.3.1
+
 v 7.3.0
   - Add an option to change the LDAP sync time from default 1 hour
   - User will receive an email when unsubscribed from admin notifications
