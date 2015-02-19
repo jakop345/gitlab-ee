@@ -623,4 +623,13 @@ class User < ActiveRecord::Base
   def oauth_authorized_tokens
     Doorkeeper::AccessToken.where(resource_owner_id: self.id, revoked_at: nil)
   end
+
+  def contributed_projects_ids
+    Event.where(author_id: self).
+      where("created_at > ?", Time.now - 1.year).
+      code_push.
+      reorder(project_id: :desc).
+      select('DISTINCT(project_id)').
+      map(&:project_id)
+  end
 end
