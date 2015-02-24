@@ -19,7 +19,7 @@ class UploadsController < ApplicationController
   end
 
   def authorize_access
-    unless params[:mounted_as] == 'avatar'
+    unless params[:mounted_as] == 'avatar' || %w(logo dark_logo light_logo).include?(params[:mounted_as])
       authenticate_user! && reject_blocked
     end
   end
