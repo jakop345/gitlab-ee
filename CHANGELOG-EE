@@ -1,3 +1,12 @@
+v 7.8.2
+  - Merge community edition changes for version 7.8.2
+  - Check if LDAP admin group exists before querying for user membership
+  - Remove duplicate settings link in admin section
+
+v 7.8.1
+  - Merge community edition changes for version 7.8.1
+  - Fix the custom logo and logo upload
+
 v 7.8.0
   - Improved Jira issue closing integration
   - Improved message logging for Jira integration
