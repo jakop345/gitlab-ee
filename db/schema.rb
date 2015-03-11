@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150217001826) do
+ActiveRecord::Schema.define(version: 20150306023112) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -290,9 +290,9 @@ ActiveRecord::Schema.define(version: 20150217001826) do
   end
 
   add_index "namespaces", ["created_at", "id"], name: "index_namespaces_on_created_at_and_id", using: :btree
-  add_index "namespaces", ["name"], name: "index_namespaces_on_name", using: :btree
+  add_index "namespaces", ["name"], name: "index_namespaces_on_name", unique: true, using: :btree
   add_index "namespaces", ["owner_id"], name: "index_namespaces_on_owner_id", using: :btree
-  add_index "namespaces", ["path"], name: "index_namespaces_on_path", using: :btree
+  add_index "namespaces", ["path"], name: "index_namespaces_on_path", unique: true, using: :btree
   add_index "namespaces", ["type"], name: "index_namespaces_on_type", using: :btree
 
   create_table "notes", force: true do |t|
