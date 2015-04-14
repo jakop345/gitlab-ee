@@ -66,12 +66,11 @@ Settings.ldap['schedule_sync_minute'] = 30  if Settings.ldap['schedule_sync_minu
 # backwards compatibility, we only have one host
 if Settings.ldap['enabled'] || Rails.env.test?
   if Settings.ldap['host'].present?
+    # We detected old LDAP configuration syntax. Update the config to make it
+    # look like it was entered with the new syntax.
     server = Settings.ldap.except('sync_time')
-    server = Settingslogic.new(server)
-    server['label'] = 'LDAP'
-    server['provider_name'] = 'ldap'
     Settings.ldap['servers'] = {
-      'ldap' => server
+      'main' => server
     }
   end
 
@@ -86,6 +85,7 @@ if Settings.ldap['enabled'] || Rails.env.test?
     Settings.ldap['servers'][key] = server
   end
 end
+
 
 Settings['omniauth'] ||= Settingslogic.new({})
 Settings.omniauth['enabled']      = false if Settings.omniauth['enabled'].nil?
