@@ -44,31 +44,29 @@ describe License do
             expect(license).to_not be_valid
           end
         end
-      end
 
         context "after the license started" do
           let(:date) { Date.today }
 
-        it "is valid" do
-          expect(license).to be_valid
+          it "is valid" do
+            expect(license).to be_valid
+          end
         end
-      end
-    end
 
         context "in the year before the license started" do
           let(:date) { License.current.starts_at - 6.months }
 
-      context "when there is no active user count restriction" do
-        it "is valid" do
-          expect(license).to be_valid
+          it "is invalid" do
+            expect(license).to_not be_valid
+          end
         end
-      end
 
         context "earlier than a year before the license started" do
           let(:date) { License.current.starts_at - 2.years }
 
-        it "is invalid" do
-          expect(license).to_not be_valid
+          it "is valid" do
+            expect(license).to be_valid
+          end
         end
       end
 
