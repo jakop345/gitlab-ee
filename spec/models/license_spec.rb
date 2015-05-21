@@ -23,8 +23,10 @@ describe License do
       end
     end
 
-    describe "Active user count" do
-      let(:active_user_count) { User.active.count }
+    describe "Historical active user count" do
+      let(:active_user_count) { User.active.count + 10 }
+      let(:date)              { License.current.starts_at }
+      let!(:historical_data)  { HistoricalData.create!(date: date, active_user_count: active_user_count) }
 
       context "when there is no active user count restriction" do
         it "is valid" do
@@ -37,15 +39,15 @@ describe License do
           gl_license.restrictions = { active_user_count: active_user_count - 1 }
         end
 
-        it "is invalid" do
-          expect(license).to_not be_valid
+        context "when the license started" do
+          it "is invalid" do
+            expect(license).to_not be_valid
+          end
         end
       end
 
-      context "when the active user count restriction is not exceeded" do
-        before do
-          gl_license.restrictions = { active_user_count: active_user_count + 1 }
-        end
+        context "after the license started" do
+          let(:date) { Date.today }
 
         it "is valid" do
           expect(license).to be_valid
@@ -53,9 +55,8 @@ describe License do
       end
     end
 
-    describe "Historical active user count" do
-      let(:active_user_count) { User.active.count + 10 }
-      let!(:historical_data)  { HistoricalData.create!(date: License.current.issued_at, active_user_count: active_user_count) }
+        context "in the year before the license started" do
+          let(:date) { License.current.starts_at - 6.months }
 
       context "when there is no active user count restriction" do
         it "is valid" do
@@ -63,10 +64,8 @@ describe License do
         end
       end
 
-      context "when the active user count restriction is exceeded" do
-        before do
-          gl_license.restrictions = { active_user_count: active_user_count - 1 }
-        end
+        context "earlier than a year before the license started" do
+          let(:date) { License.current.starts_at - 2.years }
 
         it "is invalid" do
           expect(license).to_not be_valid
