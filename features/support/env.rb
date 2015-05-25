@@ -15,7 +15,7 @@ require 'database_cleaner'
 require 'spinach/capybara'
 require 'sidekiq/testing/inline'
 
-%w(select2_helper test_env repo_helpers).each do |f|
+%w(select2_helper test_env repo_helpers license).each do |f|
   require Rails.root.join('spec', 'support', f)
 end
 
@@ -48,7 +48,9 @@ end
 
 Spinach.hooks.before_run do
   include RSpec::Mocks::ExampleMethods
+
   TestEnv.init(mailer: false)
+  TestLicense.init
 
   include FactoryGirl::Syntax::Methods
 end
