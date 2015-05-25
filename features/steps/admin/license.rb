@@ -50,7 +50,7 @@ class Spinach::Features::AdminLicense < Spinach::FeatureSteps
   end
 
   step 'I should see a notice telling me the license was uploaded' do
-    expect(page).to have_content "The license was successfully uploaded and is now active."
+    expect(page).to have_content "The license was successfully uploaded."
   end
 
   step 'I upload an invalid license' do
