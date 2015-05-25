@@ -201,4 +201,17 @@ FactoryGirl.define do
     provider 'ldapmain'
     extern_uid 'my-ldap-id'
   end
+
+  factory :gitlab_license, class: "Gitlab::License" do
+    starts_at { Date.today - 1.month }
+    licensee do 
+      { "Name" => Faker::Name.name }
+    end
+    notify_users_at   { |l| l.expires_at }
+    notify_admins_at  { |l| l.expires_at }
+  end
+
+  factory :license do
+    data { build(:gitlab_license).export }
+  end
 end
