@@ -57,9 +57,7 @@ module Gitlab
       when *PUSH_COMMANDS
         push_access_check(changes)
       when *GIT_ANNEX_COMMANDS
-        if actor.is_a? Key
-          git_annex_access_check(actor.user, project, changes)
-        end
+        git_annex_access_check(project, changes)
       else
         build_status_object(false, "Wrong command")
       end
@@ -267,8 +265,8 @@ module Gitlab
       GitAccessStatus.new(status, message)
     end
 
-    def git_annex_access_check(user, project, changes)
-      unless user && user_allowed?(user)
+    def git_annex_access_check(project, changes)
+      unless user && user_allowed?
         return build_status_object(false, "You don't have access")
       end
 
