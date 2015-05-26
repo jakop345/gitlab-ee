@@ -73,3 +73,9 @@
       %span
         Settings
 
+  = nav_link(controller: :licenses) do
+    = link_to admin_license_path, title: 'License', data: {placement: 'right'} do
+      = icon('check fw')
+      %span
+        License
+
