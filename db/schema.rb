@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150509180749) do
+ActiveRecord::Schema.define(version: 20150605131047) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -40,11 +40,13 @@ ActiveRecord::Schema.define(version: 20150509180749) do
     t.boolean  "twitter_sharing_enabled",      default: true
     t.text     "help_text"
     t.text     "restricted_visibility_levels"
-    t.boolean  "version_check_enabled",        default: true
     t.integer  "max_attachment_size",          default: 10,   null: false
     t.integer  "default_project_visibility"
+    t.boolean  "version_check_enabled",        default: true
     t.integer  "default_snippet_visibility"
     t.text     "restricted_signup_domains"
+    t.boolean  "user_oauth_applications",      default: true
+    t.string   "after_sign_out_path"
   end
 
   create_table "audit_events", force: true do |t|
@@ -131,6 +133,7 @@ ActiveRecord::Schema.define(version: 20150509180749) do
     t.boolean  "member_check",         default: false, null: false
     t.string   "file_name_regex"
     t.boolean  "is_sample",            default: false
+    t.integer  "max_file_size",        default: 0
   end
 
   create_table "historical_data", force: true do |t|
@@ -317,7 +320,7 @@ ActiveRecord::Schema.define(version: 20150509180749) do
   end
 
   add_index "namespaces", ["created_at", "id"], name: "index_namespaces_on_created_at_and_id", using: :btree
-  add_index "namespaces", ["name"], name: "index_namespaces_on_name", unique: true, using: :btree
+  add_index "namespaces", ["name"], name: "index_namespaces_on_name", using: :btree
   add_index "namespaces", ["owner_id"], name: "index_namespaces_on_owner_id", using: :btree
   add_index "namespaces", ["path"], name: "index_namespaces_on_path", unique: true, using: :btree
   add_index "namespaces", ["type"], name: "index_namespaces_on_type", using: :btree
@@ -425,11 +428,11 @@ ActiveRecord::Schema.define(version: 20150509180749) do
     t.string   "avatar"
     t.string   "import_status"
     t.float    "repository_size",               default: 0.0
-    t.text     "merge_requests_template"
     t.integer  "star_count",                    default: 0,        null: false
-    t.boolean  "merge_requests_rebase_enabled", default: false
     t.string   "import_type"
     t.string   "import_source"
+    t.text     "merge_requests_template"
+    t.boolean  "merge_requests_rebase_enabled", default: false
     t.boolean  "merge_requests_rebase_default", default: true
   end
 
@@ -519,6 +522,12 @@ ActiveRecord::Schema.define(version: 20150509180749) do
 
   add_index "tags", ["name"], name: "index_tags_on_name", unique: true, using: :btree
 
+  create_table "test", id: false, force: true do |t|
+    t.integer "col"
+  end
+
+  add_index "test", ["col"], name: "index_name", unique: true, using: :btree
+
   create_table "users", force: true do |t|
     t.string   "email",                         default: "",    null: false
     t.string   "encrypted_password",            default: "",    null: false
@@ -559,7 +568,6 @@ ActiveRecord::Schema.define(version: 20150509180749) do
     t.string   "unconfirmed_email"
     t.boolean  "hide_no_ssh_key",               default: false
     t.string   "website_url",                   default: "",    null: false
-    t.datetime "admin_email_unsubscribed_at"
     t.string   "github_access_token"
     t.string   "gitlab_access_token"
     t.string   "notification_email"
@@ -567,13 +575,14 @@ ActiveRecord::Schema.define(version: 20150509180749) do
     t.boolean  "password_automatically_set",    default: false
     t.string   "bitbucket_access_token"
     t.string   "bitbucket_access_token_secret"
+    t.datetime "admin_email_unsubscribed_at"
     t.string   "location"
+    t.string   "public_email",                  default: "",    null: false
     t.string   "encrypted_otp_secret"
     t.string   "encrypted_otp_secret_iv"
     t.string   "encrypted_otp_secret_salt"
     t.boolean  "otp_required_for_login"
     t.text     "otp_backup_codes"
-    t.string   "public_email",                  default: "",    null: false
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree
@@ -609,6 +618,7 @@ ActiveRecord::Schema.define(version: 20150509180749) do
     t.boolean  "merge_requests_events", default: false,         null: false
     t.boolean  "tag_push_events",       default: false
     t.integer  "group_id"
+    t.boolean  "note_events",           default: false,         null: false
   end
 
   add_index "web_hooks", ["created_at", "id"], name: "index_web_hooks_on_created_at_and_id", using: :btree
