@@ -279,7 +279,7 @@ class Ability
             :"modify_#{name}",
           ]
         else
-          if subject.respond_to?(:project)
+          if subject.respond_to?(:project) && subject.project
             project_abilities(user, subject.project)
           else
             []
