@@ -31,7 +31,7 @@ module MergeRequests
     end
 
     def merge!
-      if merge_request.for_fork?
+      if merge_request.for_fork? || merge_request.should_rebase
         Gitlab::Satellite::MergeAction.new(current_user, merge_request).merge!(commit_message)
       else
         # Merge local branches using rugged instead of satellites
