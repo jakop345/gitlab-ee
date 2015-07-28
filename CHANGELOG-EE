@@ -1,3 +1,6 @@
+v.7.13.2
+  - Merge community edition changes for version 7.13.2
+
 v7.13.1
   - Merge community edition changes for version 7.13.1
   - Fix: "Rebase before merge" doesn't work when source branch is in the same project
