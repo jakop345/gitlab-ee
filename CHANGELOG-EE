@@ -1,6 +1,7 @@
 v 8.0.0 (unreleased)
 
 v 7.14.1 (unreleased)
+  - Fix sign in form when just Kerberos is enabled
 
 v 7.14.0
   - Disable adding, updating and removing members from a group that is synced with LDAP
