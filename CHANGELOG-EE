@@ -1,4 +1,4 @@
-v 7.14.1 (unreleased)
+v 7.14.1
   - Fix sign in form when just Kerberos is enabled
 
 v 7.14.0
