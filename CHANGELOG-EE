@@ -1,3 +1,6 @@
+v 7.14.2
+  - Fix the rebase before merge feature
+
 v 7.14.1
   - Fix sign in form when just Kerberos is enabled
 
