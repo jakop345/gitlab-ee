@@ -1,3 +1,7 @@
+v 8.0.5
+  - "Multi-project" and "Treat unstable builds as passing" parameters for
+    the Jenkins CI service are now correctly persisted.
+
 v 8.0.4
   - Fix multi-project setup for Jenkins
 
