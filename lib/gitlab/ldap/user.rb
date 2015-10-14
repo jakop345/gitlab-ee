@@ -37,7 +37,7 @@ module Gitlab
       end
 
       def find_by_email
-        ::User.find_by(email: auth_hash.email)
+        ::User.find_by(email: auth_hash.email.downcase)
       end
 
       def update_user_attributes
