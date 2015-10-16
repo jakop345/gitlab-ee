@@ -1,3 +1,6 @@
+v 8.0.6
+  - No EE-specific changes
+
 v 8.0.5
   - "Multi-project" and "Treat unstable builds as passing" parameters for
     the Jenkins CI service are now correctly persisted.
