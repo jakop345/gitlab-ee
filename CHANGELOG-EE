@@ -1,8 +1,25 @@
-v 8.1.0 (unreleased)
-  - added an issues template (Hannes Rosenögger)
 v 8.1.0
+  - Added an issues template (Hannes Rosenögger)
   - Add documentation for "Share project with group" API call 
   - Abiliy to disable 'Share with Group' feature (via UI and API)
+
+v 8.0.6
+  - No EE-specific changes
+
+v 8.0.5
+  - "Multi-project" and "Treat unstable builds as passing" parameters for
+    the Jenkins CI service are now correctly persisted.
+  - Correct the build URL when "Multi-project" is enabled for the Jenkins CI
+    service.
+
+v 8.0.4
+  - Fix multi-project setup for Jenkins
+
+v 8.0.3
+  - No EE-specific changes
+
+v 8.0.2
+  - No EE-specific changes
 
 v 8.0.1
   - Correct gem dependency versions
