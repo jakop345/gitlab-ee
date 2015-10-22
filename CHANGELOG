@@ -8,6 +8,7 @@ v 8.1.0 (unreleased)
   - Fix bug preventing mentioned issued from being closed when MR is merged using fast-forward merge.
   - Fix duplicate repositories in GitHub import page (Stan Hu)
   - Fix nonatomic database update potentially causing project star counts to go negative (Stan Hu)
+  - Don't show "Add README" link in an empty repository if user doesn't have access to push (Stan Hu)
   - Fix error preventing displaying of commit data for a directory with a leading dot (Stan Hu)
   - Speed up load times of issue detail pages by roughly 1.5x
   - If a merge request is to close an issue, show this on the issue page (Zeger-Jan van de Weg)
@@ -19,8 +20,10 @@ v 8.1.0 (unreleased)
   - Allow removing of project without confirmation when JavaScript is disabled (Stan Hu)
   - Support filtering by "Any" milestone or issue and fix "No Milestone" and "No Label" filters (Stan Hu)
   - Improved performance of the trending projects page
+  - Remove CI migration task
   - Improved performance of finding projects by their namespace
   - Fix bug where transferring a project would result in stale commit links (Stan Hu)
+  - Fix build trace updating
   - Include full path of source and target branch names in New Merge Request page (Stan Hu)
   - Add user preference to view activities as default dashboard (Stan Hu)
   - Add option to admin area to sign in as a specific user (Pavel Forkert)
