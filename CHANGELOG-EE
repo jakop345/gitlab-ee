@@ -1,3 +1,9 @@
+v 8.1.2
+  - Prevent a 500 error related to the JIRA external issue tracker service
+
+v 8.1.1
+  - Removed, see 8.1.2
+
 v 8.1.0
   - Added an issues template (Hannes Rosenögger)
   - Add documentation for "Share project with group" API call 
