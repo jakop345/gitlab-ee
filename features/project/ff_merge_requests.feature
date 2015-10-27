@@ -10,6 +10,7 @@ Feature: Project Ff Merge Requests
     Given merge request "Bug NS-05" is rebased
     When I visit merge request page "Bug NS-05"
     Then I should see ff-only merge button
+    And I should see remove source branch checkbox
 
   Scenario: I do rebase before ff-only merge
     Given rebase before merge enabled

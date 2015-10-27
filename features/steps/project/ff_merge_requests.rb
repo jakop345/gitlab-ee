@@ -55,6 +55,10 @@ class Spinach::Features::ProjectFfMergeRequests < Spinach::FeatureSteps
     expect(page).to have_button "Rebase"
   end
 
+  step 'I should see remove source branch checkbox' do
+    expect(page).to have_field "Remove source branch"
+  end
+
   step 'I should see rebase message' do
     expect(page).to have_content "Fast-forward merge is not possible. Branch must be rebased first"
   end

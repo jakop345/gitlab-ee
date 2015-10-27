@@ -8,6 +8,7 @@
 
       .accept-control
         Fast-forward merge without creating merge commit
+      = render "projects/merge_requests/remove_source_branch"
 - else
   = form_for [:rebase, @project.namespace.becomes(Namespace), @project, @merge_request],
     remote: false, method: :post, html: { class: 'accept-mr-form js-requires-input' } do |f|

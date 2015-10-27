@@ -1,0 +1,5 @@
+- if can_remove_branch?(@merge_request.source_project, @merge_request.source_branch) && !@merge_request.for_fork?
+  .accept-control.checkbox
+    = label_tag :should_remove_source_branch, class: "remove_source_checkbox" do
+      = check_box_tag :should_remove_source_branch
+      Remove source branch
