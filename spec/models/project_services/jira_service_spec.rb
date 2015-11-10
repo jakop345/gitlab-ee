@@ -31,6 +31,7 @@ describe JiraService do
   describe "Execute" do
     let(:user)    { create(:user) }
     let(:project) { create(:project) }
+    let(:merge_request) { create(:merge_request) }
 
     before do
       @jira_service = JiraService.new
@@ -51,7 +52,7 @@ describe JiraService do
     end
 
     it "should call JIRA API" do
-      @jira_service.execute(sample_commit, JiraIssue.new("JIRA-123", project))
+      @jira_service.execute(merge_request, JiraIssue.new("JIRA-123", project))
       expect(WebMock).to have_requested(:post, @api_url).with(
         body: /Issue solved with/
       ).once
@@ -59,7 +60,7 @@ describe JiraService do
 
     it "calls the api with jira_issue_transition_id" do
       @jira_service.jira_issue_transition_id = 'this-is-a-custom-id'
-      @jira_service.execute(sample_commit, JiraIssue.new("JIRA-123", project))
+      @jira_service.execute(merge_request, JiraIssue.new("JIRA-123", project))
       expect(WebMock).to have_requested(:post, @api_url).with(
         body: /this-is-a-custom-id/
       ).once

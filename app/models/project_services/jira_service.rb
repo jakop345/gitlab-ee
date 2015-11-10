@@ -141,16 +141,21 @@ class JiraService < IssueTrackerService
     self.jira_issue_transition_id ||= "2"
   end
 
-  def close_issue(commit, issue)
+  def close_issue(entity, issue)
     url = close_issue_url(issue.iid)
 
-    commit_url = build_entity_url(:commit, commit.id)
+    commit_id = if entity.is_a?(Commit)
+                  entity.id
+                elsif entity.is_a?(MergeRequest)
+                  entity.last_commit.id
+                end
+    commit_url = build_entity_url(:commit, commit_id)
 
     message = {
       update: {
         comment: [{
           add: {
-            body: "Issue solved with [#{commit.id}|#{commit_url}]."
+            body: "Issue solved with [#{commit_id}|#{commit_url}]."
           }
         }]
       },

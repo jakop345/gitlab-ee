@@ -1,3 +1,6 @@
+v 8.1.4
+  - Fix bug in JIRA integration which prevented merge requests from being accepted when using issue closing pattern
+
 v 8.1.3
   - Fix "Rebase onto master"
 
