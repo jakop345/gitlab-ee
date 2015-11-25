@@ -1,4 +1,5 @@
 v 8.2.1
+  - No changes
 
 v 8.2.0
   - Invalidate stored jira password if the endpoint URL is changed
