@@ -1,3 +1,5 @@
+v 8.2.1
+
 v 8.2.0
   - Invalidate stored jira password if the endpoint URL is changed
   - Fix: Page is not reloaded periodically to check if rebase is finished
@@ -7,9 +9,6 @@ v 8.2.0
   - Ensure a comment is properly recorded in JIRA when a merge request is accepted
   - Allow groups to appear in the `Share with group` share if the group owner allows it
   - Add option to mirror an upstream repository.
-
-v 8.1.0 (unreleased)
-  - added an issues template (Hannes Rosenögger)
 
 v 8.1.0
   - Add documentation for "Share project with group" API call
