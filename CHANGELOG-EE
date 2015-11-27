@@ -1,3 +1,6 @@
+v 8.2.2
+  - Use the configured "shared" path for Merge Request rebasing
+
 v 8.2.1
   - No changes
 
