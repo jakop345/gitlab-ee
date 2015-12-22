@@ -182,7 +182,6 @@ production: &base
     ldap_sync_worker:
       cron: "30 1 * * *"
 
-
   #
   # 2. GitLab CI settings
   # ==========================
