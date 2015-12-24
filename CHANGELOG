@@ -1,7 +1,12 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
-v 8.3.0 (unreleased)
-  - Merge when build succeeds (Zeger-Jan van de Weg)
+v 8.3.1
+  - Fix Error 500 when global milestones have slashes (Stan Hu)
+  - Fix Error 500 when performing a search from dashboard (Stan Hu)
+  - Fix LDAP identity and user retrieval when special characters are used
+  - Move Sidekiq-cron configuration to gitlab.yml
+
+v 8.3.0
   - Bump rack-attack to 4.3.1 for security fix (Stan Hu)
   - API support for starred projects for authorized user (Zeger-Jan van de Weg)
   - Add open_issues_count to project API (Stan Hu)
@@ -39,7 +44,6 @@ v 8.3.0 (unreleased)
   - Add languages page to graphs
   - Block LDAP user when they are no longer found in the LDAP server
   - Improve wording on project visibility levels (Zeger-Jan van de Weg)
-  - Automatically select default clone protocol based on user preferences (Eirik Lygre)
   - Fix editing notes on a merge request diff
   - Automatically select default clone protocol based on user preferences (Eirik Lygre)
   - Make Network page as sub tab of Commits
@@ -71,9 +75,6 @@ v 8.2.3
   - Update documentation for "Guest" permissions
   - Properly convert Emoji-only comments into Award Emojis
   - Enable devise paranoid mode to prevent user enumeration attack
-  - Webhook payload has an added, modified and removed properties for each commit
-  - Update documentation for "Guest" permissions
-  - Properly convert Emoji-only comments into Award Emojis
   - Webhook payload has an added, modified and removed properties for each commit
   - Fix 500 error when creating a merge request that removes a submodule
 
