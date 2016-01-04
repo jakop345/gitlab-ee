@@ -25,11 +25,11 @@ class ArtifactUploader < CarrierWave::Uploader::Base
   end
 
   def store_dir
-    File.join(ArtifactUploader.artifacts_path, artifacts_path)
+    File.join(self.class.artifacts_path, @build.artifacts_path)
   end
 
   def cache_dir
-    File.join(ArtifactUploader.artifacts_cache_path, artifacts_path)
+    File.join(self.class.artifacts_cache_path, @build.artifacts_path)
   end
 
   def file_storage?
