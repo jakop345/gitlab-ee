@@ -1,3 +1,6 @@
+v 8.3.3 (unreleased)
+  - Fix undefined method call in Jenkins integration service
+
 v 8.3.2
   - No EE-specific changes
 
