@@ -43,6 +43,7 @@ class Project < ActiveRecord::Base
   include Sortable
   include AfterCommitQueue
   include CaseSensitivity
+  include TokenAuthenticatable
 
   extend Gitlab::ConfigHelper
 
@@ -182,10 +183,8 @@ class Project < ActiveRecord::Base
   validates :avatar, file_size: { maximum: 200.kilobytes.to_i }
   validates :approvals_before_merge, numericality: true, allow_blank: true
 
-  before_validation :set_runners_token_token
-  def set_runners_token_token
-    self.runners_token = SecureRandom.hex(15) if self.runners_token.blank?
-  end
+  add_authentication_token_field :runners_token
+  before_save :ensure_runners_token
 
   mount_uploader :avatar, AvatarUploader
 
@@ -1018,5 +1017,9 @@ class Project < ActiveRecord::Base
     if Gitlab::PagesTransfer.new.rename_project(path, temp_path, namespace.path)
       PagesWorker.perform_in(5.minutes, :remove, namespace.path, temp_path)
     end
+  end
+
+  def runners_token
+    ensure_runners_token!
   end
 end
