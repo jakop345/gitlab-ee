@@ -1,4 +1,4 @@
-class SearchService < BaseService
+class ElasticSearchService < BaseService
   def global_search
     query = params[:search]
 
@@ -7,7 +7,8 @@ class SearchService < BaseService
         users: search_in_users(query),
         projects: search_in_projects(query),
         merge_requests: search_in_merge_requests(query),
-        issues: search_in_issues(query)
+        issues: search_in_issues(query),
+        repositories: search_in_repository(query, project)
     }
   end
 
@@ -19,7 +20,8 @@ class SearchService < BaseService
         users: {},
         projects: {},
         merge_requests: search_in_merge_requests(query, project),
-        issues: search_in_issues(query, project)
+        issues: search_in_issues(query, project),
+        repositories: search_in_repository(query, project)
     }
   end
 
@@ -145,6 +147,29 @@ class SearchService < BaseService
         response: response.response,
         total_count: response.total_count
       }
+    rescue Exception => e
+      {}
+    end
+  end
+
+  def search_in_repository(query, project = nil)
+    opt = {
+      repository_id: project ? [project.id] : projects_ids,
+      highlight: true,
+      order: params[:order]
+    }
+
+    if params[:language].present? && params[:language] != 'All'
+      opt.merge!({ language: params[:language] })
+    end
+
+    begin
+      res = Repository.search(query, options: opt, page: page)
+
+      res[:blobs][:projects] = project_filter(res[:blobs][:repositories]) || []
+      res[:commits][:projects]  = project_filter(res[:commits][:repositories]) || []
+
+      res
     rescue Exception => e
       {}
     end
