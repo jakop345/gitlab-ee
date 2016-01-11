@@ -1,4 +1,4 @@
-v 8.3.3 (unreleased)
+v 8.3.3
   - Fix undefined method call in Jenkins integration service
 
 v 8.3.2
