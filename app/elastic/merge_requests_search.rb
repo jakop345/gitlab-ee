@@ -20,12 +20,10 @@ module MergeRequestsSearch
       indexes :source_project_id, type: :integer, index: :not_analyzed
       indexes :target_project_id, type: :integer, index: :not_analyzed
       indexes :author_id,         type: :integer, index: :not_analyzed
-      #indexes :assignee_id,       type: :integer, index: :not_analyzed
 
       indexes :source_project,  type: :nested
       indexes :target_project,  type: :nested
       indexes :author,          type: :nested
-      #indexes :assignee,        type: :nested
 
       indexes :title_sort, type: :string, index: 'not_analyzed'
       indexes :created_at_sort, type: :string, index: 'not_analyzed'
@@ -37,8 +35,7 @@ module MergeRequestsSearch
         include: {
           source_project: { only: :id },
           target_project: { only: :id },
-          author:         { only: :id },
-          #assignee: { only: :id }
+          author:         { only: :id }
         }
       ).merge({
         title_sort: title.downcase,
@@ -48,7 +45,6 @@ module MergeRequestsSearch
     end
 
     def self.elastic_search(query, page: 1, per: 20, options: {})
-
       page ||= 1
 
       if options[:in].blank?

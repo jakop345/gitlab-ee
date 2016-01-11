@@ -16,11 +16,9 @@ module IssuesSearch
 
       indexes :project_id,  type: :integer, index: :not_analyzed
       indexes :author_id,   type: :integer, index: :not_analyzed
-      #indexes :assignee_id, type: :integer, index: :not_analyzed
 
       indexes :project,     type: :nested
       indexes :author,      type: :nested
-      #indexes :assignee,    type: :nested
 
       indexes :title_sort, type: :string, index: 'not_analyzed'
       indexes :updated_at_sort, type: :date,   index: :not_analyzed
@@ -31,8 +29,7 @@ module IssuesSearch
       as_json(
         include: {
           project:  { only: :id },
-          author:   { only: :id },
-          #assignee: { only: :id }
+          author:   { only: :id }
         }
       ).merge({
         title_sort: title.downcase,
@@ -42,7 +39,6 @@ module IssuesSearch
     end
 
     def self.elastic_search(query, page: 1, per: 20, options: {})
-
       page ||= 1
 
       if options[:in].blank?

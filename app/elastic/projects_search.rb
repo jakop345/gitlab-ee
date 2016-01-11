@@ -55,7 +55,6 @@ module ProjectsSearch
     end
 
     def self.elastic_search(query, page: 1, per: 20, options: {})
-
       page ||= 1
 
       if options[:in].blank?
@@ -88,7 +87,6 @@ module ProjectsSearch
             terms: {
               field: "categories.name",
               all_terms: true,
-              # FIXME. Remove to_a
               size: Project.category_counts.to_a.count
             }
           }

@@ -83,11 +83,6 @@ module GroupsSearch
         :_score
       ]
 
-      #query_hash[:sort] = [
-        #{ name_sort: { order: :asc, mode: :min }},
-        #:_score
-      #]
-
       if options[:highlight]
         query_hash[:highlight] = highlight_options(options[:in])
       end

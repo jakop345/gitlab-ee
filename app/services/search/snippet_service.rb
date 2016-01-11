@@ -8,7 +8,11 @@ module Search
 
     def execute
       snippet_ids = Snippet.accessible_to(current_user).pluck(:id)
-      Gitlab::SnippetSearchResults.new(snippet_ids, params[:search])
+
+      if Gitlab.config.elasticsearch.present?
+        Gitlab::Elastic::SnippetSearchResults.new(snippet_ids, params[:search])
+      else  
+        Gitlab::SnippetSearchResults.new(snippet_ids, params[:search])
     end
   end
 end

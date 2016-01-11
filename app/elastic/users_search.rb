@@ -32,7 +32,6 @@ module UsersSearch
     end
 
     def self.elastic_search(query, page: 1, per: 20, options: {})
-
       page ||= 1
       per ||= 20
 

@@ -27,6 +27,7 @@ module RepositoriesSearch
             project.repository.index_commits
           rescue
           end
+
           begin
             project.repository.index_blobs
           rescue
