@@ -89,10 +89,8 @@ module SnippetsSearch
 
       query_hash = {
         query: {
-          match: {
-            query: {
-              content: query
-            },
+          filtered: {
+            query: {match: {content: query}},
           },
         },
         size: per,

@@ -7,6 +7,8 @@ class ElasticIndexerWorker
                                      port: Gitlab.config.elasticsearch.port)
 
   def perform(operation, klass, record_id, options={})
+    klass = "Snippet" if klass =~ /Snippet$/
+
     cklass = klass.constantize
 
     case operation.to_s
@@ -16,7 +18,6 @@ class ElasticIndexerWorker
       record.__elasticsearch__.__send__ "#{operation}_document"
     when /delete/
       Client.delete index: cklass.index_name, type: cklass.document_type, id: record_id
-    else raise ArgumentError, "Unknown operation '#{operation}'"
     end
   end
 end
