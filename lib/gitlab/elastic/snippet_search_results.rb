@@ -11,7 +11,7 @@ module Gitlab
       def objects(scope, page = nil)
         case scope
         when 'snippet_titles'
-          snippet_titles.records
+          snippet_titles.records.page(page).per(per_page)
         when 'snippet_blobs'
           Kaminari.paginate_array(snippet_blobs.records.map{|snippet| chunk_snippet(snippet)}).page(1).per(5)
         else
