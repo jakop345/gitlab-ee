@@ -1,4 +1,4 @@
-class ElasticIndexer
+class ElasticIndexerWorker
   include Sidekiq::Worker
   
   sidekiq_options queue: :elasticsearch
@@ -6,9 +6,7 @@ class ElasticIndexer
   Client = Elasticsearch::Client.new(host: Gitlab.config.elasticsearch.host,
                                      port: Gitlab.config.elasticsearch.port)
 
-  def self.perform(operation, klass, record_id, options={})
-    Logger.debug [operation, "#{klass}##{record_id} #{options.inspect}"]
-
+  def perform(operation, klass, record_id, options={})
     cklass = klass.constantize
 
     case operation.to_s
