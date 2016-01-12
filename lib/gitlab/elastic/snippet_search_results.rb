@@ -11,9 +11,9 @@ module Gitlab
       def objects(scope, page = nil)
         case scope
         when 'snippet_titles'
-          Kaminari.paginate_array(snippet_titles).page(page).per(per_page)
+          snippet_titles
         when 'snippet_blobs'
-          Kaminari.paginate_array(snippet_blobs).page(page).per(per_page)
+          snippet_blobs
         else
           super
         end
@@ -24,24 +24,31 @@ module Gitlab
       end
 
       def snippet_titles_count
-        @snippet_titles_count ||= snippet_titles.count
+        @snippet_titles_count ||= snippet_titles.total_count
       end
 
       def snippet_blobs_count
-        @snippet_blobs_count ||= snippet_blobs.count
+        @snippet_blobs_count ||= snippet_blobs.total_count
       end
 
       private
 
       def snippet_titles
-        Snippet.where(id: limit_snippet_ids).search(query).order('updated_at DESC')
+        opt = {
+          ids: limit_snippet_ids
+        }
+
+        Snippet.elastic_search(query, options: opt)
       end
 
       def snippet_blobs
-        search = Snippet.where(id: limit_snippet_ids).search_code(query)
-        search = search.order('updated_at DESC').to_a
+        opt = {
+          ids: limit_snippet_ids
+        }
+
+        search = Snippet.elastic_search_code(query, options: opt)
         snippets = []
-        search.each { |e| snippets << chunk_snippet(e) }
+        search.records.each { |e| snippets << chunk_snippet(e) }
         snippets
       end
 

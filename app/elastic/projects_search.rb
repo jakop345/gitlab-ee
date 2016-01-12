@@ -7,11 +7,11 @@ module ProjectsSearch
     mappings do
       indexes :id,                  type: :integer, index: 'not_analyzed'
 
-      indexes :name,                type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :path,                type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :name_with_namespace, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :path_with_namespace, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :description,         type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
+      indexes :name,                type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :path,                type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :name_with_namespace, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :path_with_namespace, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :description,         type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
 
       indexes :namespace_id,        type: :integer, index: 'not_analyzed'
 
@@ -21,31 +21,13 @@ module ProjectsSearch
       indexes :last_activity_at,    type: :date
       indexes :last_pushed_at,      type: :date
 
-      indexes :owners,              type: :nested
-      indexes :masters,             type: :nested
-      indexes :developers,          type: :nested
-      indexes :reporters,           type: :nested
-      indexes :guests,              type: :nested
-
-      indexes :categories,          type: :nested
-
       indexes :name_with_namespace_sort, type: :string, index: 'not_analyzed'
       indexes :created_at_sort, type: :string, index: 'not_analyzed'
       indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
-    def as_indexed_json(options={})
-      as_json(
-        include: {
-          owners: { only: :id },
-          masters: { only: :id },
-          developers: { only: :id },
-          reporters: { only: :id },
-          guests: { only: :id },
-
-          categories: { only: :name}
-        }
-      ).merge({
+    def as_indexed_json(options = {})
+      as_json.merge({
         name_with_namespace: name_with_namespace,
         name_with_namespace_sort: name_with_namespace.downcase,
         path_with_namespace: path_with_namespace,
@@ -81,13 +63,6 @@ module ProjectsSearch
               field: :namespace_id,
               all_terms: true,
               size: Namespace.count
-            }
-          },
-          categoryFacet: {
-            terms: {
-              field: "categories.name",
-              all_terms: true,
-              size: Project.category_counts.to_a.count
             }
           }
         },
@@ -133,18 +108,6 @@ module ProjectsSearch
         }
       end
 
-      if options[:category]
-        query_hash[:query][:filtered][:filter] ||= { and: [] }
-        query_hash[:query][:filtered][:filter][:and] << {
-          nested: {
-            path: :categories,
-            filter: {
-              term: { "categories.name" => options[:category] }
-            }
-          }
-        }
-      end
-
       if options[:non_archived]
         query_hash[:query][:filtered][:filter] ||= { and: [] }
         query_hash[:query][:filtered][:filter][:and] << {
@@ -167,9 +130,9 @@ module ProjectsSearch
         query_hash[:query][:filtered][:filter] ||= { and: [] }
         query_hash[:query][:filtered][:filter][:and] << {
           nested: {
-            path: :owners,
+            path: :owner,
             filter: {
-              term: { "owners.id" => options[:owner_id] }
+              term: { "owner.id" => options[:owner_id] }
             }
           }
         }

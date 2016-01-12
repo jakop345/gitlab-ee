@@ -6,13 +6,13 @@ module UsersSearch
 
     mappings do
       indexes :id,          type: :integer
-      indexes :email,       type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :name,        type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :username,    type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
+      indexes :email,       type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :name,        type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :username,    type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
       indexes :bio,         type: :string
-      indexes :skype,       type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
+      indexes :skype,       type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
       indexes :linkedin,    type: :string
-      indexes :twitter,     type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
+      indexes :twitter,     type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
       indexes :state,       type: :string
       indexes :website_url, type: :string
       indexes :created_at,  type: :date
@@ -33,7 +33,6 @@ module UsersSearch
 
     def self.elastic_search(query, page: 1, per: 20, options: {})
       page ||= 1
-      per ||= 20
 
       if options[:in].blank?
         options[:in] = %w(name^3 username^2 email)

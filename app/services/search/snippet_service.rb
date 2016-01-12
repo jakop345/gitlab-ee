@@ -13,6 +13,7 @@ module Search
         Gitlab::Elastic::SnippetSearchResults.new(snippet_ids, params[:search])
       else  
         Gitlab::SnippetSearchResults.new(snippet_ids, params[:search])
+      end
     end
   end
 end

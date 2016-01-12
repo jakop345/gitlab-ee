@@ -8,10 +8,10 @@ module MergeRequestsSearch
       indexes :id,            type: :integer, index: :not_analyzed
 
       indexes :iid,           type: :integer, index: :not_analyzed
-      indexes :target_branch, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :source_branch, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :title,         type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
-      indexes :description,   type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, index_analyzer: :index_analyzer
+      indexes :target_branch, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :source_branch, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :title,         type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :description,   type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
       indexes :created_at,    type: :date
       indexes :updated_at,    type: :date
       indexes :state,         type: :string

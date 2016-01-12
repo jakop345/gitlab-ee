@@ -2,7 +2,7 @@ module RepositoriesSearch
   extend ActiveSupport::Concern
 
   included do
-    include Elasticsearch::Git::Repository
+    # include Elasticsearch::Git::Repository
 
     self.__elasticsearch__.client = Elasticsearch::Client.new host: Gitlab.config.elasticsearch.host, port: Gitlab.config.elasticsearch.port
 

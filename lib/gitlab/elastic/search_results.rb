@@ -15,37 +15,37 @@ module Gitlab
       def objects(scope, page = nil)
         case scope
         when 'projects'
-          projects.page(page).per(per_page)
+          projects
         when 'issues'
-          issues.page(page).per(per_page)
+          issues
         when 'merge_requests'
-          merge_requests.page(page).per(per_page)
+          merge_requests
         when 'milestones'
-          milestones.page(page).per(per_page)
+          milestones
         else
-          Kaminari.paginate_array([]).page(page).per(per_page)
+          Kaminari.paginate_array([])
         end
       end
 
       def total_count
-        @total_count ||= projects_count + issues_count + merge_requests_count + milestones_count
+        @total_count ||= projects_count + issues_count + merge_requests_count# + milestones_count
       end
 
       def projects_count
-        @projects_count ||= projects.count
+        @projects_count ||= projects.total_count
       end
 
       def issues_count
-        @issues_count ||= issues.count
+        @issues_count ||= issues.total_count
       end
 
       def merge_requests_count
-        @merge_requests_count ||= merge_requests.count
+        @merge_requests_count ||= merge_requests.total_count
       end
 
-      def milestones_count
-        @milestones_count ||= milestones.count
-      end
+      # def milestones_count
+      #   @milestones_count ||= milestones.total_count
+      # end
 
       def empty?
         total_count.zero?
@@ -54,33 +54,47 @@ module Gitlab
       private
 
       def projects
-        Project.where(id: limit_project_ids).elastic_search(query)
+        opt = {
+          pids: projects_ids,
+          fields: %w(name^10 path^9 description^5
+             name_with_namespace^2 path_with_namespace),
+          highlight: true
+        }
+
+        @projects = Project.elastic_search(query, options: opt)
       end
 
       def issues
-        issues = Issue.where(project_id: limit_project_ids)
+        opt = {
+          projects_ids: projects_ids
+        }
+
         if query =~ /#(\d+)\z/
-          issues = issues.where(iid: $1)
+          issues = Issue.where(project_id: limit_project_ids).where(iid: $1)
         else
-          issues = issues.elastic_search(query)
+          issues = Issue.elastic_search(query, options: opt)
         end
-        issues.order('updated_at DESC')
       end
 
-      def milestones
-        milestones = Milestone.where(project_id: limit_project_ids)
-        milestones = milestones.elastic_search(query)
-        milestones.order('updated_at DESC')
-      end
+      # def milestones
+      #   opt = {
+      #     projects_ids: projects_ids
+      #   }
+
+      #   milestones = Milestone.elastic_search(query, options: opt)
+      # end
 
       def merge_requests
-        merge_requests = MergeRequest.in_projects(limit_project_ids)
+        opt = {
+          projects_ids: projects_ids,
+          highlight: true
+        }
+
         if query =~ /[#!](\d+)\z/
-          merge_requests = merge_requests.where(iid: $1)
+          merge_requests = MergeRequest.in_projects(limit_project_ids).where(iid: $1)
         else
-          merge_requests = merge_requests.elastic_search(query)
+          merge_requests = MergeRequest.elastic_search(query, options: opt)
         end
-        merge_requests.order('updated_at DESC')
       end
 
       def default_scope

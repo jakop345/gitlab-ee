@@ -10,44 +10,44 @@ module ApplicationSearch
 
     settings \
       index: {
-      query: {
-        default_field: :name
-      },
-      analysis: {
-        :analyzer => {
-          :index_analyzer => {
-            type: "custom",
-            tokenizer: "ngram_tokenizer",
-            filter: %w(lowercase asciifolding name_ngrams)
+        query: {
+          default_field: :name
+        },
+        analysis: {
+          :analyzer => {
+            :my_analyzer => {
+              type: "custom",
+              tokenizer: "ngram_tokenizer",
+              filter: %w(lowercase asciifolding name_ngrams)
+            },
+            :search_analyzer => {
+              type: "custom",
+              tokenizer: "standard",
+              filter: %w(lowercase asciifolding)
+            }
           },
-          :search_analyzer => {
-            type: "custom",
-            tokenizer: "standard",
-            filter: %w(lowercase asciifolding )
-          }
-        },
-        tokenizer: {
-          ngram_tokenizer: {
-            type: "NGram",
-            min_gram: 1,
-            max_gram: 20,
-            token_chars: %w(letter digit connector_punctuation punctuation)
-          }
-        },
-        filter: {
-          name_ngrams: {
-            type:     "NGram",
-            max_gram: 20,
-            min_gram: 1
+          tokenizer: {
+            ngram_tokenizer: {
+              type: "nGram",
+              min_gram: 1,
+              max_gram: 20,
+              token_chars: %w(letter digit connector_punctuation punctuation)
+            }
+          },
+          filter: {
+            name_ngrams: {
+              type:     "nGram",
+              max_gram: 20,
+              min_gram: 1
+            }
           }
         }
       }
-    }
 
-    # after_commit lambda { Resque.enqueue(Elastic::BaseIndexer, :index,  self.class.to_s, self.id) }, on: :create
-    # after_commit lambda { Resque.enqueue(Elastic::BaseIndexer, :update, self.class.to_s, self.id) }, on: :update
-    # after_commit lambda { Resque.enqueue(Elastic::BaseIndexer, :delete, self.class.to_s, self.id) }, on: :destroy
-    # after_touch  lambda { Resque.enqueue(Elastic::BaseIndexer, :update, self.class.to_s, self.id) }
+    after_commit lambda { ElasticIndexer.perform_async(:index, self.class.to_s, self.id) }, on: :create
+    after_commit lambda { ElasticIndexer.perform_async(:update, self.class.to_s, self.id) }, on: :update
+    after_commit lambda { ElasticIndexer.perform_async(:delete, self.class.to_s, self.id) }, on: :destroy
+    after_touch  lambda { ElasticIndexer.perform_async(:update, self.class.to_s, self.id) }
   end
 
    module ClassMethods

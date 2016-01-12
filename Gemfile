@@ -95,8 +95,8 @@ gem "six", '~> 0.2.0'
 gem "seed-fu", '~> 2.3.5'
 
 # Search
-gem 'elasticsearch-model',  github: 'elasticsearch/elasticsearch-rails',  ref: '88b6597e47c9f45024b603faeddb0a85b47e1fce'
-gem 'elasticsearch-rails',  github: 'elasticsearch/elasticsearch-rails'
+gem 'elasticsearch-model'
+gem 'elasticsearch-rails'
 
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 1.11.0'
