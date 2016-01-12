@@ -246,6 +246,12 @@ Settings.gitlab['import_sources'] ||= ['github','bitbucket','gitlab','gitorious'
 
 
 #
+# Elasticseacrh
+#
+Settings['elasticsearch'] ||= Settingslogic.new({})
+Settings.elasticsearch['enabled']    = false if Settings.elasticsearch['enabled'].nil?
+
+#
 # CI
 #
 Settings['gitlab_ci'] ||= Settingslogic.new({})

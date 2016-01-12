@@ -137,7 +137,10 @@ production: &base
     # storage_path: shared/lfs-objects
 
   ## Elasticsearch (EE only)
+  # Enable it if you are going to use elasticsearch instead of
+  # regular database search
   elasticsearch:
+    enabled: false
     host: localhost
     port: 9200
 
