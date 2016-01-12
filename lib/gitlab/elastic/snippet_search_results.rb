@@ -13,7 +13,11 @@ module Gitlab
         when 'snippet_titles'
           snippet_titles.records.page(page).per(per_page)
         when 'snippet_blobs'
-          Kaminari.paginate_array(snippet_blobs.records.map{|snippet| chunk_snippet(snippet)}).page(1).per(5)
+          Kaminari.paginate_array(
+            snippet_blobs.records.map do
+              |snippet| chunk_snippet(snippet)
+            end
+          ).page(page).per(per_page)
         else
           super
         end
