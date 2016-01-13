@@ -18,7 +18,7 @@ module NotesSearch
     end
 
     def self.elastic_search(query, options: {})
-      options[:in] = "note"
+      options[:in] = ["note"]
 
       query_hash = {
         query: {
@@ -48,7 +48,6 @@ module NotesSearch
       ]
 
       query_hash[:highlight] = highlight_options(options[:in])
-      
 
       self.__elasticsearch__.search(query_hash)
     end

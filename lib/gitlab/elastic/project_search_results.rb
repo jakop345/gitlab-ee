@@ -17,7 +17,7 @@ module Gitlab
       def objects(scope, page = nil)
         case scope
         when 'notes'
-          notes.page(page).per(per_page)
+          notes.records.page(page).per(per_page)
         when 'blobs'
           Kaminari.paginate_array(blobs).page(page).per(per_page)
         when 'wiki_blobs'
@@ -53,25 +53,27 @@ module Gitlab
       private
 
       def blobs
-        if project.empty_repo? || query.blank?
-          []
-        else
-          project.repository.search_files(query, repository_ref)
-        end
+        Kaminari.paginate_array([])
+        # if project.empty_repo? || query.blank?
+        #   []
+        # else
+        #   project.repository.search_files(query, repository_ref)
+        # end
       end
 
       def wiki_blobs
-        if project.wiki_enabled? && query.present?
-          project_wiki = ProjectWiki.new(project)
+        Kaminari.paginate_array([])
+        # if project.wiki_enabled? && query.present?
+        #   project_wiki = ProjectWiki.new(project)
 
-          unless project_wiki.empty?
-            project_wiki.search_files(query)
-          else
-            []
-          end
-        else
-          []
-        end
+        #   unless project_wiki.empty?
+        #     project_wiki.search_files(query)
+        #   else
+        #     []
+        #   end
+        # else
+        #   []
+        # end
       end
 
       def notes
@@ -83,11 +85,12 @@ module Gitlab
       end
 
       def commits
-        if project.empty_repo? || query.blank?
-          []
-        else
-          project.repository.find_commits_by_message(query).compact
-        end
+        Kaminari.paginate_array([])
+        # if project.empty_repo? || query.blank?
+        #   []
+        # else
+        #   project.repository.find_commits_by_message(query).compact
+        # end
       end
 
       def limit_project_ids

@@ -52,15 +52,6 @@ module MergeRequestsSearch
               }
             },
           },
-        },
-        facets: {
-          targetProjectFacet: {
-            terms: {
-              field: :target_project_id,
-              all_terms: true,
-              size: Project.count
-            }
-          }
         }
       }
 

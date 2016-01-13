@@ -19,7 +19,7 @@ module Gitlab
         when 'issues'
           issues.records.page(page).per(per_page)
         when 'merge_requests'
-          merge_requests
+          merge_requests.records.page(page).per(per_page)
         when 'milestones'
           milestones.records.page(page).per(per_page)
         else
