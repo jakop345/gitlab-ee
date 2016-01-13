@@ -44,15 +44,6 @@ module ProjectsSearch
             },
           },
         },
-        facets: {
-          namespaceFacet: {
-            terms: {
-              field: :namespace_id,
-              all_terms: true,
-              size: Namespace.count
-            }
-          }
-        }
       }
 
       if query.blank?
