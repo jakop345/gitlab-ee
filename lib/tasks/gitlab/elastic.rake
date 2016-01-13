@@ -1,7 +1,7 @@
 namespace :gitlab do
   namespace :elastic do
     desc "Indexing repositories"
-    task :index_repository do
+    task index_repository: :environment  do
       Repository.import
     end
 

@@ -85,12 +85,12 @@ module Gitlab
       end
 
       def commits
-        Kaminari.paginate_array([])
-        # if project.empty_repo? || query.blank?
-        #   []
-        # else
-        #   project.repository.find_commits_by_message(query).compact
-        # end
+        binding.pry
+        if project.empty_repo? || query.blank?
+          []
+        else
+          project.repository.search(query, type: :commit)[:commits][:results]
+        end
       end
 
       def limit_project_ids
