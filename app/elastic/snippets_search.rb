@@ -38,9 +38,7 @@ module SnippetsSearch
       })
     end
 
-    def self.elastic_search(query, page: 1, per: 20, options: {})
-      page ||= 1
-
+    def self.elastic_search(query, options: {})
       if options[:in].blank?
         options[:in] = %w(title file_name)
       else
@@ -58,9 +56,7 @@ module SnippetsSearch
               }
             },
           },
-        },
-        size: per,
-        from: per * (page.to_i - 1)
+        }
       }
 
       if query.blank?
@@ -84,17 +80,13 @@ module SnippetsSearch
       self.__elasticsearch__.search(query_hash)
     end
 
-    def self.elastic_search_code(query, page: 1, per: 20, options: {})
-      page ||= 1
-
+    def self.elastic_search_code(query, options: {})
       query_hash = {
         query: {
           filtered: {
             query: {match: {content: query}},
           },
-        },
-        size: per,
-        from: per * (page.to_i - 1)
+        }
       }
 
       if options[:ids]

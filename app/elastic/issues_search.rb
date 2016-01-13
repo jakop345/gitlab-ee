@@ -38,9 +38,7 @@ module IssuesSearch
       })
     end
 
-    def self.elastic_search(query, page: 1, per: 20, options: {})
-      page ||= 1
-
+    def self.elastic_search(query, options: {})
       if options[:in].blank?
         options[:in] = %w(title^2 description)
       else
@@ -58,9 +56,7 @@ module IssuesSearch
               }
             },
           },
-        },
-        size: per,
-        from: per * (page.to_i - 1)
+        }
       }
 
       if query.blank?

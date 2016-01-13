@@ -5,6 +5,7 @@ module Gitlab
 
       def initialize(project_id, query, repository_ref = nil)
         @project = Project.find(project_id)
+
         @repository_ref = if repository_ref.present?
                             repository_ref
                           else

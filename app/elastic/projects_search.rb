@@ -36,9 +36,7 @@ module ProjectsSearch
       })
     end
 
-    def self.elastic_search(query, page: 1, per: 20, options: {})
-      page ||= 1
-
+    def self.elastic_search(query, options: {})
       if options[:in].blank?
         options[:in] = %w(name^10 name_with_namespace^2 path_with_namespace path^9)
       else
@@ -65,9 +63,7 @@ module ProjectsSearch
               size: Namespace.count
             }
           }
-        },
-        size: per,
-        from: per * (page.to_i - 1)
+        }
       }
 
       if query.blank?
