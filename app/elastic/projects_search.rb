@@ -20,28 +20,17 @@ module ProjectsSearch
       indexes :visibility_level,    type: :integer, index: 'not_analyzed'
       indexes :last_activity_at,    type: :date
       indexes :last_pushed_at,      type: :date
-
-      indexes :name_with_namespace_sort, type: :string, index: 'not_analyzed'
-      indexes :created_at_sort, type: :string, index: 'not_analyzed'
-      indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options = {})
       as_json.merge({
         name_with_namespace: name_with_namespace,
-        name_with_namespace_sort: name_with_namespace.downcase,
-        path_with_namespace: path_with_namespace,
-        updated_at_sort: updated_at,
-        created_at_sort: created_at
+        path_with_namespace: path_with_namespace
       })
     end
 
     def self.elastic_search(query, options: {})
-      if options[:in].blank?
-        options[:in] = %w(name^10 name_with_namespace^2 path_with_namespace path^9)
-      else
-        options[:in].push(%w(name^10 name_with_namespace^2 path_with_namespace path^9) - options[:in])
-      end
+      options[:in] = %w(name^10 name_with_namespace^2 path_with_namespace path^9)
 
       query_hash = {
         query: {
@@ -143,28 +132,10 @@ module ProjectsSearch
         }
       end
 
-      options[:order] = :default if options[:order].blank?
-      order = case options[:order].to_sym
-              when :newest
-                { created_at_sort: { order: :asc, mode: :min } }
-              when :oldest
-                { created_at_sort: { order: :desc, mode: :min } }
-              when :recently_updated
-                { updated_at_sort: { order: :asc, mode: :min } }
-              when :last_updated
-                { updated_at_sort: { order: :desc, mode: :min } }
-              else
-                { name_with_namespace_sort: { order: :asc, mode: :min } }
-              end
+      query_hash[:sort] = [:_score]
 
-      query_hash[:sort] = [
-        order,
-        :_score
-      ]
-
-      if options[:highlight]
-        query_hash[:highlight] = highlight_options(options[:in])
-      end
+      query_hash[:highlight] = highlight_options(options[:in])
+      
 
       self.__elasticsearch__.search(query_hash)
     end

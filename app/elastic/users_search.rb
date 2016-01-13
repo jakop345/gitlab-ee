@@ -17,10 +17,6 @@ module UsersSearch
       indexes :website_url, type: :string
       indexes :created_at,  type: :date
       indexes :admin,       type: :boolean
-
-      indexes :name_sort,   type: :string, index: 'not_analyzed'
-      indexes :created_at_sort, type: :string, index: 'not_analyzed'
-      indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options = {})
@@ -32,11 +28,7 @@ module UsersSearch
     end
 
     def self.elastic_search(query, options: {})
-      if options[:in].blank?
-        options[:in] = %w(name^3 username^2 email)
-      else
-        options[:in].push(%w(name^3 username^2 email) - options[:in])
-      end
+      options[:in] = %w(name^3 username^2 email)
 
       query_hash = {
         query: {
@@ -75,30 +67,10 @@ module UsersSearch
         }
       end
 
-      options[:order] = :default if options[:order].blank?
-      order = case options[:order].to_sym
-              when :newest
-                { created_at_sort: { order: :asc, mode: :min } }
-              when :oldest
-                { created_at_sort: { order: :desc, mode: :min } }
-              when :recently_updated
-                { updated_at_sort: { order: :asc, mode: :min } }
-              when :last_updated
-                { updated_at_sort: { order: :desc, mode: :min } }
-              else
-                { name_sort: { order: :asc, mode: :min } }
-              end
+      query_hash[:sort] = [:_score]
 
-
-      query_hash[:sort] = [
-        order,
-        :_score
-      ]
-
-      if options[:highlight]
-        query_hash[:highlight] = highlight_options(options[:in])
-      end
-
+      query_hash[:highlight] = highlight_options(options[:in])
+      
       self.__elasticsearch__.search(query_hash)
     end
   end

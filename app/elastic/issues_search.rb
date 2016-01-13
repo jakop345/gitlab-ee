@@ -20,9 +20,7 @@ module IssuesSearch
       indexes :project,     type: :nested
       indexes :author,      type: :nested
 
-      indexes :title_sort, type: :string, index: 'not_analyzed'
       indexes :updated_at_sort, type: :date,   index: :not_analyzed
-      indexes :created_at_sort, type: :string, index: :not_analyzed
     end
 
     def as_indexed_json(options = {})
@@ -31,20 +29,12 @@ module IssuesSearch
           project:  { only: :id },
           author:   { only: :id }
         }
-      ).merge({
-        title_sort: title.downcase,
-        updated_at_sort: updated_at,
-        created_at_sort: created_at
-      })
+      ).merge({ updated_at_sort: updated_at })
     end
 
     def self.elastic_search(query, options: {})
-      if options[:in].blank?
-        options[:in] = %w(title^2 description)
-      else
-        options[:in].push(%w(title^2 description) - options[:in])
-      end
-
+      options[:in] = %w(title^2 description)
+      
       query_hash = {
         query: {
           filtered: {
@@ -73,30 +63,13 @@ module IssuesSearch
         }
       end
 
-      options[:order] = :default if options[:order].blank?
-      order = case options[:order].to_sym
-              when :newest
-                { created_at_sort: { order: :asc, mode: :min } }
-              when :oldest
-                { created_at_sort: { order: :desc, mode: :min } }
-              when :recently_updated
-                { updated_at_sort: { order: :asc, mode: :min } }
-              when :last_updated
-                { updated_at_sort: { order: :desc, mode: :min } }
-              else
-                { title_sort:      { order: :asc, mode: :min } }
-              end
-
-
       query_hash[:sort] = [
-        order,
+        { updated_at_sort: { order: :desc, mode: :min } },
         :_score
       ]
 
-      if options[:highlight]
-        query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
-      end
-
+      query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
+      
       self.__elasticsearch__.search(query_hash)
     end
   end

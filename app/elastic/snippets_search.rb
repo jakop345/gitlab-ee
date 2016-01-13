@@ -20,9 +20,7 @@ module SnippetsSearch
       indexes :project,     type: :nested
       indexes :author,      type: :nested
 
-      indexes :title_sort, type: :string, index: :not_analyzed
       indexes :updated_at_sort, type: :date,   index: :not_analyzed
-      indexes :created_at_sort, type: :string, index: :not_analyzed
     end
 
     def as_indexed_json(options = {})
@@ -31,20 +29,12 @@ module SnippetsSearch
           project:  { only: :id },
           author:   { only: :id }
         }
-      ).merge({
-        title_sort: title.downcase,
-        updated_at_sort: updated_at,
-        created_at_sort: created_at
-      })
+      )
     end
 
     def self.elastic_search(query, options: {})
-      if options[:in].blank?
-        options[:in] = %w(title file_name)
-      else
-        options[:in].push(%w(title file_name) - options[:in])
-      end
-
+      options[:in] = %w(title file_name)
+      
       query_hash = {
         query: {
           filtered: {
@@ -73,14 +63,19 @@ module SnippetsSearch
         }
       end
 
-      if options[:highlight]
-        query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
-      end
+      query_hash[:sort] = [
+        { updated_at_sort: { order: :desc, mode: :min } },
+        :_score
+      ]
+
+      query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
 
       self.__elasticsearch__.search(query_hash)
     end
 
     def self.elastic_search_code(query, options: {})
+      options[:in] = %w(title file_name)
+
       query_hash = {
         query: {
           filtered: {
@@ -98,9 +93,12 @@ module SnippetsSearch
         }
       end
 
-      if options[:highlight]
-        query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
-      end
+      query_hash[:sort] = [
+        { updated_at_sort: { order: :desc, mode: :min } },
+        :_score
+      ]
+
+      query_hash[:highlight] = { fields: options[:in].inject({}) { |a, o| a[o.to_sym] = {} } }
 
       self.__elasticsearch__.search(query_hash)
     end

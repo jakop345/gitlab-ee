@@ -10,21 +10,15 @@ module NotesSearch
       indexes :project_id,  type: :integer, index: :not_analyzed
       indexes :created_at,  type: :date
 
-      indexes :created_at_sort, type: :string, index: 'not_analyzed'
       indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options = {})
-      as_json.merge({
-        created_at_sort: created_at,
-        updated_at_sort: updated_at
-      })
+      as_json.merge({ updated_at_sort: updated_at })
     end
 
     def self.elastic_search(query, options: {})
-      if options[:in].blank?
-        options[:in] = "note"
-      end
+      options[:in] = "note"
 
       query_hash = {
         query: {
@@ -48,28 +42,13 @@ module NotesSearch
         }
       end
 
-      options[:order] = :default if options[:order].blank?
-      order = case options[:order].to_sym
-              when :newest
-                { created_at_sort: { order: :asc, mode: :min } }
-              when :oldest
-                { created_at_sort: { order: :desc, mode: :min } }
-              when :recently_updated
-                { updated_at_sort: { order: :asc, mode: :min } }
-              when :last_updated
-                { updated_at_sort: { order: :desc, mode: :min } }
-              else
-                { name_sort: { order: :asc, mode: :min } }
-              end
-
       query_hash[:sort] = [
-        order,
+        { updated_at_sort: { order: :desc, mode: :min } },
         :_score
       ]
 
-      if options[:highlight]
-        query_hash[:highlight] = highlight_options(options[:in])
-      end
+      query_hash[:highlight] = highlight_options(options[:in])
+      
 
       self.__elasticsearch__.search(query_hash)
     end

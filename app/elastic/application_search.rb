@@ -56,11 +56,7 @@ module ApplicationSearch
          memo
        end
 
-       {
-           pre_tags: ["gitlabelasticsearch→"],
-           post_tags: ["←gitlabelasticsearch"],
-           fields: es_fields
-       }
+       { fields: es_fields }
      end
    end
 end
