@@ -15,20 +15,20 @@ module Gitlab
       def objects(scope, page = nil)
         case scope
         when 'projects'
-          projects
+          projects.records.page(page).per(per_page)
         when 'issues'
-          issues
+          issues.records.page(page).per(per_page)
         when 'merge_requests'
           merge_requests
         when 'milestones'
-          milestones
+          milestones.records.page(page).per(per_page)
         else
           Kaminari.paginate_array([])
         end
       end
 
       def total_count
-        @total_count ||= projects_count + issues_count + merge_requests_count# + milestones_count
+        @total_count ||= projects_count + issues_count + merge_requests_count + milestones_count
       end
 
       def projects_count
@@ -43,9 +43,9 @@ module Gitlab
         @merge_requests_count ||= merge_requests.total_count
       end
 
-      # def milestones_count
-      #   @milestones_count ||= milestones.total_count
-      # end
+      def milestones_count
+        @milestones_count ||= milestones.total_count
+      end
 
       def empty?
         total_count.zero?
@@ -55,10 +55,7 @@ module Gitlab
 
       def projects
         opt = {
-          pids: projects_ids,
-          fields: %w(name^10 path^9 description^5
-             name_with_namespace^2 path_with_namespace),
-          highlight: true
+          pids: limit_project_ids
         }
 
         @projects = Project.elastic_search(query, options: opt)
@@ -66,7 +63,7 @@ module Gitlab
 
       def issues
         opt = {
-          projects_ids: projects_ids
+          projects_ids: limit_project_ids
         }
 
         if query =~ /#(\d+)\z/
@@ -76,18 +73,17 @@ module Gitlab
         end
       end
 
-      # def milestones
-      #   opt = {
-      #     projects_ids: projects_ids
-      #   }
+      def milestones
+        opt = {
+          projects_ids: limit_project_ids
+        }
 
-      #   milestones = Milestone.elastic_search(query, options: opt)
-      # end
+        milestones = Milestone.elastic_search(query, options: opt)
+      end
 
       def merge_requests
         opt = {
-          projects_ids: projects_ids,
-          highlight: true
+          projects_ids: limit_project_ids
         }
 
         if query =~ /[#!](\d+)\z/

@@ -6,7 +6,7 @@ class ElasticIndexerWorker
   Client = Elasticsearch::Client.new(host: Gitlab.config.elasticsearch.host,
                                      port: Gitlab.config.elasticsearch.port)
 
-  def perform(operation, klass, record_id, options={})
+  def perform(operation, klass, record_id, options = {})
     klass = "Snippet" if klass =~ /Snippet$/
 
     cklass = klass.constantize

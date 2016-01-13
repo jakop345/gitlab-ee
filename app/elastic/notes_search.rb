@@ -1,4 +1,4 @@
-module GroupsSearch
+module NotesSearch
   extend ActiveSupport::Concern
 
   included do
@@ -6,44 +6,32 @@ module GroupsSearch
 
     mappings do
       indexes :id,          type: :integer
-      indexes :name,        type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
-      indexes :path,        type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
-      indexes :description, type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :note,        type: :string, index_options: 'offsets', search_analyzer: :search_analyzer, analyzer: :my_analyzer
+      indexes :project_id,  type: :integer, index: :not_analyzed
       indexes :created_at,  type: :date
 
-      indexes :name_sort,   type: :string, index: :not_analyzed
       indexes :created_at_sort, type: :string, index: 'not_analyzed'
       indexes :updated_at_sort, type: :string, index: 'not_analyzed'
     end
 
     def as_indexed_json(options = {})
       as_json.merge({
-        name_sort: name.downcase,
         created_at_sort: created_at,
         updated_at_sort: updated_at
       })
     end
 
     def self.elastic_search(query, page: 1, per: 20, options: {})
-
       page ||= 1
 
       if options[:in].blank?
-        options[:in] = %w(name^10 path^5)
-      else
-        options[:in].push(%w(name^10 path^5) - options[:in])
+        options[:in] = "note"
       end
 
       query_hash = {
         query: {
           filtered: {
-            query: {
-              multi_match: {
-                fields: options[:in],
-                query: "#{query}",
-                operator: :and
-              }
-            },
+            query: {match: {note: query}},
           },
         },
         size: per,
@@ -55,11 +43,11 @@ module GroupsSearch
         query_hash[:track_scores] = true
       end
 
-      if options[:gids]
+      if options[:project_ids]
         query_hash[:query][:filtered][:filter] ||= { and: [] }
         query_hash[:query][:filtered][:filter][:and] << {
-          ids: {
-            values: options[:gids]
+          terms: {
+            project_id: [options[:project_ids]].flatten
           }
         }
       end

@@ -23,6 +23,7 @@ class Milestone < ActiveRecord::Base
   include InternalId
   include Sortable
   include StripAttribute
+  include MilestonesSearch
 
   belongs_to :project
   has_many :issues

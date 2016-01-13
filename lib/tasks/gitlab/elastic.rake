@@ -7,7 +7,7 @@ namespace :gitlab do
 
     desc "Create indexes in the Elasticsearch from database records"
     task create_index: :environment do
-      [Project, Group, User, Issue, MergeRequest, Snippet].each do |klass|
+      [Project, User, Issue, MergeRequest, Snippet, Note, Milestone].each do |klass|
         klass.__elasticsearch__.create_index!
         klass.import
       end
