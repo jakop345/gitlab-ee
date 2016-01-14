@@ -178,6 +178,9 @@ gem 'tinder', '~> 1.10.0'
 # HipChat integration
 gem 'hipchat', '~> 1.5.0'
 
+# JIRA integration
+gem 'jira-ruby', '~> 0.1.17'
+
 # Flowdock integration
 gem 'gitlab-flowdock-git-hook', '~> 1.0.1'
 
