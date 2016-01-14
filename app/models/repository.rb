@@ -103,6 +103,12 @@ class Repository
     commits
   end
 
+  def find_commits_by_message_with_elastic(query)
+    project.repository.search(query, type: :commit)[:commits][:results].map do |result|
+      commit result["_source"]["commit"]["sha"]
+    end
+  end
+
   def find_branch(name)
     raw_repository.branches.find { |branch| branch.name == name }
   end

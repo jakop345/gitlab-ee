@@ -47,7 +47,7 @@ module Gitlab
       end
 
       def commits_count
-        @commits_count ||= commits.total_count
+        @commits_count ||= commits.count
       end
 
       private
@@ -85,11 +85,10 @@ module Gitlab
       end
 
       def commits
-        binding.pry
         if project.empty_repo? || query.blank?
           []
         else
-          project.repository.search(query, type: :commit)[:commits][:results]
+          project.repository.find_commits_by_message_with_elastic(query)
         end
       end
 
