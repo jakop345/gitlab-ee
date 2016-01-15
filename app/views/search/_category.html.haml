@@ -1,12 +1,12 @@
 %ul.nav.nav-tabs.search-filter
   - if @project
-    / %li{class: ("active" if @scope == 'blobs')}
-    /   = link_to search_filter_path(scope: 'blobs') do
-    /     = icon('code fw')
-    /     %span
-    /       Code
-    /       %span.badge
-    /         = @search_results.blobs_count
+    %li{class: ("active" if @scope == 'blobs')}
+      = link_to search_filter_path(scope: 'blobs') do
+        = icon('code fw')
+        %span
+          Code
+          %span.badge
+            = @search_results.blobs_count
     %li{class: ("active" if @scope == 'issues')}
       = link_to search_filter_path(scope: 'issues') do
         = icon('exclamation-circle fw')
