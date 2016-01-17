@@ -78,7 +78,7 @@ module Gitlab
 
       def commits
         if project.empty_repo? || query.blank?
-          []
+          Kaminari.paginate_array([])
         else
           project.repository.find_commits_by_message_with_elastic(query)
         end
