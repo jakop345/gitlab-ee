@@ -21,7 +21,7 @@ module Gitlab
         when 'blobs'
           blobs.response.page(page).per(per_page)
         when 'wiki_blobs'
-          Kaminari.paginate_array(wiki_blobs).page(page).per(per_page)
+          wiki_blobs.response.page(page).per(per_page)
         when 'commits'
           Kaminari.paginate_array(commits).page(page).per(per_page)
         else
@@ -54,25 +54,18 @@ module Gitlab
 
       def blobs
         if project.empty_repo? || query.blank?
-          []
+          Kaminari.paginate_array([])
         else
           project.repository.search(query, type: :blob, options: {highlight: true})[:blobs][:results]
         end
       end
 
       def wiki_blobs
-        Kaminari.paginate_array([])
-        # if project.wiki_enabled? && query.present?
-        #   project_wiki = ProjectWiki.new(project)
-
-        #   unless project_wiki.empty?
-        #     project_wiki.search_files(query)
-        #   else
-        #     []
-        #   end
-        # else
-        #   []
-        # end
+        if project.wiki_enabled? && !project.wiki.empty? && query.present?
+          project.wiki.search(query, type: :blob, options: {highlight: true})[:blobs][:results]
+        else
+          Kaminari.paginate_array([])
+        end
       end
 
       def notes

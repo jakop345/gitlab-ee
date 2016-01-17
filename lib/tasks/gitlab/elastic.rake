@@ -5,6 +5,11 @@ namespace :gitlab do
       Repository.import
     end
 
+    desc "Indexing all wikis"
+    task index_wiki: :environment  do
+      ProjectWiki.import
+    end
+
     desc "Create indexes in the Elasticsearch from database records"
     task create_index: :environment do
       [Project, User, Issue, MergeRequest, Snippet, Note, Milestone].each do |klass|
