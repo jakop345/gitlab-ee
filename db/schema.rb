@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160119112418) do
+ActiveRecord::Schema.define(version: 20160119145451) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -814,19 +814,19 @@ ActiveRecord::Schema.define(version: 20160119112418) do
     t.string   "type"
     t.string   "title"
     t.integer  "project_id"
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
-    t.boolean  "active",                                               null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.boolean  "active",                default: false,    null: false
     t.text     "properties"
-    t.boolean  "template",                          default: false
-    t.boolean  "push_events",                       default: true
-    t.boolean  "issues_events",                     default: true
-    t.boolean  "merge_requests_events",             default: true
-    t.boolean  "tag_push_events",                   default: true
-    t.boolean  "note_events",                       default: true,     null: false
-    t.boolean  "build_events",                      default: false,    null: false
-    t.string   "category",                          default: "common", null: false
-    t.boolean  "default",                           default: false
+    t.boolean  "template",              default: false
+    t.boolean  "push_events",           default: true
+    t.boolean  "issues_events",         default: true
+    t.boolean  "merge_requests_events", default: true
+    t.boolean  "tag_push_events",       default: true
+    t.boolean  "note_events",           default: true,     null: false
+    t.boolean  "build_events",          default: false,    null: false
+    t.string   "category",              default: "common", null: false
+    t.boolean  "default",               default: false
   end
 
   add_index "services", ["category"], name: "index_services_on_category", using: :btree
@@ -945,6 +945,7 @@ ActiveRecord::Schema.define(version: 20160119112418) do
     t.text     "note"
     t.string   "unlock_token"
     t.datetime "otp_grace_period_started_at"
+    t.boolean  "ldap_email",                  default: false, null: false
   end
 
   add_index "users", ["admin"], name: "index_users_on_admin", using: :btree
