@@ -5,6 +5,7 @@ v 8.4.2
   - Don't redirect away from Mirror Repository settings when repo is empty
   - Fix updating of branches in mirrored repository
   - Fix a 500 error preventing LDAP users with 2FA enabled from logging in
+  - Rake task gitlab:elastic:index_repositories handles errors and shows progress
 
 v 8.4.1
   - No EE-specific changes
