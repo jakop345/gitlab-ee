@@ -117,6 +117,26 @@ sudo gitlab-rake gitlab:elastic:index_repositories
 bundle exec rake gitlab:elastic:index_repositories RAILS_ENV=production
 ```
 
+If you want to run several tasks in parallel (probably in separate terminal
+windows) you can provide the `ID_FROM` and `ID_TO` parameters:
+
+```
+ID_FROM=1001 ID_TO=2000 sudo gitlab-rake gitlab:elastic:index_repositories
+
+```
+
+Both parameters are optional. Keep in mind that this task will skip repositories
+(and certain commits) that have already been indexed. It stores the last commit
+SHA of every indexed repository in the database. As an example, if you have
+3,000 repositories and you want to run three separate indexing tasks, you might
+run:
+
+```
+ID_TO=1000 sudo gitlab-rake gitlab:elastic:index_repositories
+ID_FROM=1001 ID_TO=2000 sudo gitlab-rake gitlab:elastic:index_repositories
+ID_FROM=2001 sudo gitlab-rake gitlab:elastic:index_repositories
+```
+
 To index all wikis:
 
 ```
@@ -126,6 +146,9 @@ sudo gitlab-rake gitlab:elastic:index_wikis
 # installations from source
 bundle exec rake gitlab:elastic:index_wikis RAILS_ENV=production
 ```
+
+The wiki indexer also supports the `ID_FROM` and `ID_TO` parameters if you want
+to limit a project set.
 
 To index all database entities:
 
@@ -144,6 +167,32 @@ Disabling the Elasticsearch integration is as easy as setting `enabled` to
 to find where those settings are and don't forget to reconfigure/restart GitLab
 for the changes to take effect.
 
+
+To minimize downtime of the search feature we recommend the following:
+
+1. Configure Elasticsearch in `gitlab.yml`, or `gitlab.rb` for Omnibus
+   installations, but do not enable it, just set a host and port.
+
+1. Create empty indexes:
+
+    ```
+    # Omnibus installations
+    sudo gitlab-rake gitlab:elastic:create_empty_indexes
+
+    # Installations from source
+    bundle exec rake gitlab:elastic:create_empty_indexes
+    ```
+
+1. Index all repositories using the `gitlab:elastic:index_repositories` Rake
+   task (see above). You'll probably want to do this in parallel.
+
+1. Enable Elasticsearch and restart GitLab.
+
+1. Run indexers for database, wikis, and repositories. By running the repository
+   indexer twice you will be sure that everything is indexed because some
+   commits could be pushed while you performed initial indexing. The repository
+   indexer will skip repositories and commits that are already indexed, so it
+   will be much shorter than the first run.
 
 [ee-109]: https://gitlab.com/gitlab-org/gitlab-ee/merge_requests/109 "Elasticsearch Merge Request"
 [elasticsearch]: https://www.elastic.co/products/elasticsearch "Elasticsearch website"
