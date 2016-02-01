@@ -11,11 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-<<<<<<< HEAD
-ActiveRecord::Schema.define(version: 20160128233227) do
-=======
 ActiveRecord::Schema.define(version: 20160129075828) do
->>>>>>> 03370b0... ES: writing index status
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -408,20 +404,6 @@ ActiveRecord::Schema.define(version: 20160129075828) do
 
   add_index "forked_project_links", ["forked_to_project_id"], name: "index_forked_project_links_on_forked_to_project_id", unique: true, using: :btree
 
-<<<<<<< HEAD
-=======
-  create_table "geo_nodes", force: :cascade do |t|
-    t.string  "schema"
-    t.string  "host"
-    t.integer "port"
-    t.string  "relative_url_root"
-    t.boolean "primary"
-  end
-
-  add_index "geo_nodes", ["host"], name: "index_geo_nodes_on_host", using: :btree
-  add_index "geo_nodes", ["primary"], name: "index_geo_nodes_on_primary", using: :btree
-
->>>>>>> 03370b0... ES: writing index status
   create_table "git_hooks", force: :cascade do |t|
     t.string   "force_push_regex"
     t.string   "delete_branch_regex"
@@ -463,7 +445,7 @@ ActiveRecord::Schema.define(version: 20160129075828) do
     t.datetime "created_at",  null: false
     t.datetime "updated_at",  null: false
   end
-
+  
   add_index "index_statuses", ["project_id"], name: "index_index_statuses_on_project_id", unique: true, using: :btree
 
   create_table "issues", force: :cascade do |t|
