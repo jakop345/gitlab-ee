@@ -37,7 +37,9 @@ namespace :gitlab do
     task index_wikis: :environment  do
       ProjectWiki.__elasticsearch__.create_index!
 
-      Project.where(wiki_enabled: true).find_each do |project|
+      projects = apply_project_filters(Project.where(wiki_enabled: true))
+
+      projects.find_each do |project|
         unless project.wiki.empty?
           puts "Indexing wiki of #{project.name_with_namespace}..."
           begin
