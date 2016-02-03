@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.4.4
+  - Re-introduce "Send email to users" link in Admin area
+
 v 8.4.3
   - Elasticsearch: fix partial blob indexing on push
   - Elasticsearch: added advanced indexer for repositories
