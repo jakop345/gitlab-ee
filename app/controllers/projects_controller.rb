@@ -235,6 +235,7 @@ class ProjectsController < ApplicationController
       :build_coverage_regex,
       :build_timeout_in_minutes,
       :builds_enabled,
+      :public_builds,
       :default_branch,
       :description,
       :import_url,
