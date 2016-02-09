@@ -777,10 +777,16 @@ ActiveRecord::Schema.define(version: 20160204190809) do
     t.boolean  "shared_runners_enabled",           default: true,     null: false
     t.string   "runners_token"
     t.string   "build_coverage_regex"
+<<<<<<< HEAD
     t.boolean  "build_allow_git_fetch",            default: true,     null: false
     t.integer  "build_timeout",                    default: 3600,     null: false
     t.boolean  "mirror_trigger_builds",            default: false,    null: false
     t.boolean  "public_builds",                    default: true,     null: false
+=======
+    t.boolean  "build_allow_git_fetch",  default: true,     null: false
+    t.integer  "build_timeout",          default: 3600,     null: false
+    t.boolean  "public_builds",          default: true,     null: false
+>>>>>>> ce/8-4-stable
   end
 
   add_index "projects", ["builds_enabled", "shared_runners_enabled"], name: "index_projects_on_builds_enabled_and_shared_runners_enabled", using: :btree
