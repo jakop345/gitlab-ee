@@ -421,6 +421,10 @@ module API
       end
     end
 
+    class BuildArtifactFile < Grape::Entity
+      expose :filename, :size
+    end
+
     class Build < Grape::Entity
       expose :id, :status, :stage, :name, :ref, :tag, :coverage
       expose :created_at, :started_at, :finished_at
@@ -432,6 +436,7 @@ module API
           repo_obj.artifacts_download_url
         end
       end
+      expose :artifacts_file, using: BuildArtifactFile, if: -> (build, opts) { build.artifacts? }
       expose :commit, with: RepoCommit do |repo_obj, _options|
         if repo_obj.respond_to?(:commit)
           repo_obj.commit.commit_data
