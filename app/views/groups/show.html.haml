@@ -32,14 +32,12 @@
     %li.active
       = link_to "#activity", 'data-toggle' => 'tab' do
         Activity
-    - if @projects.present?
-      %li
-        = link_to "#projects", 'data-toggle' => 'tab' do
-          Projects
-    - if @shared_projects.present?
-      %li
-        = link_to "#shared", 'data-toggle' => 'tab' do
-          Shared Projects
+    %li
+      = link_to "#projects", 'data-toggle' => 'tab' do
+        Projects
+    %li
+      = link_to "#shared", 'data-toggle' => 'tab' do
+        Shared Projects
 
 - if can?(current_user, :read_group, @group)
   %div{ class: container_class }
