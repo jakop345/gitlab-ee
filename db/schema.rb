@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160220123949) do
+ActiveRecord::Schema.define(version: 20160224201211) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -31,8 +31,7 @@ ActiveRecord::Schema.define(version: 20160220123949) do
     t.integer  "updated_by"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "dark_logo"
-    t.string   "light_logo"
+    t.string   "header_logo"
   end
 
   create_table "application_settings", force: :cascade do |t|
@@ -74,11 +73,11 @@ ActiveRecord::Schema.define(version: 20160220123949) do
     t.string   "recaptcha_site_key"
     t.string   "recaptcha_private_key"
     t.integer  "metrics_port",                      default: 8089
+    t.boolean  "akismet_enabled",                   default: false
+    t.string   "akismet_api_key"
     t.integer  "metrics_sample_interval",           default: 15
     t.boolean  "sentry_enabled",                    default: false
     t.string   "sentry_dsn"
-    t.boolean  "akismet_enabled",                   default: false
-    t.string   "akismet_api_key"
     t.boolean  "email_author_in_body",              default: false
   end
 
