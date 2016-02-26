@@ -10,28 +10,6 @@ module Gitlab
         Gitlab::LDAP::Config.providers
       end
 
-      # TODO: This isn't valid anymore. We have to check for group_base elsewhere
-      def update_permissions
-        update_ldap_group_links if group_base.present?
-        update_admin_status if admin_group.present?
-      end
-
-      def update_admin_status
-        admin_group = Gitlab::LDAP::Group.find_by_cn(ldap_config.admin_group, adapter)
-        admin_user = Gitlab::LDAP::Person.find_by_dn(user.ldap_identity.extern_uid, adapter)
-
-        if admin_group && admin_group.has_member?(admin_user)
-          unless user.admin?
-            user.admin = true
-            user.save
-          end
-        else
-          if user.admin?
-            user.admin = false
-            user.save
-          end
-        end
-      end
 
       # TODO: Update the docs
       # Loop through all ldap connected groups, and update the users link with it
@@ -41,15 +19,30 @@ module Gitlab
       # documentation if you change the algorithm below.
 
 
-      def update_ldap_group_links
+      def update_permissions
         providers.each do |provider|
+          config = Gitlab::LDAP::Config.new(provider)
           adapter = Gitlab::LDAP::Adapter.new(provider)
-          groups = gitlab_groups_with_ldap_link(provider)
 
-          logger.debug "Performing LDAP group sync for '#{provider}' provider"
-          sync_groups(groups, provider, adapter)
-          logger.debug "Finished LDAP group sync for '#{provider} provider'"
+          if config.group_base.present?
+            groups = gitlab_groups_with_ldap_link(provider)
+
+            logger.debug "Performing LDAP group sync for '#{provider}' provider"
+            sync_groups(groups, provider, adapter)
+            logger.debug "Finished LDAP group sync for '#{provider} provider'"
+          else
+            logger.debug "No `group_base` configured for '#{provider}' provider. Skipping"
+          end
+
+          if config.admin_group.present?
+            logger.debug "Syncing admin users for '#{provider}' provider"
+            sync_admin_users(config.admin_group, provider, adapter)
+            logger.debug "Finished syncing admin users for '#{provider} provider'"
+          else
+            logger.debug "No `admin_group` configured for '#{provider}' provider. Skipping"
+          end
         end
+
         nil
       end
 
@@ -78,6 +71,41 @@ module Gitlab
         end
       end
 
+
+      def sync_admin_users(admin_group_cn, provider, adapter)
+        admin_group = Gitlab::LDAP::Group.find_by_cn(admin_group_cn, adapter)
+        admin_group_member_dns = ldap_group_members(admin_group)
+        current_admin_users = ::User.admins
+                                .includes(:identities).references(:identities)
+                                .where(identities: { provider: provider })
+        verified_admin_users = []
+
+        # Verify existing admin users and add new ones.
+        admin_group_member_dns.each do |member_dn|
+          user = find_user_by_dn_and_provider(member_dn, provider)
+
+          if user.present?
+            user.admin = true
+            user.save
+            verified_admin_users << user
+          else
+            logger.debug <<-MSG.strip_heredoc.gsub(/\n/, ' ')
+              #{self.class.name}: User with DN `#{member_dn}` should have admin
+              access but there is no user in GitLab with that identity.
+              Membership will be updated once the user signs in for the first time.
+            MSG
+          end
+        end
+
+        # Revoke the unverified admins.
+        current_admin_users.each do |user|
+          unless verified_admin_users.include?(user)
+            user.admin = false
+            user.save
+          end
+        end
+      end
+
       private
 
       def ldap_group_members(ldap_group)
@@ -97,7 +125,8 @@ module Gitlab
         logger.debug "Updating existing membership for '#{group.name}' group"
 
         group.members.each do |member|
-          identity = member.user.identities.where(provider: provider)
+          user = member.user
+          identity = user.identities.where(provider: provider) if user.present?
           member_dn = identity.first.extern_uid if identity.present?
           desired_access = access_hash[member_dn]
 
@@ -127,27 +156,17 @@ module Gitlab
         logger.debug "Adding new members to '#{group.name}' group"
 
         access_hash.each do |member_dn, access_level|
-          user = ::User
-                   .includes(:identities).references(:identities)
-                   .where(
-                     identities: { provider: provider, extern_uid: member_dn }
-                   )
+          user = find_user_by_dn_and_provider(member_dn, provider)
 
-          if user.empty?
-            logger.debug <<-MSG.strip_heredoc.gsub(/\n/,'')
+          if user.present?
+            group.add_users([user.id], access_level, skip_notification: true)
+          else
+            logger.debug <<-MSG.strip_heredoc.gsub(/\n/, ' ')
               #{self.class.name}: User with DN `#{member_dn}` should have access
               to '#{group.name}' group but there is no user in GitLab with that
               identity. Membership will be updated once the user signs in for
               the first time.
             MSG
-          elsif user.count > 1
-            logger.warn <<-MSG.strip_heredoc.gsub(/\n/,'')
-              #{self.class.name}: Found more than one user with identity
-              where provider is '#{provider}' and extern_uid is '#{member_dn}'.
-              Only one result expected.
-            MSG
-          else
-            group.add_users([user.first.id], access_level, skip_notification: true)
           end
         end
       end
@@ -162,7 +181,7 @@ module Gitlab
       end
 
       def warn_cannot_remove_last_owner(user, group)
-        logger.warn <<-MSG.strip_heredoc.gsub(/\n/,'')
+        logger.warn <<-MSG.strip_heredoc.gsub(/\n/, ' ')
           #{self.class.name}: LDAP group sync cannot remove #{user.name}
           (#{user.id}) from group #{group.name} (#{group.id}) as this is
           the group's last owner
@@ -198,6 +217,28 @@ module Gitlab
         ::Group.includes(:ldap_group_links).references(:ldap_group_links).
           where.not(ldap_group_links: { id: nil }).
           where(ldap_group_links: { provider: provider })
+      end
+
+      def find_user_by_dn_and_provider(dn, provider)
+        user = ::User
+                 .includes(:identities).references(:identities)
+                 .where(
+                   identities: { provider: provider, extern_uid: dn }
+                 )
+
+        if user.count > 1
+          logger.warn <<-MSG.strip_heredoc.gsub(/\n/, ' ')
+            #{self.class.name}: Found more than one user with identity
+            where provider is '#{provider}' and extern_uid is '#{dn}'.
+            Only one result expected.
+          MSG
+
+          # TODO: Raise an exception here? This **shouldn't** happen. If it
+          # does, do we want to halt the entire process?
+          nil
+        else
+          user.first
+        end
       end
 
       def logger
