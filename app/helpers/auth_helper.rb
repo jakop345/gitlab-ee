@@ -6,6 +6,10 @@ module AuthHelper
     Gitlab.config.ldap.enabled
   end
 
+  def omniauth_enabled?
+    Gitlab.config.omniauth.enabled
+  end
+
   def kerberos_enabled?
     auth_providers.include?(:kerberos)
   end

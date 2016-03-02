@@ -2,7 +2,7 @@
 
 FactoryGirl.define do
   factory :appearance do
-    title "GitLab Enterprise Edition"
-    description "Open source software to collaborate on code"
+    title       "MepMep"
+    description "This is my Community Edition instance"
   end
 end
