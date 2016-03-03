@@ -1,6 +1,7 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.5.3
+  - Prevent LDAP from downgrading a group's last owner
   - Update Update gitlab-elastic-search gem to 0.0.11
 
 v 8.5.2
