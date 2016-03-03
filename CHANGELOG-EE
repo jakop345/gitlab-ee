@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.5.3
+  - Update Update gitlab-elastic-search gem to 0.0.11
+
 v 8.5.2
   - Update LDAP groups asynchronously
   - Fix an issue when weight text was displayed in Issuable collapsed sidebar
