@@ -8,6 +8,9 @@ v 8.6.0 (unreleased)
   - [Elastic] Update index on push to wiki
   - [Elastic] Use subprocesses for ElasticSearch index jobs
 
+v 8.5.5
+  - GitLab Geo: Repository synchronization between primary and secondary nodes
+
 v 8.5.4
   - [Elastic][Security] Notes exposure
 
