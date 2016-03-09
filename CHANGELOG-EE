@@ -10,6 +10,7 @@ v 8.6.0 (unreleased)
 
 v 8.5.5
   - GitLab Geo: Repository synchronization between primary and secondary nodes
+  - Add documentation for GitLab Pages
   - Fix importing projects from GitHub Enterprise Edition
   - Fix syntax error in init file
   - Only show group member roles if explicitly requested
