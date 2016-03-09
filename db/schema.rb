@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160320204112) do
+ActiveRecord::Schema.define(version: 20160321161032) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -882,6 +882,20 @@ ActiveRecord::Schema.define(version: 20160320204112) do
 
   add_index "releases", ["project_id", "tag"], name: "index_releases_on_project_id_and_tag", using: :btree
   add_index "releases", ["project_id"], name: "index_releases_on_project_id", using: :btree
+
+  create_table "remote_mirrors", force: :cascade do |t|
+    t.integer  "project_id"
+    t.string   "url"
+    t.boolean  "enabled",                   default: true
+    t.string   "update_status"
+    t.datetime "last_update_at"
+    t.datetime "last_successful_update_at"
+    t.string   "last_error"
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
+
+  add_index "remote_mirrors", ["project_id"], name: "index_remote_mirrors_on_project_id", using: :btree
 
   create_table "sent_notifications", force: :cascade do |t|
     t.integer "project_id"

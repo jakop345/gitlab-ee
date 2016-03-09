@@ -698,6 +698,7 @@ Rails.application.routes.draw do
         resource :mirror, only: [:show, :update] do
           member do
             post :update_now
+            post :update_remote_now
           end
         end
         resources :git_hooks, constraints: { id: /\d+/ }
