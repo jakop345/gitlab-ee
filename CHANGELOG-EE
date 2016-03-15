@@ -8,6 +8,9 @@ v 8.6.0 (unreleased)
   - [Elastic] Update index on push to wiki
   - [Elastic] Use subprocesses for ElasticSearch index jobs
 
+v 8.5.7
+  - No EE-specific changes
+
 v 8.5.6
   - No changes
 
