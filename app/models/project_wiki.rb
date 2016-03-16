@@ -3,7 +3,7 @@ class ProjectWiki
   include Elastic::WikiRepositoriesSearch
 
   MARKUPS = {
-    'Markdown' => :md,
+    'Markdown' => :markdown,
     'RDoc'     => :rdoc,
     'AsciiDoc' => :asciidoc
   } unless defined?(MARKUPS)
@@ -49,7 +49,7 @@ class ProjectWiki
   def wiki
     @wiki ||= begin
       Gollum::Wiki.new(path_to_repo)
-    rescue Gollum::NoSuchPathError
+    rescue Rugged::OSError
       create_repo!
     end
   end
@@ -92,7 +92,7 @@ class ProjectWiki
   def create_page(title, content, format = :markdown, message = nil)
     commit = commit_details(:created, message, title)
 
-    wiki.write_page(title, format, content, commit)
+    wiki.write_page(title, format.to_sym, content, commit)
 
     update_elastic_index
 
@@ -105,7 +105,7 @@ class ProjectWiki
   def update_page(page, content, format = :markdown, message = nil)
     commit = commit_details(:updated, message, page.title)
 
-    wiki.update_page(page, page.name, format, content, commit)
+    wiki.update_page(page, page.name, format.to_sym, content, commit)
 
     update_elastic_index
 
