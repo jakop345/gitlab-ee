@@ -1,6 +1,7 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.6.0 (unreleased)
+  - Add confidential issues
   - Bump gitlab_git to 9.0.3 (Stan Hu)
   - Support Golang subpackage fetching (Stan Hu)
   - Bump Capybara gem to 2.6.2 (Stan Hu)
@@ -14,6 +15,7 @@ v 8.6.0 (unreleased)
   - Add support for wiki with UTF-8 page names (Hiroyuki Sato)
   - Fix wiki search results point to raw source (Hiroyuki Sato)
   - Don't load all of GitLab in mail_room
+  - HTTP error pages work independently from location and config (Artem Sidorenko)
   - Update `omniauth-saml` to 1.5.0 to allow for custom response attributes to be set
   - Memoize @group in Admin::GroupsController (Yatish Mehta)
   - Indicate how much an MR diverged from the target branch (Pierre de La Morinerie)
@@ -37,10 +39,13 @@ v 8.6.0 (unreleased)
   - Fix bug where Bitbucket `closed` issues were imported as `opened` (Iuri de Silvio)
   - Don't show Issues/MRs from archived projects in Groups view
   - Fix wrong "iid of max iid" in Issuable sidebar for some merged MRs
+  - Fix empty source_sha on Merge Request when there is no diff (Pierre de La Morinerie)
   - Increase the notes polling timeout over time (Roberto Dip)
   - Add shortcut to toggle markdown preview (Florent Baldino)
   - Show labels in dashboard and group milestone views
+  - Fix an issue when the target branch of a MR had been deleted
   - Add main language of a project in the list of projects (Tiago Botelho)
+  - Add #upcoming filter to Milestone filter (Tiago Botelho)
   - Add ability to show archived projects on dashboard, explore and group pages
   - Allow SSL verification to be configurable when importing GitHub projects
   - Move group activity to separate page
@@ -48,6 +53,7 @@ v 8.6.0 (unreleased)
   - Continue parameters are checked to ensure redirection goes to the same instance
   - User deletion is now done in the background so the request can not time out
   - Canceled builds are now ignored in compound build status if marked as `allowed to fail`
+  - Trigger a todo for mentions on commits page
 
 v 8.5.8
   - Bump Git version requirement to 2.7.4
@@ -64,8 +70,6 @@ v 8.5.5
   - Prevent a 500 error in Todos when author was removed
   - Fix pagination for filtered dashboard and explore pages
   - Fix "Show all" link behavior
-  - Add #upcoming filter to Milestone filter (Tiago Botelho)
-  - HTTP error pages work independently from location and config (Artem Sidorenko)
 
 v 8.5.4
   - Do not cache requests for badges (including builds badge)

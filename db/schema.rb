@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160316124047) do
+ActiveRecord::Schema.define(version: 20160316204731) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -976,7 +976,7 @@ ActiveRecord::Schema.define(version: 20160316124047) do
   create_table "todos", force: :cascade do |t|
     t.integer  "user_id",     null: false
     t.integer  "project_id",  null: false
-    t.integer  "target_id",   null: false
+    t.integer  "target_id"
     t.string   "target_type", null: false
     t.integer  "author_id"
     t.integer  "action",      null: false
@@ -984,9 +984,11 @@ ActiveRecord::Schema.define(version: 20160316124047) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "note_id"
+    t.string   "commit_id"
   end
 
   add_index "todos", ["author_id"], name: "index_todos_on_author_id", using: :btree
+  add_index "todos", ["commit_id"], name: "index_todos_on_commit_id", using: :btree
   add_index "todos", ["note_id"], name: "index_todos_on_note_id", using: :btree
   add_index "todos", ["project_id"], name: "index_todos_on_project_id", using: :btree
   add_index "todos", ["state"], name: "index_todos_on_state", using: :btree

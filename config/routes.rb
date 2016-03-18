@@ -368,6 +368,8 @@ Rails.application.routes.draw do
     get :issues
     get :merge_requests
     get :activity
+    get :labels
+    get :milestones
 
     scope module: :dashboard do
       resources :milestones, only: [:index, :show]
