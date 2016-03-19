@@ -8,6 +8,8 @@ v 8.6.0 (unreleased)
   - Update settings and documentation for per-install LDAP sync time
   - GitLab Geo: Wiki synchronization
   - Fire merge request webhooks when a merge request is approved
+  - Add full diff highlighting to Email on push
+  - Clear "stuck" mirror updates before periodically updating all mirrors.
   - [Elastic] Add elastic checker to gitlab:check
   - [Elastic] Added UPDATE_INDEX option to rake task
   - [Elastic] Removing repository and wiki index after removing project

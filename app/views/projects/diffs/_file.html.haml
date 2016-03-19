@@ -40,8 +40,8 @@
         = view_file_btn(diff_commit.id, diff_file, project)
 
   .diff-content.diff-wrap-lines
-    -# Skipp all non non-supported blobs
-    - return unless blob.respond_to?('text?')
+    -# Skip all non non-supported blobs
+    - return unless blob.respond_to?(:text?)
     - if diff_file.too_large?
       .nothing-here-block
         This diff could not be displayed because it is too large.
