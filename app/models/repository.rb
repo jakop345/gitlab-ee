@@ -47,12 +47,15 @@ class Repository
   end
 
   def exists?
-    return false unless raw_repository
+    return @exists unless @exists.nil?
 
-    raw_repository.rugged
-    true
-  rescue Gitlab::Git::Repository::NoRepository
-    false
+    @exists = cache.fetch(:exists?) do
+      begin
+        raw_repository && raw_repository.rugged ? true : false
+      rescue Gitlab::Git::Repository::NoRepository
+        false
+      end
+    end
   end
 
   def empty?
@@ -358,12 +361,23 @@ class Repository
     @avatar = nil
   end
 
+  def expire_exists_cache
+    cache.expire(:exists?)
+    @exists = nil
+  end
+
+  # Runs code after a repository has been created.
+  def after_create
+    expire_exists_cache
+  end
+
   # Runs code just before a repository is deleted.
   def before_delete
     expire_cache if exists?
 
     expire_root_ref_cache
     expire_emptiness_caches
+    expire_exists_cache
   end
 
   # Runs code just before the HEAD of a repository is changed.
@@ -389,6 +403,7 @@ class Repository
   # Runs code after a repository has been forked/imported.
   def after_import
     expire_emptiness_caches
+    expire_exists_cache
   end
 
   # Runs code after a new commit has been pushed.

@@ -537,6 +537,12 @@ describe Repository, models: true do
 
         repository.before_delete
       end
+
+      it 'flushes the exists cache' do
+        expect(repository).to receive(:expire_exists_cache)
+
+        repository.before_delete
+      end
     end
 
     describe 'when a repository exists' do
@@ -590,6 +596,12 @@ describe Repository, models: true do
   describe '#after_import' do
     it 'flushes the emptiness cachess' do
       expect(repository).to receive(:expire_emptiness_caches)
+
+      repository.after_import
+    end
+
+    it 'flushes the exists cache' do
+      expect(repository).to receive(:expire_exists_cache)
 
       repository.after_import
     end
@@ -662,6 +674,14 @@ describe Repository, models: true do
         expect(parsed_result.startline).to eq(2)
         expect(parsed_result.data).to include("Popen")
       end
+    end
+  end
+
+  describe '#after_create' do
+    it 'flushes the exists cache' do
+      expect(repository).to receive(:expire_exists_cache)
+
+      repository.after_create
     end
   end
 
@@ -824,6 +844,16 @@ describe Repository, models: true do
 
         repository.expire_avatar_cache(repository.root_ref, '123')
       end
+    end
+  end
+
+  describe '#expire_exists_cache' do
+    let(:cache) { repository.send(:cache) }
+
+    it 'expires the cache' do
+      expect(cache).to receive(:expire).with(:exists?)
+
+      repository.expire_exists_cache
     end
   end
 
