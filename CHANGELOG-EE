@@ -6,7 +6,6 @@ v 8.6.0 (unreleased)
   - Improve weight filter for issues
   - Clear "stuck" mirror updates before periodically updating all mirrors
   - Update settings and documentation for per-install LDAP sync time
-  - GitLab Geo: Documentation
   - GitLab Geo: Wiki synchronization
   - Fire merge request webhooks when a merge request is approved
   - [Elastic] Add elastic checker to gitlab:check
@@ -19,8 +18,14 @@ v 8.6.0 (unreleased)
   - [Elastic] Fixed exception on branch removing
   - [Elastic] Fix bin/elastic_repo_indexer to follow config
 
+v 8.5.8
+  - GitLab Geo: Documentation
+
+v 8.5.7
+  - No EE-specific changes
+
 v 8.5.6
-  - No changes
+  - No EE-specific changes
 
 v 8.5.5
   - GitLab Geo: Repository synchronization between primary and secondary nodes
