@@ -880,6 +880,8 @@ class Repository
   def parse_search_result_from_elastic(result)
     ref = result["_source"]["blob"]["commit_sha"]
     filename = result["_source"]["blob"]["path"]
+    extname = File.extname(filename)
+    basename = filename.sub(/#{extname}$/, '')
     content = result["_source"]["blob"]["content"]
     total_lines = content.lines.size
 
@@ -909,6 +911,7 @@ class Repository
 
     OpenStruct.new(
       filename: filename,
+      basename: basename,
       ref: ref,
       startline: from + 1,
       data: data.join
