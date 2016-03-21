@@ -6,7 +6,6 @@ v 8.6.0 (unreleased)
   - Improve weight filter for issues
   - Clear "stuck" mirror updates before periodically updating all mirrors
   - Update settings and documentation for per-install LDAP sync time
-  - GitLab Geo: Wiki synchronization
   - Fire merge request webhooks when a merge request is approved
   - Add full diff highlighting to Email on push
   - Clear "stuck" mirror updates before periodically updating all mirrors
