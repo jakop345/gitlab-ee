@@ -457,6 +457,7 @@ ActiveRecord::Schema.define(version: 20160320204112) do
     t.integer  "user_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "secondary_extern_uid"
   end
 
   add_index "identities", ["created_at", "id"], name: "index_identities_on_created_at_and_id", using: :btree
@@ -680,9 +681,11 @@ ActiveRecord::Schema.define(version: 20160320204112) do
     t.boolean  "membership_lock",       default: false
     t.boolean  "share_with_group_lock", default: false
     t.integer  "visibility_level",      default: 20,    null: false
+    t.datetime "last_ldap_sync_at"
   end
 
   add_index "namespaces", ["created_at", "id"], name: "index_namespaces_on_created_at_and_id", using: :btree
+  add_index "namespaces", ["last_ldap_sync_at"], name: "index_namespaces_on_last_ldap_sync_at", using: :btree
   add_index "namespaces", ["name"], name: "index_namespaces_on_name", unique: true, using: :btree
   add_index "namespaces", ["name"], name: "index_namespaces_on_name_trigram", using: :gin, opclasses: {"name"=>"gin_trgm_ops"}
   add_index "namespaces", ["owner_id"], name: "index_namespaces_on_owner_id", using: :btree
@@ -836,7 +839,7 @@ ActiveRecord::Schema.define(version: 20160320204112) do
     t.boolean  "pending_delete",                   default: false
     t.boolean  "public_builds",                    default: true,     null: false
     t.string   "main_language"
-    t.integer  "pushes_since_gc",        default: 0
+    t.integer  "pushes_since_gc",                  default: 0
   end
 
   add_index "projects", ["builds_enabled", "shared_runners_enabled"], name: "index_projects_on_builds_enabled_and_shared_runners_enabled", using: :btree
