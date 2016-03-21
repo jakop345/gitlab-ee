@@ -666,6 +666,7 @@ Rails.application.routes.draw do
             post :cancel_merge_when_build_succeeds
             get :ci_status
             post :toggle_subscription
+            post :remove_wip
             post :approve
             post :rebase
           end
