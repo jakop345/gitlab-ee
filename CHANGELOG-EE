@@ -20,6 +20,10 @@ v 8.6.0 (unreleased)
   - [Elastic] Fix: Don't index newly created system messages and awards
   - [Elastic] Fixed exception on branch removing
   - [Elastic] Fix bin/elastic_repo_indexer to follow config
+  - GitLab Geo: OAuth authentication
+  - GitLab Geo: Wiki synchronization
+  - GitLab Geo: ReadOnly Middleware improvements
+  - GitLab Geo: SSH Keys synchronization
 
 v 8.5.8
   - GitLab Geo: Documentation
