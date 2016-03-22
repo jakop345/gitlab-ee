@@ -26,7 +26,7 @@ module ProjectsHelper
     image_tag(avatar_icon(author, opts[:size]), width: opts[:size], class: "avatar avatar-inline #{"s#{opts[:size]}" if opts[:size]}", alt:'') if opts[:avatar]
   end
 
-  def link_to_member(project, author, opts = {})
+  def link_to_member(project, author, opts = {}, &block)
     default_opts = { avatar: true, name: true, size: 16, author_class: 'author', title: ":name" }
     opts = default_opts.merge(opts)
 
@@ -44,13 +44,15 @@ module ProjectsHelper
       author_html << content_tag(:span, sanitize(author.name), class: opts[:author_class]) if opts[:name]
     end
 
+    author_html << capture(&block) if block
+
     author_html = author_html.html_safe
 
     if opts[:name]
       link_to(author_html, user_path(author), class: "author_link #{"#{opts[:mobile_classes]}" if opts[:mobile_classes]}").html_safe
     else
       title = opts[:title].sub(":name", sanitize(author.name))
-      link_to(author_html, user_path(author), class: "author_link has_tooltip", data: { 'original-title'.to_sym => title, container: 'body' } ).html_safe
+      link_to(author_html, user_path(author), class: "author_link has-tooltip", data: { 'original-title'.to_sym => title, container: 'body' } ).html_safe
     end
   end
 
