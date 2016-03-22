@@ -1,6 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
-v 8.6.0 (unreleased)
+v 8.6.1 (unreleased)
+
+
+v 8.6.0
   - Handle duplicate appearances table creation issue with upgrade from CE to EE
   - Add confidential issues
   - Improve weight filter for issues
