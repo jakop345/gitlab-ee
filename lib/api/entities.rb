@@ -94,10 +94,11 @@ module API
     end
 
     class Group < Grape::Entity
-      expose :id, :name, :path, :ldap_cn, :ldap_access, :description
+      expose :id, :name, :path, :description, :visibility_level
+      expose :ldap_cn, :ldap_access
       expose :ldap_group_links, using: Entities::LdapGroupLink, if: lambda { |group, options| group.ldap_group_links.any? }
-      expose :avatar_url
 
+      expose :avatar_url
       expose :web_url do |group, options|
         Gitlab::Application.routes.url_helpers.group_url(group)
       end
@@ -354,6 +355,7 @@ module API
       expose :session_expire_delay
       expose :default_project_visibility
       expose :default_snippet_visibility
+      expose :default_group_visibility
       expose :restricted_signup_domains
       expose :user_oauth_applications
       expose :after_sign_out_path
