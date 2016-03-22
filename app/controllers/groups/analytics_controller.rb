@@ -1,14 +1,12 @@
 class Groups::AnalyticsController < Groups::ApplicationController
-  before_action :group
-
-  layout 'group'
+  before_action :group_projects
 
   def show
     @users = @group.users
     @start_date = params[:start_date] || Date.today - 1.week
     @events = Event.contributions.
-      where("created_at > ?", @start_date).
-      where(project_id: @group.projects)
+      in_projects(@projects).
+      where("created_at > ?", @start_date)
 
     @stats = {}
 
