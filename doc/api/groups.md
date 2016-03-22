@@ -112,6 +112,7 @@ Parameters:
 - `description` (optional) - The group's description
 - `membership_lock` (optional, boolean) - Prevent adding new members to project membership within this group
 - `share_with_group_lock` (optional, boolean) - Prevent sharing a project with another group within this group
+- `visibility_level` (optional) - The group's visibility. 0 for private, 10 for internal, 20 for public.
 
 ## Update group
 
@@ -128,7 +129,6 @@ Parameters:
 - `description` (optional) - The group's description
 - `membership_lock` (optional, boolean) - Prevent adding new members to project membership within this group
 - `share_with_group_lock` (optional, boolean) - Prevent sharing a project with another group within this group
-- `visibility_level` (optional) - The group's visibility. 0 for private, 10 for internal, 20 for public.
 
 ## Transfer project to group
 
@@ -273,7 +273,7 @@ Parameters:
 - `id` (required) - The ID of a group
 - `cn` (required) - The CN of a LDAP group
 - `group_access` (required) - Minimum access level for members of the LDAP group
-- `provider` (required) - LDAP provider for the LDAP group (when using several providers) 
+- `provider` (required) - LDAP provider for the LDAP group (when using several providers)
 
 ### Delete LDAP group link
 

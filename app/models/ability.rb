@@ -253,7 +253,9 @@ class Ability
         :remove_project,
         :remove_pages,
         :archive_project,
-        :remove_fork_project
+        :remove_fork_project,
+        :destroy_merge_request,
+        :destroy_issue
       ]
     end
 
