@@ -97,13 +97,11 @@
               - else
                 No
           .title.hide-collapsed
-            %label Weight
+            Weight
             - if can?(current_user, :"admin_#{issuable.to_ability_name}", @project)
-              .pull-right
-                = link_to 'Edit', '#', class: 'edit-link'
-          .value.hide-collapsed
+              = link_to 'Edit', '#', class: 'edit-link pull-right'
+          .value.bold.hide-collapsed
             - if issuable.weight
-              = icon('balance-scale')
               = issuable.weight
             - else
               .light None
