@@ -1,7 +1,7 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.6.1 (unreleased)
-
+  - Fix diffs in text part of email-on-push messages (Stan Hu)
 
 v 8.6.0
   - Handle duplicate appearances table creation issue with upgrade from CE to EE
