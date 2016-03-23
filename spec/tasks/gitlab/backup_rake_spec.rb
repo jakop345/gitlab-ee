@@ -54,25 +54,15 @@ describe 'gitlab:app namespace rake task' do
       it 'should invoke restoration on match' do
         allow(YAML).to receive(:load_file).
           and_return({ gitlab_version: gitlab_version })
-<<<<<<< HEAD
-        expect(Rake::Task["gitlab:backup:db:restore"]).to receive(:invoke)
-        expect(Rake::Task["gitlab:backup:repo:restore"]).to receive(:invoke)
-        expect(Rake::Task["gitlab:backup:builds:restore"]).to receive(:invoke)
-        expect(Rake::Task["gitlab:backup:uploads:restore"]).to receive(:invoke)
-        expect(Rake::Task["gitlab:backup:artifacts:restore"]).to receive(:invoke)
-        expect(Rake::Task["gitlab:backup:pages:restore"]).to receive(:invoke)
-        expect(Rake::Task["gitlab:backup:lfs:restore"]).to receive(:invoke)
-        expect(Rake::Task["gitlab:shell:setup"]).to receive(:invoke)
-=======
         expect(Rake::Task['gitlab:db:drop_tables']).to receive(:invoke)
         expect(Rake::Task['gitlab:backup:db:restore']).to receive(:invoke)
         expect(Rake::Task['gitlab:backup:repo:restore']).to receive(:invoke)
         expect(Rake::Task['gitlab:backup:builds:restore']).to receive(:invoke)
         expect(Rake::Task['gitlab:backup:uploads:restore']).to receive(:invoke)
         expect(Rake::Task['gitlab:backup:artifacts:restore']).to receive(:invoke)
+        expect(Rake::Task['gitlab:backup:pages:restore']).to receive(:invoke)
         expect(Rake::Task['gitlab:backup:lfs:restore']).to receive(:invoke)
         expect(Rake::Task['gitlab:shell:setup']).to receive(:invoke)
->>>>>>> ce/8-6-stable
         expect { run_rake_task('gitlab:backup:restore') }.not_to raise_error
       end
     end
