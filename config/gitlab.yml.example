@@ -186,9 +186,10 @@ production: &base
     historical_data_worker:
       cron: "0 12 * * *"
 
-    # Update mirrored repositories
+    # Update repository mirrors, if necessary, every 15 minutes. Mirrors with an
+    # update frequency higher than 15 minutes will only be updated as-needed.
     update_all_mirrors_worker:
-      cron: "0 * * * *"
+      cron: "*/15 * * * *"
 
     # In addition to refreshing users when they log in,
     # periodically refresh LDAP users membership.

@@ -4,7 +4,7 @@ class UpdateAllMirrorsWorker
   def perform
     fail_stuck_mirrors!
 
-    Project.mirror.each(&:update_mirror)
+    Project.mirror.each { |project| project.update_mirror(force: false) }
   end
 
   def fail_stuck_mirrors!

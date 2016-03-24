@@ -14,7 +14,8 @@ describe UpdateAllMirrorsWorker do
       create(:empty_project, :mirror)
       create(:empty_project)
 
-      expect_any_instance_of(Project).to receive(:update_mirror).once
+      expect_any_instance_of(Project).
+        to receive(:update_mirror).with(force: false).once
 
       described_class.new.perform
     end
