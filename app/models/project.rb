@@ -527,9 +527,9 @@ class Project < ActiveRecord::Base
     mirror_updated? && self.mirror_last_successful_update_at
   end
 
-  def update_mirror
+  def update_mirror(force: true)
     return unless mirror?
-
+    return if mirror_recently_updated? && !force
     return if import_in_progress?
 
     if import_failed?

@@ -67,6 +67,11 @@ FactoryGirl.define do
       import_status :started
     end
 
+    trait :import_failed do
+      import_started
+      import_status :failed
+    end
+
     trait :import_finished do
       import_started
       import_status :finished

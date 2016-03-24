@@ -224,6 +224,49 @@ describe Project, models: true do
     end
   end
 
+  describe '#update_mirror' do
+    it 'returns early for non-mirrors' do
+      project = build(:empty_project)
+
+      expect(project).not_to receive(:import_in_progress?)
+
+      expect(project.update_mirror).to eq nil
+    end
+
+    it 'returns early for recently-updated mirrors not forcing an update' do
+      project = build(:empty_project, :mirror, :import_started)
+
+      expect(project).to receive(:mirror_recently_updated?).and_return(true)
+      expect(project).not_to receive(:import_in_progress?)
+
+      expect(project.update_mirror(force: false)).to eq nil
+    end
+
+    it 'returns early for imports in progress' do
+      project = build(:empty_project, :mirror, :import_started)
+
+      expect(project).not_to receive(:import_failed?)
+
+      expect(project.update_mirror).to eq nil
+    end
+
+    it 'retries failed imports' do
+      project = build(:empty_project, :mirror, :import_failed)
+
+      expect(project).to receive(:import_retry)
+
+      project.update_mirror
+    end
+
+    it 'starts fresh imports' do
+      project = build(:empty_project, :mirror, :import_finished)
+
+      expect(project).to receive(:import_start)
+
+      project.update_mirror
+    end
+  end
+
   describe '#get_issue' do
     let(:project) { create(:empty_project) }
     let!(:issue)  { create(:issue, project: project) }
