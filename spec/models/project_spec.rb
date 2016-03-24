@@ -189,6 +189,41 @@ describe Project, models: true do
     end
   end
 
+  describe '#mirror_recently_updated?' do
+    it 'returns false when mirror has never been updated' do
+      project = build(:empty_project)
+
+      expect(project).not_to be_mirror_recently_updated
+    end
+
+    it 'handles mirrors updated every 15 minutes' do
+      project = build(:empty_project, :mirror, mirror_update_frequency: 15.minutes)
+
+      project.mirror_last_update_at = 30.minutes.ago
+
+      expect { project.mirror_last_update_at = 10.minutes.ago }.
+        to change { project.mirror_recently_updated? }.from(false).to(true)
+    end
+
+    it 'handles mirrors updated every hour' do
+      project = build(:empty_project, :mirror, mirror_update_frequency: 1.hour)
+
+      project.mirror_last_update_at = 3.hours.ago
+
+      expect { project.mirror_last_update_at = 45.minutes.ago }.
+        to change { project.mirror_recently_updated? }.from(false).to(true)
+    end
+
+    it 'handles mirrors updated every day' do
+      project = build(:empty_project, :mirror, mirror_update_frequency: 1.day)
+
+      project.mirror_last_update_at = 3.days.ago
+
+      expect { project.mirror_last_update_at = 3.hours.ago }.
+        to change { project.mirror_recently_updated? }.from(false).to(true)
+    end
+  end
+
   describe '#get_issue' do
     let(:project) { create(:empty_project) }
     let!(:issue)  { create(:issue, project: project) }

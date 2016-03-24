@@ -495,6 +495,12 @@ class Project < ActiveRecord::Base
     mirror? && self.mirror_last_update_at
   end
 
+  def mirror_recently_updated?
+    return false unless mirror_updated?
+
+    mirror_last_update_at >= mirror_update_frequency.seconds.ago
+  end
+
   def updating_mirror?
     mirror? && import_in_progress? && !empty_repo?
   end
