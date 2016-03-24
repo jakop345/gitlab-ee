@@ -210,6 +210,9 @@ class Project < ActiveRecord::Base
     if: ->(project) { project.avatar.present? && project.avatar_changed? }
   validates :avatar, file_size: { maximum: 200.kilobytes.to_i }
   validates :approvals_before_merge, numericality: true, allow_blank: true
+  validates :mirror_update_frequency,
+    numericality: true,
+    inclusion: [15.minutes, 1.hour, 1.day]
 
   add_authentication_token_field :runners_token
   before_save :ensure_runners_token

@@ -96,6 +96,8 @@ describe Project, models: true do
     it { is_expected.to validate_presence_of(:creator) }
     it { is_expected.to validate_length_of(:issues_tracker_id).is_within(0..255) }
     it { is_expected.to validate_presence_of(:namespace) }
+    it { is_expected.to validate_numericality_of(:mirror_update_frequency) }
+    it { is_expected.to validate_inclusion_of(:mirror_update_frequency).in_array([15.minutes, 1.hour, 1.day]) }
 
     it 'should not allow new projects beyond user limits' do
       project2 = build(:project)
