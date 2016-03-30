@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160321161032) do
+ActiveRecord::Schema.define(version: 20160330031024) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -893,6 +893,9 @@ ActiveRecord::Schema.define(version: 20160321161032) do
     t.string   "last_error"
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
+    t.text     "encrypted_credentials"
+    t.text     "encrypted_credentials_iv"
+    t.text     "encrypted_credentials_salt"
   end
 
   add_index "remote_mirrors", ["project_id"], name: "index_remote_mirrors_on_project_id", using: :btree

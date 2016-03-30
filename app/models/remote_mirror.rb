@@ -17,6 +17,8 @@
 class RemoteMirror < ActiveRecord::Base
   include AfterCommitQueue
 
+  attr_encrypted :credentials, key: Gitlab::Application.secrets.db_key_base, marshal: true, encode: true, mode: :per_attribute_iv_and_salt
+
   belongs_to :project
 
   validates :url, presence: true, url: { protocols: %w(ssh git http https), allow_blank: true }, on: :create
