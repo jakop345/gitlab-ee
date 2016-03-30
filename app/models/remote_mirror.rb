@@ -93,6 +93,18 @@ class RemoteMirror < ActiveRecord::Base
     update_column(:last_error, error_message)
   end
 
+  def url=(value)
+    mirror_url = Gitlab::ImportUrl.new(value)
+    self.credentials = mirror_url.credentials if mirror_url.credentials.values.any?
+
+    super(mirror_url.sanitized_url)
+  end
+
+  def full_url
+    mirror_url = Gitlab::ImportUrl.new(super, credentials: credentials)
+    mirror_url.full_url
+  end
+
   private
 
   def url_availability
@@ -122,7 +134,7 @@ class RemoteMirror < ActiveRecord::Base
 
   def refresh_remote
     project.repository.remove_remote(ref_name)
-    project.repository.add_remote(ref_name, url)
+    project.repository.add_remote(ref_name, full_url)
   end
 
   def remove_remote
