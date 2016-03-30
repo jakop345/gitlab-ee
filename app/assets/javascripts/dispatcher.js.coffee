@@ -109,6 +109,7 @@ class Dispatcher
         new GroupsSelect()
       when 'projects:mirrors:show', 'projects:mirrors:update'
         new UsersSelect()
+        new MirrorUrlProtector()
       when 'admin:emails:show'
         new AdminEmailSelect()
 

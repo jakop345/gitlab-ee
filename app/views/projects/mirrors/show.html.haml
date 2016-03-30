@@ -113,7 +113,9 @@
       = rm_form.label :url, class: 'control-label' do
         %span Git repository URL
       .col-sm-10
-        = rm_form.text_field :url, class: 'form-control', placeholder: 'https://username:password@gitlab.company.com/group/project.git'
+        = rm_form.text_field :url, class: 'form-control', placeholder: 'https://username:password@gitlab.company.com/group/project.git', data: { 'safe-url' => @remote_mirror.url, 'full-url' => @remote_mirror.full_url }
+        - if @remote_mirror.has_credentials?
+          = link_to 'Show credentials', '#', class: 'toggle-remote-credentials'
         .well.prepend-top-20
           The requirements for the URL format are the same mentioned in the <strong>Pull from a remote repository</strong> section.
 

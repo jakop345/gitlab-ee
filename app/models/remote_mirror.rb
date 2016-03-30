@@ -95,14 +95,20 @@ class RemoteMirror < ActiveRecord::Base
 
   def url=(value)
     mirror_url = Gitlab::ImportUrl.new(value)
-    self.credentials = mirror_url.credentials if mirror_url.credentials.values.any?
+
+    # Update credentials only if passed URL is different than the previous one.
+    self.credentials = mirror_url.credentials if url != value
 
     super(mirror_url.sanitized_url)
   end
 
   def full_url
-    mirror_url = Gitlab::ImportUrl.new(super, credentials: credentials)
+    mirror_url = Gitlab::ImportUrl.new(url, credentials: credentials)
     mirror_url.full_url
+  end
+
+  def has_credentials?
+    credentials.values.any?
   end
 
   private
