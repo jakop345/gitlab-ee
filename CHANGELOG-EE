@@ -2,6 +2,7 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.6.3 (unreleased)
   - Fix other cases where git hooks would fail due to old commits. !310
+  - Exit ElasticIndexerWorker's job happily if record cannot be found. !311
 
 v 8.6.2
   - Fix old commits triggering git hooks on new branches branched off another branch. !281
