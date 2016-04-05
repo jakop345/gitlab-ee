@@ -962,7 +962,7 @@ DEPENDENCIES
   gitlab-flowdock-git-hook (~> 1.0.1)
   gitlab-license (~> 0.0.4)
   gitlab_emoji (~> 0.2.0)
-  gitlab_git (~> 7.2.22)
+  gitlab_git (~> 7.2.24)
   gitlab_meta (= 7.0)
   gitlab_omniauth-ldap (~> 1.2.1)
   gollum-lib (~> 4.1.0)
