@@ -43,17 +43,21 @@ class GitPushService < BaseService
       @push_commits = @project.repository.commits_between(params[:oldrev], params[:newrev])
       process_commit_messages
     end
-    # Checks if the main language has changed in the project and if so
-    # it updates it accordingly
-    update_main_language
     # Update merge requests that may be affected by this push. A new branch
     # could cause the last commit of a merge request to change.
     update_merge_requests
+
+    # Checks if the main language has changed in the project and if so
+    # it updates it accordingly
+    update_main_language
 
     perform_housekeeping
   end
 
   def update_main_language
+    return unless is_default_branch?
+    return unless push_to_new_branch? || push_to_existing_branch?
+
     current_language = @project.repository.main_language
 
     unless current_language == @project.main_language
@@ -73,10 +77,10 @@ class GitPushService < BaseService
     @project.execute_hooks(build_push_data.dup, :push_hooks)
     @project.execute_services(build_push_data.dup, :push_hooks)
 
-    index_commits_blobs if Gitlab.config.elasticsearch.enabled
-
     CreateCommitBuildsService.new.execute(@project, current_user, build_push_data, mirror_update: mirror_update)
     ProjectCacheWorker.perform_async(@project.id)
+
+    index_commits_blobs if Gitlab.config.elasticsearch.enabled
   end
 
   def index_commits_blobs
