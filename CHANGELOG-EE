@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.6.5
+  - Allow OAuth SSL verification to be disabled when importing from GitHub. !323
+
 v 8.6.4
   - No EE-specific changes
 
@@ -72,7 +75,6 @@ v 8.5.3
 v 8.5.2
   - Update LDAP groups asynchronously
   - Fix an issue when weight text was displayed in Issuable collapsed sidebar
-v 8.5.2
   - Fix importing projects from GitHub Enterprise Edition.
 
 v 8.5.1
