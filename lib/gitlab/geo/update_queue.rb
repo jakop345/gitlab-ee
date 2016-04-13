@@ -5,11 +5,14 @@ module Gitlab
       NAMESPACE = 'geo:gitlab'
 
       def initialize(queue)
-        @queue = queue
+        @queue = "#{NAMESPACE}:#{queue}"
       end
 
       def store(data)
-        redis.rpush(@queue, data.to_json)
+        Gitlab::Redis.with do |redis|
+          redis.rpush(@queue, data.to_json)
+        end
+
         expire_queue_size!
       end
 
@@ -27,9 +30,11 @@ module Gitlab
         projects = []
         bsize = batch_size
 
-        redis.multi do
-          projects = redis.lrange(@queue, 0, bsize - 1)
-          redis.ltrim(@queue, bsize, -1)
+        Gitlab::Redis.with do |redis|
+          redis.multi do
+            projects = redis.lrange(@queue, 0, bsize - 1)
+            redis.ltrim(@queue, bsize, -1)
+          end
         end
 
         expire_queue_size!
@@ -37,12 +42,15 @@ module Gitlab
       end
 
       def store_batched_data(projects)
-        redis.pipelined do
-          projects.reverse_each do |project|
-            # enqueue again to the head of the queue
-            redis.lpush(@queue, project.to_json)
+        Gitlab::Redis.with do |redis|
+          redis.pipelined do
+            projects.reverse_each do |project|
+              # enqueue again to the head of the queue
+              redis.lpush(@queue, project.to_json)
+            end
           end
         end
+
         expire_queue_size!
       end
 
@@ -59,17 +67,23 @@ module Gitlab
       end
 
       def empty!
-        redis.del(@queue)
+        Gitlab::Redis.with do |redis|
+          redis.del(@queue)
+        end
       end
 
       protected
 
       def fetch(start, stop)
-        deserialize(redis.lrange(@queue, start, stop))
+        Gitlab::Redis.with do |redis|
+          deserialize(redis.lrange(@queue, start, stop))
+        end
       end
 
       def fetch_queue_size
-        redis.llen(@queue)
+        Gitlab::Redis.with do |redis|
+          redis.llen(@queue)
+        end
       end
 
       def expire_queue_size!
@@ -79,26 +93,6 @@ module Gitlab
       def deserialize(data)
         data.map! { |item| JSON.parse(item) } unless data.empty?
         data
-      end
-
-      def redis
-        self.class.redis
-      end
-
-      def self.redis_connection
-        redis_config_file = Rails.root.join('config', 'resque.yml')
-
-        redis_url_string = if File.exists?(redis_config_file)
-                             YAML.load_file(redis_config_file)[Rails.env]
-                           else
-                             'redis://localhost:6379'
-                           end
-
-        ::Redis::Namespace.new(NAMESPACE, redis: ::Redis.new(url: redis_url_string))
-      end
-
-      def self.redis
-        @redis ||= redis_connection
       end
     end
   end
