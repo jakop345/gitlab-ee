@@ -6,8 +6,9 @@ v 8.7.0 (unreleased)
   - [Elastic] Stabilize database indexer if database is inconsistent
 
 v 8.6.6
-  - Fix LDAP group sync regression for groups with member value `uid=<username>` !335
-  - Concat AD group recursive member results with regular member results
+  - Concat AD group recursive member results with regular member results. !333
+  - Fix LDAP group sync regression for groups with member value `uid=<username>`. !335
+  - Don't attempt to include too large diffs in e-mail-on-push messages (Stan Hu). !338
 
 v 8.6.5
   - Allow OAuth SSL verification to be disabled when importing from GitHub. !323
