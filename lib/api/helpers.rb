@@ -91,8 +91,7 @@ module API
       if can?(current_user, :read_group, group)
         group
       else
-        forbidden!("#{current_user.username} lacks sufficient "\
-        "access to #{group.name}")
+        not_found!('Group')
       end
     end
 
@@ -109,6 +108,13 @@ module API
     def authenticate_by_gitlab_shell_token!
       input = params['secret_token'].try(:chomp)
       unless Devise.secure_compare(secret_token, input)
+        unauthorized!
+      end
+    end
+
+    def authenticate_by_gitlab_geo_token!
+      token = headers['X-Gitlab-Token'].try(:chomp)
+      unless token && Devise.secure_compare(geo_token, token)
         unauthorized!
       end
     end
@@ -239,6 +245,10 @@ module API
 
     def file_to_large!
       render_api_error!('413 Request Entity Too Large', 413)
+    end
+
+    def not_modified!
+      render_api_error!('304 Not Modified', 304)
     end
 
     def render_validation_error!(model)
@@ -372,6 +382,10 @@ module API
 
     def secret_token
       File.read(Gitlab.config.gitlab_shell.secret_file).chomp
+    end
+
+    def geo_token
+      Gitlab::Geo.current_node.system_hook.token
     end
 
     def handle_member_errors(errors)
