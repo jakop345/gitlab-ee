@@ -1,6 +1,7 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.7.0 (unreleased)
+  - The number of InfluxDB points stored per UDP packet can now be configured
   - Transactions for /internal/allowed now have an "action" tag set
   - Method instrumentation now uses Module#prepend instead of aliasing methods
   - Repository.clean_old_archives is now instrumented
@@ -75,6 +76,7 @@ v 8.7.0 (unreleased)
   - API: Do not leak group existence via return code (Robert Schilling)
   - ClosingIssueExtractor regex now also works with colons. e.g. "Fixes: #1234" !3591
   - Update number of Todos in the sidebar when it's marked as "Done". !3600
+  - Sanitize branch names created for confidential issues
   - API: Expose 'updated_at' for issue, snippet, and merge request notes (Robert Schilling)
   - Add ability to sync to remote mirrors. !249
   - API: User can leave a project through the API when not master or owner. !3613
@@ -85,7 +87,9 @@ v 8.7.0 (unreleased)
   - Diffs load at the correct point when linking from from number
   - Selected diff rows highlight
   - Fix emoji categories in the emoji picker
+  - API: Properly display annotated tags for GET /projects/:id/repository/tags (Robert Schilling)
   - Add encrypted credentials for imported projects and migrate old ones
+  - Properly format all merge request references with ! rather than # !3740 (Ben Bodenmiller)
   - Author and participants are displayed first on users autocompletion
   - Show number sign on external issue reference text (Florent Baldino)
   - Updated print style for issues
@@ -95,9 +99,11 @@ v 8.7.0 (unreleased)
   - Fix emoji catgories in the emoji picker
   - Execute system web hooks on push to the project
   - Allow enable/disable push events for system hooks
+  - Fix GitHub project's link in the import page when provider has a custom URL
 
 v 8.6.7 (unreleased)
   - Fix vulnerability that made it possible to enumerate private projects belonging to group
+  - Add support to cherry-pick any commit into any branch in the web interface (Minqi Pan)
 
 v 8.6.6
   - Expire the exists cache before deletion to ensure project dir actually exists (Stan Hu). !3413
