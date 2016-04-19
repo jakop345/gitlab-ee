@@ -1,3 +1,6 @@
+v 8.3.8
+  - Fix vulnerability that made it possible to enumerate private projects belonging to group
+
 v 8.3.7
   - No EE-specific changes
 
