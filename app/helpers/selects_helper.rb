@@ -5,6 +5,7 @@ module SelectsHelper
     css_class << "skip_ldap " if opts[:skip_ldap]
     css_class << (opts[:class] || '')
     value = opts[:selected] || ''
+    current_user = opts[:current_user] || false
     
     first_user = opts[:first_user] && current_user ? current_user.username : false
     
@@ -16,7 +17,7 @@ module SelectsHelper
         any_user: opts[:any_user]         || false,
         email_user: opts[:email_user]     || false,
         first_user: first_user,
-        current_user: opts[:current_user] || false,
+        current_user: current_user,
         "push-code-to-protected-branches" => opts[:push_code_to_protected_branches],
         author_id: opts[:author_id]       || ''
       }
