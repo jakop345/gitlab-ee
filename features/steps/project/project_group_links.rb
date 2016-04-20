@@ -18,6 +18,7 @@ class Spinach::Features::ProjectGroupLinks < Spinach::FeatureSteps
 
   step 'I select group "Market" for share' do
     group = Group.find_by(path: 'market')
+    group.add_developer(current_user)
     select2(group.id, from: "#link_group_id")
     select "Master", from: 'link_group_access'
     click_button "Share"
