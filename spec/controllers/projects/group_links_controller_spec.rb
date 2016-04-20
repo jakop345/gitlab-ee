@@ -1,8 +1,8 @@
 require 'spec_helper'
 
 describe Projects::GroupLinksController do
-  let(:project) { create(:project, :private) }
-  let(:group) { create(:group, :private) }
+  let(:project) { create(:project) }
+  let(:group) { create(:group) }
   let(:user) { create(:user) }
 
   before do
