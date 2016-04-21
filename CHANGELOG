@@ -1,6 +1,7 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.7.0 (unreleased)
+  - Gitlab::GitAccess and Gitlab::GitAccessWiki are now instrumented
   - The number of InfluxDB points stored per UDP packet can now be configured
   - Fix error when cross-project label reference used with non-existent project
   - Transactions for /internal/allowed now have an "action" tag set
@@ -49,8 +50,9 @@ v 8.7.0 (unreleased)
   - Add endpoints to archive or unarchive a project !3372
   - Fix a bug whith trailing slash in bamboo_url
   - Add links to CI setup documentation from project settings and builds pages
+  - Display project members page to all members
   - Handle nil descriptions in Slack issue messages (Stan Hu)
-  - Add automated repository integrity checks
+  - Add automated repository integrity checks (OFF by default)
   - API: Expose open_issues_count, closed_issues_count, open_merge_requests_count for labels (Robert Schilling)
   - API: Ability to star and unstar a project (Robert Schilling)
   - Add default scope to projects to exclude projects pending deletion
