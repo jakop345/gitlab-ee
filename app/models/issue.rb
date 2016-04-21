@@ -20,7 +20,6 @@
 #
 
 require 'carrierwave/orm/activerecord'
-require 'file_size_validator'
 
 class Issue < ActiveRecord::Base
   include InternalId
@@ -35,6 +34,13 @@ class Issue < ActiveRecord::Base
   WEIGHT_ANY = 'Any Weight'
   WEIGHT_NONE = 'No Weight'
 
+  DueDateStruct = Struct.new(:title, :name).freeze
+  NoDueDate     = DueDateStruct.new('No Due Date', '0').freeze
+  AnyDueDate    = DueDateStruct.new('Any Due Date', '').freeze
+  Overdue       = DueDateStruct.new('Overdue', 'overdue').freeze
+  DueThisWeek   = DueDateStruct.new('Due This Week', 'week').freeze
+  DueThisMonth  = DueDateStruct.new('Due This Month', 'month').freeze
+
   ActsAsTaggableOn.strict_case_match = true
 
   belongs_to :project
@@ -45,6 +51,13 @@ class Issue < ActiveRecord::Base
   scope :cared, ->(user) { where(assignee_id: user) }
   scope :open_for, ->(user) { opened.assigned_to(user) }
   scope :in_projects, ->(project_ids) { where(project_id: project_ids) }
+
+  scope :without_due_date, -> { where(due_date: nil) }
+  scope :due_before, ->(date) { where('issues.due_date < ?', date) }
+  scope :due_between, ->(from_date, to_date) { where('issues.due_date >= ?', from_date).where('issues.due_date <= ?', to_date) }
+
+  scope :order_due_date_asc, -> { reorder('issues.due_date IS NULL, issues.due_date ASC') }
+  scope :order_due_date_desc, -> { reorder('issues.due_date IS NULL, issues.due_date DESC') }
 
   state_machine :state, initial: :opened do
     event :close do
@@ -87,6 +100,15 @@ class Issue < ActiveRecord::Base
 
   def self.link_reference_pattern
     @link_reference_pattern ||= super("issues", /(?<issue>\d+)/)
+  end
+
+  def self.sort(method)
+    case method.to_s
+    when 'due_date_asc' then order_due_date_asc
+    when 'due_date_desc'  then order_due_date_desc
+    else
+      super
+    end
   end
 
   def to_reference(from_project = nil)
@@ -179,5 +201,9 @@ class Issue < ActiveRecord::Base
       !self.project.forked? &&
       self.related_branches(current_user).empty? &&
       self.closed_by_merge_requests(current_user).empty?
+  end
+
+  def overdue?
+    due_date.try(:past?) || false
   end
 end

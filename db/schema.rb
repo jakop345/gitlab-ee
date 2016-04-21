@@ -495,6 +495,7 @@ ActiveRecord::Schema.define(version: 20160419120017) do
     t.boolean  "confidential",  default: false
     t.datetime "deleted_at"
     t.integer  "moved_to_id"
+    t.date     "due_date"
   end
 
   add_index "issues", ["assignee_id"], name: "index_issues_on_assignee_id", using: :btree
@@ -504,6 +505,7 @@ ActiveRecord::Schema.define(version: 20160419120017) do
   add_index "issues", ["created_at"], name: "index_issues_on_created_at", using: :btree
   add_index "issues", ["deleted_at"], name: "index_issues_on_deleted_at", using: :btree
   add_index "issues", ["description"], name: "index_issues_on_description_trigram", using: :gin, opclasses: {"description"=>"gin_trgm_ops"}
+  add_index "issues", ["due_date"], name: "index_issues_on_due_date", using: :btree
   add_index "issues", ["milestone_id"], name: "index_issues_on_milestone_id", using: :btree
   add_index "issues", ["project_id", "iid"], name: "index_issues_on_project_id_and_iid", unique: true, using: :btree
   add_index "issues", ["project_id"], name: "index_issues_on_project_id", using: :btree
@@ -951,6 +953,7 @@ ActiveRecord::Schema.define(version: 20160419120017) do
     t.boolean  "build_events",          default: false,    null: false
     t.string   "category",              default: "common", null: false
     t.boolean  "default",               default: false
+    t.boolean  "wiki_page_events",      default: true
   end
 
   add_index "services", ["category"], name: "index_services_on_category", using: :btree
@@ -1149,6 +1152,7 @@ ActiveRecord::Schema.define(version: 20160419120017) do
     t.boolean  "enable_ssl_verification",              default: true
     t.boolean  "build_events",                         default: false,         null: false
     t.string   "token"
+    t.boolean  "wiki_page_events",                     default: false,         null: false
   end
 
   add_index "web_hooks", ["created_at", "id"], name: "index_web_hooks_on_created_at_and_id", using: :btree
