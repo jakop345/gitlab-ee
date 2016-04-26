@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.4.10
+  - No EE-specific changes
+
 v 8.4.9
   - Fix vulnerability that made it possible to enumerate private projects belonging to group
 
