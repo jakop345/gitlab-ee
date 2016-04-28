@@ -14,6 +14,9 @@ v 8.7.1 (unreleased)
   - Prevent information disclosure via snippet API
   - Prevent information disclosure via project labels
   - Prevent information disclosure via new merge request page
+v 8.7.2
+  - The "New Branch" button is now loaded asynchronously
+
 v 8.7.1
   - Use the `can?` helper instead of `current_user.can?`
   - Fix .gitlab-ci.yml parsing issue when hidde job is a template without script definition. !3849
@@ -22,7 +25,6 @@ v 8.7.1
   - Fix Error 500 due to stale cache when projects are renamed or transferred
   - Fix .gitlab-ci.yml parsing issue when hidde job is a template without script definition
   - Update width of search box to fix Safari bug. !3900 (Jedidiah)
-  - The "New Branch" button is now loaded asynchronously
   - Use the `can?` helper instead of `current_user.can?`
 
 v 8.7.0
