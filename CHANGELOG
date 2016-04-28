@@ -14,6 +14,7 @@ v 8.7.1 (unreleased)
   - Prevent information disclosure via snippet API
   - Prevent information disclosure via project labels
   - Prevent information disclosure via new merge request page
+v 8.7.1
   - Use the `can?` helper instead of `current_user.can?`
   - Fix .gitlab-ci.yml parsing issue when hidde job is a template without script definition. !3849
   - Fix license detection to detect all license files, not only known licenses. !3878
