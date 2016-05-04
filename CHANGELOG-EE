@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.7.3
+  - No EE-specific changes
+
 v 8.7.2
   - Fix MR notifications for slack and hipchat when approvals are fullfiled. !325
   - GitLab Geo: Merge requests on Secondary should not check mergeable status
