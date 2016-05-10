@@ -75,14 +75,14 @@ describe Gitlab::Geo, lib: true do
       expect(described_class.license_allows?).to be_truthy
     end
 
-    it 'returns false if license doesnt have Geo addon' do
+    it 'returns true if license doesnt have Geo addon' do
       allow_any_instance_of(License).to receive(:add_on?).with('GitLab_Geo') { false }
-      expect(described_class.license_allows?).to be_falsey
+      expect(described_class.license_allows?).to be_truthy
     end
 
-    it 'returns false if no license is present' do
+    it 'returns true if no license is present' do
       allow(License).to receive(:current) { nil }
-      expect(described_class.license_allows?).to be_falsey
+      expect(described_class.license_allows?).to be_truthy
     end
   end
 end
