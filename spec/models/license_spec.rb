@@ -23,10 +23,13 @@ describe License do
       end
     end
 
-    describe "Historical active user count" do
+    describe "Active user count" do
       let(:active_user_count) { User.active.count + 10 }
       let(:date)              { License.current.starts_at }
-      let!(:historical_data)  { HistoricalData.create!(date: date, active_user_count: active_user_count) }
+
+      before do
+        allow(User).to receive(:active).and_return(Array.new(active_user_count))
+      end
 
       context "when there is no active user count restriction" do
         it "is valid" do
@@ -39,34 +42,8 @@ describe License do
           gl_license.restrictions = { active_user_count: active_user_count - 1 }
         end
 
-        context "when the license started" do
-          it "is invalid" do
-            expect(license).not_to be_valid
-          end
-        end
-
-        context "after the license started" do
-          let(:date) { Date.today }
-
-          it "is valid" do
-            expect(license).to be_valid
-          end
-        end
-
-        context "in the year before the license started" do
-          let(:date) { License.current.starts_at - 6.months }
-
-          it "is invalid" do
-            expect(license).not_to be_valid
-          end
-        end
-
-        context "earlier than a year before the license started" do
-          let(:date) { License.current.starts_at - 2.years }
-
-          it "is valid" do
-            expect(license).to be_valid
-          end
+        it "is invalid" do
+          expect(license).not_to be_valid
         end
       end
 
