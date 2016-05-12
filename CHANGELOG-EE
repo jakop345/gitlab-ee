@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.7.5
+  - No EE-specific changes
+
 v 8.7.4
   - Delete ProjectImportData record only if Project is not a mirror !370
   - Fixed typo in GitLab GEO license check alert !379
