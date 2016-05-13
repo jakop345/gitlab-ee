@@ -20,6 +20,7 @@ v 8.7.4
   - Use a case-insensitive comparison in sanitizing URI schemes
   - Fix always showing build notification message when switching between merge requests
   - Links for Redmine issue references are generated correctly again (Benedikt Huss)
+  - Bump GitLab Pages to 0.2.4 to fix Content-Type for predefined 404
 
 v 8.7.3
   - Emails, Gitlab::Email::Message, Gitlab::Diff, and Premailer::Adapter::Nokogiri are now instrumented
