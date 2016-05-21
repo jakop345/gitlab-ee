@@ -401,7 +401,7 @@ describe Gitlab::GitAccess, lib: true do
         project.git_hook.update(commit_message_regex: "Change some files")
 
         # push to new branch, so use a blank old rev and new ref
-        expect(access.git_hook_check(user, project, 'refs/heads/master', '6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9', '570e7b2abdd848b95f2f578043fc23bd6f6fd24d')).to be_allowed
+        expect(access.git_hook_check(user, project, 'refs/heads/master', Gitlab::Git::BLANK_SHA, '570e7b2abdd848b95f2f578043fc23bd6f6fd24d')).to be_allowed
       end
     end
 
