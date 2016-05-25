@@ -3,6 +3,7 @@ Please view this file on the master branch, on stable branches it's out of date.
 v 8.8.3
   - Add standard web hook headers to Jenkins CI post. !374
   - Gracefully handle malformed DNs in LDAP group sync. !392
+  - Reduce load on DB for license upgrade check. !421
   - Fix Git hook validations for fast-forward merges. !427
   - [Elastic] In search results, only show notes on confidential issues that the user has access to.
 
