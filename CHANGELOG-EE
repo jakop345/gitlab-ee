@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.8.3
+ - Add standard web hook headers to Jenkins CI post. !374
+
 v 8.8.2
   - [Elastic] Search through the filenames. !409
   - Fix repository mirror updates for new imports stuck in "started" state. !416
