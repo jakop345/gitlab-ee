@@ -11,6 +11,15 @@ module BlobHelper
     %w(credits changelog news copying copyright license authors)
   end
 
+  def lock_file_link(project = @project, path = @path)
+    # TODO: implement the condition
+    if false
+      button_tag 'Lock', class: 'btn disabled has-tooltip btn-file-option', title: 'You can only edit files when you are on a branch', data: { container: 'body' }
+    elsif true#can_lock_path?(path, project, ref)
+      link_to 'Lock', "#", class: 'btn btn-file-option'
+    end
+  end
+
   def edit_blob_link(project = @project, ref = @ref, path = @path, options = {})
     return unless current_user
 

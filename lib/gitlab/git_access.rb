@@ -186,11 +186,45 @@ module Gitlab
 
       # Return build_status_object(true) if all git hook checks passed successfully
       # or build_status_object(false) if any hook fails
-      git_hook_check(user, project, ref, oldrev, newrev)
+      result = git_hook_check(user, project, ref, oldrev, newrev)
+
+      if result.status
+        result = file_locks_check(user, project, ref, oldrev, newrev)
+      end
+
+      return result
     end
 
     def forced_push?(oldrev, newrev)
       Gitlab::ForcePushCheck.force_push?(project, oldrev, newrev)
+    end
+
+    def file_locks_check(user, project, ref, oldrev, newrev)
+      unless project.any_path_locks? && newrev && oldrev
+        return build_status_object(true)
+      end
+
+      # if newrev is blank, the branch was deleted
+      if Gitlab::Git.blank_ref?(newrev)
+        return build_status_object(true)
+      end
+
+      # if oldrev is blank, the branch was just created
+      oldrev = project.default_branch if Gitlab::Git.blank_ref?(oldrev)
+
+      commits(newrev, oldrev, project).each do |commit|
+        next if commit_from_annex_sync?(commit.safe_message) || old_commit?(commit)
+        commit.diffs.each do |diff|
+          path = diff.new_path || diff.old_path
+
+          if lock_info = project.path_lock_info(path)
+            return build_status_object(false, "The path '#{lock_info.path}' is locked by #{lock_info.user.name}")
+          end
+        end
+      end
+
+
+      build_status_object(true)
     end
 
     def git_hook_check(user, project, ref, oldrev, newrev)

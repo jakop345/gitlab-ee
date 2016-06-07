@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160530214349) do
+ActiveRecord::Schema.define(version: 20160601102211) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_trgm"
@@ -85,6 +86,10 @@ ActiveRecord::Schema.define(version: 20160530214349) do
     t.text     "disabled_oauth_sign_in_sources"
     t.string   "health_check_access_token"
     t.boolean  "send_user_confirmation_email",          default: false
+    t.boolean  "es_indexing",                           default: false,       null: false
+    t.boolean  "es_search",                             default: false,       null: false
+    t.string   "es_host",                               default: "localhost"
+    t.string   "es_port",                               default: "9200"
     t.integer  "container_registry_token_expire_delay", default: 5
   end
 
@@ -822,6 +827,18 @@ ActiveRecord::Schema.define(version: 20160530214349) do
 
   add_index "pages_domains", ["domain"], name: "index_pages_domains_on_domain", unique: true, using: :btree
 
+  create_table "path_locks", force: :cascade do |t|
+    t.string   "path",       null: false
+    t.integer  "project_id"
+    t.integer  "user_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  add_index "path_locks", ["path"], name: "index_path_locks_on_path", using: :btree
+  add_index "path_locks", ["project_id"], name: "index_path_locks_on_project_id", using: :btree
+  add_index "path_locks", ["user_id"], name: "index_path_locks_on_user_id", using: :btree
+
   create_table "project_group_links", force: :cascade do |t|
     t.integer  "project_id",                null: false
     t.integer  "group_id",                  null: false
@@ -1193,6 +1210,8 @@ ActiveRecord::Schema.define(version: 20160530214349) do
   add_index "web_hooks", ["created_at", "id"], name: "index_web_hooks_on_created_at_and_id", using: :btree
   add_index "web_hooks", ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
 
+  add_foreign_key "path_locks", "projects"
+  add_foreign_key "path_locks", "users"
   add_foreign_key "remote_mirrors", "projects"
   add_foreign_key "u2f_registrations", "users"
 end

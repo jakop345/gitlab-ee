@@ -15,6 +15,8 @@
                 = link_to @commit.short_id, namespace_project_commit_path(@project.namespace, @project, @commit), class: "monospace"
                 &ndash;
                 = truncate(@commit.title, length: 50)
+            = link_to 'Lock', '#', class: 'pull-right prepend-left-10'
+
             = link_to 'History', namespace_project_commits_path(@project.namespace, @project, @id), class: 'pull-right'
 
       - if @path.present?
