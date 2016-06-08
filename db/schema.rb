@@ -11,7 +11,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160530214349) do
+ActiveRecord::Schema.define(version: 20160603182247) do
+
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
   enable_extension "pg_trgm"
@@ -766,6 +767,7 @@ ActiveRecord::Schema.define(version: 20160530214349) do
   end
 
   add_index "notification_settings", ["source_id", "source_type"], name: "index_notification_settings_on_source_id_and_source_type", using: :btree
+  add_index "notification_settings", ["user_id", "source_id", "source_type"], name: "index_notifications_on_user_id_and_source_id_and_source_type", unique: true, using: :btree
   add_index "notification_settings", ["user_id"], name: "index_notification_settings_on_user_id", using: :btree
 
   create_table "oauth_access_grants", force: :cascade do |t|
@@ -846,6 +848,7 @@ ActiveRecord::Schema.define(version: 20160530214349) do
     t.datetime "updated_at"
     t.integer  "creator_id"
     t.boolean  "issues_enabled",                   default: true,     null: false
+    t.boolean  "wall_enabled",                     default: true,     null: false
     t.boolean  "merge_requests_enabled",           default: true,     null: false
     t.boolean  "wiki_enabled",                     default: true,     null: false
     t.integer  "namespace_id"
@@ -1186,8 +1189,8 @@ ActiveRecord::Schema.define(version: 20160530214349) do
     t.boolean  "note_events",                          default: false,         null: false
     t.boolean  "enable_ssl_verification",              default: true
     t.boolean  "build_events",                         default: false,         null: false
-    t.boolean  "wiki_page_events",                     default: false,         null: false
     t.string   "token"
+    t.boolean  "wiki_page_events",                     default: false,         null: false
   end
 
   add_index "web_hooks", ["created_at", "id"], name: "index_web_hooks_on_created_at_and_id", using: :btree
