@@ -34,6 +34,7 @@ v 8.9.0 (unreleased)
   - Add rake task 'gitlab:db:configure' for conditionally seeding or migrating the database
   - Changed the Slack build message to use the singular duration if necessary (Aran Koning)
   - Links from a wiki page to other wiki pages should be rewritten as expected
+  - Add option to project to only allow merge requests to be merged if the build succeeds (Rui Santos)
   - Fix issues filter when ordering by milestone
   - Todos will display target state if issuable target is 'Closed' or 'Merged'
   - Fix bug when sorting issues by milestone due date and filtering by two or more labels
@@ -64,6 +65,7 @@ v 8.9.0 (unreleased)
   - Markdown editor now correctly resets the input value on edit cancellation !4175
   - Toggling a task list item in a issue/mr description does not creates a Todo for mentions
   - Improved UX of date pickers on issue & milestone forms
+  - Cache on the database if a project has an active external issue tracker.
 
 v 8.8.5 (unreleased)
   - Ensure branch cleanup regardless of whether the GitHub import process succeeds
@@ -73,6 +75,7 @@ v 8.8.5 (unreleased)
   - Import GitHub repositories respecting the API rate limit
   - Fix importer for GitHub comments on diff
   - Disable Webhooks before proceeding with the GitHub import
+  - Fix incremental trace upload API when using multi-byte UTF-8 chars in trace
 
 v 8.8.4
   - Fix LDAP-based login for users with 2FA enabled. !4493

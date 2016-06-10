@@ -1,4 +1,4 @@
-%fieldset.merge-request-feature.append-bottom-default
+%fieldset.merge-requests-feature.append-bottom-default
   %h5.prepend-top-0
     Merge requests
 
@@ -35,6 +35,15 @@
         %br
         %span.descr
           When the branch has not been rebased, the user is given the option to do so.
+
+  .form-group
+    .checkbox
+      = f.label :only_allow_merge_if_build_succeeds do
+        = f.check_box :only_allow_merge_if_build_succeeds
+        %strong Only allow merge requests to be merged if the build succeeds
+      .help-block
+        Builds need to be configured to enable this feature.
+        = link_to icon('question-circle'), help_page_path('workflow', 'merge_requests#only-allow-merge-requests-to-be-merged-if-the-build-succeeds')
 
   .form-group
     = f.label :merge_requests_template, class: 'label-light' do

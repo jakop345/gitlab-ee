@@ -851,7 +851,6 @@ ActiveRecord::Schema.define(version: 20160608155312) do
     t.datetime "updated_at"
     t.integer  "creator_id"
     t.boolean  "issues_enabled",                   default: true,     null: false
-    t.boolean  "wall_enabled",                     default: true,     null: false
     t.boolean  "merge_requests_enabled",           default: true,     null: false
     t.boolean  "wiki_enabled",                     default: true,     null: false
     t.integer  "namespace_id"
@@ -894,6 +893,8 @@ ActiveRecord::Schema.define(version: 20160608155312) do
     t.boolean  "last_repository_check_failed"
     t.datetime "last_repository_check_at"
     t.boolean  "container_registry_enabled"
+    t.boolean  "only_allow_merge_if_build_succeeds", default: false,    null: false
+    t.boolean  "has_external_issue_tracker"
   end
 
   add_index "projects", ["builds_enabled", "shared_runners_enabled"], name: "index_projects_on_builds_enabled_and_shared_runners_enabled", using: :btree
