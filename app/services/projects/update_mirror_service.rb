@@ -4,7 +4,10 @@ module Projects
     class UpdateError < Error; end
 
     def execute
-      return false unless project.mirror?
+      # A mirror project requires an import_url but for some reason it seems there are projects without import_url
+      unless project.mirror? && project.import_url?
+        return error("Only mirror projects with import url can be updated")
+      end
 
       unless can?(current_user, :push_code_to_protected_branches, project)
         return error("The mirror user is not allowed to push code to all branches on this project.")

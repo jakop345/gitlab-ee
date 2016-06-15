@@ -545,7 +545,8 @@ class Project < ActiveRecord::Base
   end
 
   def update_mirror
-    return unless mirror? && repository_exists?
+    # A mirror project requires an import_url but for some reason it seems there are project without import_url
+    return unless mirror? && import_url? && repository_exists?
 
     return if import_in_progress?
 
