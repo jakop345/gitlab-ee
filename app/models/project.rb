@@ -79,7 +79,7 @@ class Project < ActiveRecord::Base
   has_one :jira_service, dependent: :destroy
   has_one :redmine_service, dependent: :destroy
   has_one :custom_issue_tracker_service, dependent: :destroy
-  has_one :gitlab_issue_tracker_service, dependent: :destroy
+  has_one :gitlab_issue_tracker_service, dependent: :destroy, inverse_of: :project
   has_one :external_wiki_service, dependent: :destroy
   has_one :index_status, dependent: :destroy
 
@@ -130,6 +130,8 @@ class Project < ActiveRecord::Base
   has_many :variables, dependent: :destroy, class_name: 'Ci::Variable', foreign_key: :gl_project_id
   has_many :triggers, dependent: :destroy, class_name: 'Ci::Trigger', foreign_key: :gl_project_id
   has_many :remote_mirrors, dependent: :destroy
+  has_many :environments, dependent: :destroy
+  has_many :deployments, dependent: :destroy
 
   accepts_nested_attributes_for :variables, allow_destroy: true
   accepts_nested_attributes_for :remote_mirrors,
