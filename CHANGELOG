@@ -58,6 +58,7 @@ v 8.9.0 (unreleased)
   - Add option to project to only allow merge requests to be merged if the build succeeds (Rui Santos)
   - Added navigation shortcuts to the project pipelines, milestones, builds and forks page. !4393
   - Fix issues filter when ordering by milestone
+  - Disable SAML account unlink feature
   - Added artifacts:when to .gitlab-ci.yml - this requires GitLab Runner 1.3
   - Bamboo Service: Fix missing credentials & URL handling when base URL contains a path (Benjamin Schmid)
   - TeamCity Service: Fix URL handling when base URL contains a path
@@ -133,6 +134,8 @@ v 8.8.5 (unreleased)
   - Update tanuki logo highlight/loading colors
   - Use Git cached counters for branches and tags on project page
   - Filter parameters for request_uri value on instrumented transactions.
+  - Cache user todo counts from TodoService
+  - Ensure Todos counters doesn't count Todos for projects pending delete
 
 v 8.8.5
   - Import GitHub repositories respecting the API rate limit !4166
