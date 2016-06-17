@@ -23,6 +23,7 @@ v 8.9.0 (unreleased)
   - Added descriptions to notification settings dropdown
   - Improve note validation to prevent errors when creating invalid note via API
   - Reduce number of fog gem dependencies
+  - Implement a fair usage of shared runners
   - Remove project notification settings associated with deleted projects
   - Fix 404 page when viewing TODOs that contain milestones or labels in different projects
   - Add a metric for the number of new Redis connections created by a transaction
@@ -39,7 +40,9 @@ v 8.9.0 (unreleased)
   - `git clone https://host/namespace/project` now works, in addition to using the `.git` suffix
   - Bump nokogiri to 1.6.8
   - Use gitlab-shell v3.0.0
+  - Fixed alignment of download dropdown in merge requests
   - Upgrade to jQuery 2
+  - Adds selected branch name to the dropdown toggle
   - Use Knapsack to evenly distribute tests across multiple nodes
   - Add `sha` parameter to MR merge API, to ensure only reviewed changes are merged
   - Don't allow MRs to be merged when commits were added since the last review / page load
@@ -62,7 +65,9 @@ v 8.9.0 (unreleased)
   - Use downcased path to container repository as this is expected path by Docker
   - Projects pending deletion will render a 404 page
   - Measure queue duration between gitlab-workhorse and Rails
+  - Added Gfm autocomplete for labels
   - Make Omniauth providers specs to not modify global configuration
+  - Remove unused JiraIssue class and replace references with ExternalIssue. !4659 (Ilan Shamir)
   - Make authentication service for Container Registry to be compatible with < Docker 1.11
   - Add Application Setting to configure Container Registry token expire delay (default 5min)
   - Cache assigned issue and merge request counts in sidebar nav
