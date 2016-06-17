@@ -222,7 +222,7 @@ class NotificationService
   end
 
   def accept_group_invite(group_member)
-    mailer.member_invite_accepted_email(group_member.id).deliver_later
+    mailer.member_invite_accepted_email(group_member.real_source_type, group_member.id).deliver_later
   end
 
   def decline_group_invite(group_member)
@@ -264,6 +264,14 @@ class NotificationService
       email.deliver_later
       email
     end
+  end
+
+  def project_exported(project, current_user)
+    mailer.project_was_exported_email(current_user, project).deliver_later
+  end
+
+  def project_not_exported(project, current_user, errors)
+    mailer.project_was_not_exported_email(current_user, project, errors).deliver_later
   end
 
   protected

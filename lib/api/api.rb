@@ -64,5 +64,6 @@ module API
     mount ::API::LicenseTemplates
     mount ::API::Subscriptions
     mount ::API::Gitignores
+    mount ::API::SidekiqMetrics
   end
 end

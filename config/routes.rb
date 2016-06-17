@@ -179,6 +179,10 @@ Rails.application.routes.draw do
       get   :new_user_map,    path: :user_map
       post  :create_user_map, path: :user_map
     end
+
+    resource :gitlab_project, only: [:create, :new] do
+      post :create
+    end
   end
 
   #
@@ -369,6 +373,13 @@ Rails.application.routes.draw do
       resources :keys
       resources :emails, only: [:index, :create, :destroy]
       resource :avatar, only: [:destroy]
+
+      resources :personal_access_tokens, only: [:index, :create] do
+        member do
+          put :revoke
+        end
+      end
+
       resource :two_factor_auth, only: [:show, :create, :destroy] do
         member do
           post :create_u2f
@@ -497,6 +508,10 @@ Rails.application.routes.draw do
         post :housekeeping
         post :toggle_star
         post :markdown_preview
+        post :export
+        post :remove_export
+        post :generate_new_export
+        get :download_export
         get :autocomplete_sources
         get :activity
       end

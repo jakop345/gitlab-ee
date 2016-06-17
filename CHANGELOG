@@ -1,6 +1,7 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.9.0 (unreleased)
+  - Fix error when CI job variables key specified but not defined
   - Fix pipeline status when there are no builds in pipeline
   - Fix Error 500 when using closes_issues API with an external issue tracker
   - Add more information into RSS feed for issues (Alexander Matyushentsev)
@@ -13,6 +14,8 @@ v 8.9.0 (unreleased)
   - Fix an issue where note polling stopped working if a window was in the
     background during a refresh.
   - Make EmailsOnPushWorker use Sidekiq mailers queue
+  - Redesign all Devise emails. !4297
+  - Don't show 'Leave Project' to group members
   - Fix wiki page events' webhook to point to the wiki repository
   - Don't show tags for revert and cherry-pick operations
   - Fix issue todo not remove when leave project !4150 (Long Nguyen)
@@ -33,6 +36,7 @@ v 8.9.0 (unreleased)
   - Added shortcut 'y' for copying a files content hash URL #14470
   - Fix groups API to list only user's accessible projects
   - Fix horizontal scrollbar for long commit message.
+  - GitLab Performance Monitoring now tracks the total method execution time and call count per method
   - Add Environments and Deployments
   - Redesign account and email confirmation emails
   - Don't fail builds for projects that are deleted
@@ -43,6 +47,7 @@ v 8.9.0 (unreleased)
   - Fixed alignment of download dropdown in merge requests
   - Upgrade to jQuery 2
   - Adds selected branch name to the dropdown toggle
+  - Add API endpoint for Sidekiq Metrics !4653
   - Use Knapsack to evenly distribute tests across multiple nodes
   - Add `sha` parameter to MR merge API, to ensure only reviewed changes are merged
   - Don't allow MRs to be merged when commits were added since the last review / page load
@@ -57,11 +62,13 @@ v 8.9.0 (unreleased)
   - Bamboo Service: Fix missing credentials & URL handling when base URL contains a path (Benjamin Schmid)
   - TeamCity Service: Fix URL handling when base URL contains a path
   - Todos will display target state if issuable target is 'Closed' or 'Merged'
+  - Validate only and except regexp
   - Fix bug when sorting issues by milestone due date and filtering by two or more labels
   - Add support for using Yubikeys (U2F) for two-factor authentication
   - Link to blank group icon doesn't throw a 404 anymore
   - Remove 'main language' feature
   - Pipelines can be canceled only when there are running builds
+  - Allow authentication using personal access tokens
   - Use downcased path to container repository as this is expected path by Docker
   - Projects pending deletion will render a 404 page
   - Measure queue duration between gitlab-workhorse and Rails
@@ -87,6 +94,7 @@ v 8.9.0 (unreleased)
   - Show categorised search queries in the search autocomplete
   - RepositoryCheck::SingleRepositoryWorker public and private methods are now instrumented
   - Improve issuables APIs performance when accessing notes !4471
+  - Add sorting dropdown to tags page !4423
   - External links now open in a new tab
   - Prevent default actions of disabled buttons and links
   - Markdown editor now correctly resets the input value on edit cancellation !4175
@@ -94,6 +102,7 @@ v 8.9.0 (unreleased)
   - Improved UX of date pickers on issue & milestone forms
   - Cache on the database if a project has an active external issue tracker.
   - Put project Labels and Milestones pages links under Issues and Merge Requests tabs as subnav
+  - GitLab project import and export functionality
   - All classes in the Banzai::ReferenceParser namespace are now instrumented
   - Remove deprecated issues_tracker and issues_tracker_id from project model
   - Allow users to create confidential issues in private projects
@@ -122,6 +131,8 @@ v 8.8.5 (unreleased)
   - Fix incremental trace upload API when using multi-byte UTF-8 chars in trace
   - Set inverse_of for Project/Service association to reduce the number of queries
   - Update tanuki logo highlight/loading colors
+  - Use Git cached counters for branches and tags on project page
+  - Filter parameters for request_uri value on instrumented transactions.
 
 v 8.8.5
   - Import GitHub repositories respecting the API rate limit !4166
