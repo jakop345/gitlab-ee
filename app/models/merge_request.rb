@@ -475,11 +475,22 @@ class MergeRequest < ActiveRecord::Base
   end
 
   def approvers_left
-    User.where(id: overall_approvers.select(:user_id)).where.not(id: approvals.select(:user_id))
+    @approvers ||= begin
+      records = User.where(id: overall_approvers.select(:user_id)).where.not(id: approvals.select(:user_id)).to_a
+      records.delete_if { |approver| approver == author }
+    end
+  end
+
+  def requires_approval_from_author?
+    return @approval_from_author if defined?(@approval_from_author)
+
+    @approval_from_author = author && overall_approvers.map(&:user_id).include?(author.id)
   end
 
   def approvals_required
-    target_project.approvals_before_merge
+    total = target_project.approvals_before_merge
+
+    requires_approval_from_author? ? total - 1 : total
   end
 
   def requires_approve?

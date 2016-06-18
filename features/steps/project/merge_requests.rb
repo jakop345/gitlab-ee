@@ -526,8 +526,10 @@ class Spinach::Features::ProjectMergeRequests < Spinach::FeatureSteps
   end
 
   step 'project settings contain list of approvers' do
+    @user = create(:user)
+
     project.update(approvals_before_merge: 1)
-    project.approvers.create(user_id: current_user.id)
+    project.approvers.create(user_id: @user.id)
   end
 
   step 'there is one auto-suggested approver' do

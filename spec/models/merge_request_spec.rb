@@ -235,6 +235,17 @@ describe MergeRequest, models: true do
 
       expect(merge_request.approvers_left).to eq [user]
     end
+
+    context 'when the MR author is an approver' do
+      it 'should be excluded from list of approvers' do
+        author = merge_request.author
+
+        merge_request.approvers.create(user: author)
+
+        expect(merge_request.approvers_left).not_to include(author)
+        expect(merge_request.approvers_left).to be_blank
+      end
+    end
   end
 
   describe "#approvals_required" do
@@ -244,6 +255,17 @@ describe MergeRequest, models: true do
       merge_request.target_project.update(approvals_before_merge: 2)
 
       expect(merge_request.approvals_required).to eq 2
+    end
+
+    context 'when the MR author is an approver' do
+      it 'is assumed like he has already approved the MR' do
+        author = merge_request.author
+
+        merge_request.target_project.update(approvals_before_merge: 2)
+        merge_request.approvers.create(user: author)
+
+        expect(merge_request.approvals_required).to eq(1)
+      end
     end
   end
 
