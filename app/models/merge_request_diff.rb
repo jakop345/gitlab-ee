@@ -145,7 +145,10 @@ class MergeRequestDiff < ActiveRecord::Base
     end
 
     new_attributes[:st_diffs] = new_diffs
-    new_attributes[:base_commit_sha] = self.repository.merge_base(self.head, self.base)
+
+    new_attributes[:start_commit_sha] = self.target_branch_sha
+    new_attributes[:head_commit_sha] = self.source_branch_sha
+    new_attributes[:base_commit_sha] = branch_base_sha
 
     update_columns_serialized(new_attributes)
   end
