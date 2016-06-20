@@ -26,6 +26,7 @@ v 8.9.0 (unreleased)
   - Added descriptions to notification settings dropdown
   - Improve note validation to prevent errors when creating invalid note via API
   - Reduce number of fog gem dependencies
+  - Add number of merge requests for a given milestone to the milestones view.
   - Implement a fair usage of shared runners
   - Remove project notification settings associated with deleted projects
   - Fix 404 page when viewing TODOs that contain milestones or labels in different projects
@@ -53,6 +54,7 @@ v 8.9.0 (unreleased)
   - Add `sha` parameter to MR merge API, to ensure only reviewed changes are merged
   - Don't allow MRs to be merged when commits were added since the last review / page load
   - Add DB index on users.state
+  - Limit email on push diff size to 30 files / 150 KB
   - Add rake task 'gitlab:db:configure' for conditionally seeding or migrating the database
   - Changed the Slack build message to use the singular duration if necessary (Aran Koning)
   - Links from a wiki page to other wiki pages should be rewritten as expected
@@ -136,6 +138,7 @@ v 8.8.5 (unreleased)
   - Update tanuki logo highlight/loading colors
   - Use Git cached counters for branches and tags on project page
   - Filter parameters for request_uri value on instrumented transactions.
+  - Remove duplicated keys add UNIQUE index to keys fingerprint column
   - Cache user todo counts from TodoService
   - Ensure Todos counters doesn't count Todos for projects pending delete
 
