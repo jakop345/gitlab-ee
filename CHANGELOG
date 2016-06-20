@@ -7,6 +7,7 @@ v 8.9.0 (unreleased)
   - Add more information into RSS feed for issues (Alexander Matyushentsev)
   - Bulk assign/unassign labels to issues.
   - Ability to prioritize labels !4009 / !3205 (Thijs Wouters)
+  - Show Star and Fork buttons on mobile.
   - Fix endless redirections when accessing user OAuth applications when they are disabled
   - Allow enabling wiki page events from Webhook management UI
   - Bump rouge to 1.11.0
@@ -71,6 +72,7 @@ v 8.9.0 (unreleased)
   - Add support for using Yubikeys (U2F) for two-factor authentication
   - Link to blank group icon doesn't throw a 404 anymore
   - Remove 'main language' feature
+  - Toggle whitespace button now available for compare branches diffs #17881
   - Pipelines can be canceled only when there are running builds
   - Allow authentication using personal access tokens
   - Use downcased path to container repository as this is expected path by Docker
