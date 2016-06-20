@@ -732,4 +732,8 @@ class MergeRequest < ActiveRecord::Base
   def can_be_cherry_picked?
     merge_commit
   end
+
+  def support_new_diff_notes?
+    diff_refs && diff_refs.complete?
+  end
 end
