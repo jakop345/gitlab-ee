@@ -2,7 +2,7 @@
   = render 'layouts/nav/group_settings'
 
   %ul.nav-links.scrolling-tabs
-    .fade-left
+    %li.fade-left
       = icon('arrow-left')
     = nav_link(path: 'groups#show', html_options: {class: 'home'}) do
       = link_to group_path(@group), title: 'Home' do
@@ -33,8 +33,8 @@
         %span
           Members
     = nav_link(controller: [:stats]) do
-      = link_to group_analytics_path(@group), title: 'Contribution Analytics', data: {placement: 'right'} do
+      = link_to group_analytics_path(@group), title: 'Contribution Analytics' do
         %span
           Contribution Analytics
-    .fade-right
+    %li.fade-right
       = icon('arrow-right')
