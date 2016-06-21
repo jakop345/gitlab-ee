@@ -2,6 +2,7 @@
   .nav-links.sub-nav.scrolling-tabs
     %ul{ class: (container_class) }
       .fade-left
+        = icon('arrow-left')
       = nav_link(controller: %w(tree blob blame edit_tree new_tree find_file)) do
         = link_to project_files_path(@project) do
           Files
@@ -31,3 +32,4 @@
             Locked Files
 
       .fade-right
+        = icon('arrow-right')
