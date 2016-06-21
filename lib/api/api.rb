@@ -34,7 +34,6 @@ module API
     mount ::API::DeployKeys
     mount ::API::Files
     mount ::API::Geo
-    mount ::API::Gitignores
     mount ::API::GroupMembers
     mount ::API::Groups
     mount ::API::Internal
@@ -63,6 +62,7 @@ module API
     mount ::API::Subscriptions
     mount ::API::SystemHooks
     mount ::API::Tags
+    mount ::API::Templates
     mount ::API::Triggers
     mount ::API::Users
     mount ::API::Variables
