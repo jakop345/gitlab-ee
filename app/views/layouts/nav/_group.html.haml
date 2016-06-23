@@ -1,9 +1,10 @@
-%div{ class: nav_control_class }
+.scrolling-tabs-container{ class: nav_control_class }
   = render 'layouts/nav/group_settings'
-
+  .fade-left
+    = icon('arrow-left')
+  .fade-right
+    = icon('arrow-right')
   %ul.nav-links.scrolling-tabs
-    %li.fade-left
-      = icon('arrow-left')
     = nav_link(path: 'groups#show', html_options: {class: 'home'}) do
       = link_to group_path(@group), title: 'Home' do
         %span
@@ -36,5 +37,3 @@
       = link_to group_analytics_path(@group), title: 'Contribution Analytics' do
         %span
           Contribution Analytics
-    %li.fade-right
-      = icon('arrow-right')
