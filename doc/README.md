@@ -3,18 +3,19 @@
 ## User documentation
 
 - [API](api/README.md) Automate GitLab via a simple and powerful API.
-- [CI](ci/README.md) GitLab Continuous Integration (CI) getting started, `.gitlab-ci.yml` options, and examples.
+- [Analytics](analytics/README.md)
+- [CI/CD](ci/README.md) GitLab Continuous Integration (CI) and Continuous Delivery (CD) getting started, `.gitlab-ci.yml` options, and examples.
 - [GitLab as OAuth2 authentication service provider](integration/oauth_provider.md). It allows you to login to other applications from GitLab.
+- [Container Registry](container_registry/README.md) Learn how to use GitLab Container Registry.
 - [GitLab Basics](gitlab-basics/README.md) Find step by step how to start working on your commandline and on GitLab.
 - [Importing to GitLab](workflow/importing/README.md).
+- [Importing and exporting projects between instances](user/project/settings/import_export.md).
 - [Markdown](markdown/markdown.md) GitLab's advanced formatting system.
-- [Migrating from SVN](workflow/importing/migrating_from_svn.md) Convert a SVN repository to Git and GitLab
+- [Migrating from SVN](workflow/importing/migrating_from_svn.md) Convert a SVN repository to Git and GitLab.
 - [Permissions](permissions/permissions.md) Learn what each role in a project (external/guest/reporter/developer/master/owner) can do.
 - [Profile Settings](profile/README.md)
 - [Project Services](project_services/project_services.md) Integrate a project with external services, such as CI and chat.
 - [Public access](public_access/public_access.md) Learn how you can allow public and internal access to projects.
-- [Analytics](analytics/README.md)
-- [Container Registry](container_registry/README.md) Learn how to use GitLab Container Registry.
 - [SSH](ssh/README.md) Setup your ssh keys and deploy keys for secure access to your projects.
 - [Webhooks](web_hooks/web_hooks.md) Let GitLab notify you when new code has been pushed to your project.
 - [Workflow](workflow/README.md) Using GitLab functionality and importing projects from GitHub and SVN.
@@ -33,15 +34,15 @@
 - [Help message](customization/help_message.md) Set information about administrators of your GitLab instance.
 - [Install](install/README.md) Requirements, directory structures and installation from source.
 - [Installing your license](license/README.md)
-- [Integration](integration/README.md) How to integrate with systems such as JIRA, Redmine, LDAP and Twitter.
-- [Restart GitLab](administration/restart_gitlab.md) Learn how to restart GitLab and its components
+- [Integration](integration/README.md) How to integrate with systems such as JIRA, Redmine, Twitter.
+- [Restart GitLab](administration/restart_gitlab.md) Learn how to restart GitLab and its components.
 - [Issue closing](customization/issue_closing.md) Customize how to close an issue from commit messages.
 - [Libravatar](customization/libravatar.md) Use Libravatar for user avatars.
 - [Log system](administration/logs.md) Log system.
 - [Environment Variables](administration/environment_variables.md) to configure GitLab.
-- [Operations](operations/README.md) Keeping GitLab up and running
+- [Operations](operations/README.md) Keeping GitLab up and running.
 - [Raketasks](raketasks/README.md) Backups, maintenance, automatic webhook setup and the importing of projects.
-- [Repository checks](administration/repository_checks.md) Periodic Git repository checks
+- [Repository checks](administration/repository_checks.md) Periodic Git repository checks.
 - [Security](security/README.md) Learn what you can do to further secure your GitLab instance.
 - [System hooks](system_hooks/system_hooks.md) Notifications when users, projects and keys are changed.
 - [Update](update/README.md) Update guides to upgrade your installation.
@@ -53,14 +54,13 @@
 - [Git LFS configuration](workflow/lfs/lfs_administration.md)
 - [Housekeeping](administration/housekeeping.md) Keep your Git repository tidy and fast.
 - [GitLab Pages configuration](pages/administration.md)
-- [Elasticsearch](integration/elasticsearch.md) Enable Elasticsearch
-- [GitLab Performance Monitoring](monitoring/performance/introduction.md) Configure GitLab and InfluxDB for measuring performance metrics
-- [Monitoring uptime](monitoring/health_check.md) Check the server status using the health check endpoint
-- [Sidekiq Troubleshooting](administration/troubleshooting/sidekiq.md) Debug when Sidekiq appears hung and is not processing jobs
-- [High Availability](administration/high_availability/README.md) Configure multiple servers for scaling or high availability
-- [GitLab GEO](gitlab-geo/README.md) Configure GitLab GEO, a
-  secondary read-only GitLab instance
-- [Container Registry](administration/container_registry.md) Configure Docker Registry with GitLab
+- [Elasticsearch](integration/elasticsearch.md) Enable Elasticsearch.
+- [GitLab Performance Monitoring](monitoring/performance/introduction.md) Configure GitLab and InfluxDB for measuring performance metrics.
+- [Monitoring uptime](monitoring/health_check.md) Check the server status using the health check endpoint.
+- [Sidekiq Troubleshooting](administration/troubleshooting/sidekiq.md) Debug when Sidekiq appears hung and is not processing jobs.
+- [High Availability](administration/high_availability/README.md) Configure multiple servers for scaling or high availability.
+- [GitLab GEO](gitlab-geo/README.md) Configure GitLab GEO, a secondary read-only GitLab instance.
+- [Container Registry](administration/container_registry.md) Configure Docker Registry with GitLab.
 
 ## Contributor documentation
 

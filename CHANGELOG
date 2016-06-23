@@ -4,6 +4,33 @@ v 8.8.1
   - Add documentation for the "Health Check" feature
   - Allow anonymous users to access a public project's pipelines
 v 8.9.0 (unreleased)
+v 8.9.1 (unreleased)
+  - Refactor labels documentation. !3347
+  - Fix some CI wording in documentation. !4660
+  - Document `GIT_STRATEGY` and `GIT_DEPTH`. !4720
+  - Add documentation for the export & import features. !4732
+  - Add some docs for Docker Registry configuration. !4738
+  - Ensure we don't send the "access request declined" email to access requesters on project deletion. !4744
+  - Display group/project access requesters separately in the admin area. !4798
+  - Add documentation and examples for configuring cloud storage for registry images. !4812
+  - Clarifies documentation about artifact expiry. !4831
+  - Fix the Network graph links. !4832
+  - Fix MR-auto-close text added to description. !4836
+  - Add documentation for award emoji now that comments can be awarded with emojis. !4839
+  - Fix typo in export failure email. !4847
+  - Fix header vertical centering. !4170
+  - Fix subsequent SAML sign ins. !4718
+  - Prevent invalid URLs from raising exceptions in WikiLink Filter. !4775
+  - Handle external issues in IssueReferenceFilter. !4789
+  - Update Todos documentation and screenshots to include new functionality. !4840
+  - Hide nav arrows by default. !4843
+  - Added bottom padding to label color suggestion link. !4845
+  - Fix GitLab project import issues related to notes and builds. !4855
+  - Restrict header logo to 36px so it doesn't overflow. !4861
+  - Fix merge requests project settings help link anchor. !4873
+  - Fix 404 when accessing pipelines as guest user on public projects. !4881
+
+v 8.9.0
   - Fix builds API response not including commit data
   - Fix error when CI job variables key specified but not defined
   - Fix pipeline status when there are no builds in pipeline
@@ -66,6 +93,7 @@ v 8.9.0 (unreleased)
   - Limit email on push diff size to 30 files / 150 KB
   - Add rake task 'gitlab:db:configure' for conditionally seeding or migrating the database
   - Changed the Slack build message to use the singular duration if necessary (Aran Koning)
+  - Fix race condition on merge when build succeeds
   - Links from a wiki page to other wiki pages should be rewritten as expected
   - Add option to project to only allow merge requests to be merged if the build succeeds (Rui Santos)
   - Added navigation shortcuts to the project pipelines, milestones, builds and forks page. !4393
@@ -159,8 +187,8 @@ v 8.8.5 (unreleased)
   - ExtractsPath get ref_names from repository cache, if not there access git.
   - Cache user todo counts from TodoService
   - Ensure Todos counters doesn't count Todos for projects pending delete
-  - Add tooltip to pin/unpin navbar
   - Add left/right arrows horizontal navigation
+  - Add tooltip to pin/unpin navbar
   - Add new sub nav style to Wiki and Graphs sub navigation
 
 v 8.8.5
