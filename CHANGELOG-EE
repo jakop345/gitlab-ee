@@ -2,6 +2,7 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.9.1 (unreleased)
   - Improve Geo documentation. !431
+  - Fix vertical alignment of git-hooks page. !499
 
 v 8.9.0
   - Fix JenkinsService test button
