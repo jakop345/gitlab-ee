@@ -213,7 +213,9 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     return access_denied! unless @merge_request.can_be_merged_by?(current_user)
     return render_404 unless @merge_request.approved?
 
-    unless @merge_request.mergeable?
+    # Disable the CI check if merge_when_build_succeeds is enabled since we have
+    # to wait until CI completes to know
+    unless @merge_request.mergeable?(skip_ci_check: merge_when_build_succeeds_active?)
       @status = :failed
       return
     end
@@ -438,5 +440,10 @@ class Projects::MergeRequestsController < Projects::ApplicationController
   # have head file in refs/merge-requests/
   def ensure_ref_fetched
     @merge_request.ensure_ref_fetched
+  end
+
+  def merge_when_build_succeeds_active?
+    params[:merge_when_build_succeeds].present? &&
+      @merge_request.pipeline && @merge_request.pipeline.active?
   end
 end
