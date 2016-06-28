@@ -1,58 +1,131 @@
 require 'spec_helper'
 
-describe Search::SnippetService, services: true do
-  let(:author) { create(:author) }
-  let(:project) { create(:empty_project) }
+describe Search::SnippetService, elastic: true do
+  context 'when Elasticsearch is enabled' do
+    before do
+      allow(Gitlab.config.elasticsearch).to receive(:enabled).and_return(true)
+      Snippet.__elasticsearch__.create_index!
+    end
 
-  let!(:public_snippet)   { create(:snippet, :public, content: 'password: XXX') }
-  let!(:internal_snippet) { create(:snippet, :internal, content: 'password: XXX') }
-  let!(:private_snippet)  { create(:snippet, :private, content: 'password: XXX', author: author) }
+    after do
+      allow(Gitlab.config.elasticsearch).to receive(:enabled).and_return(false)
+      Snippet.__elasticsearch__.delete_index!
+    end
 
-  let!(:project_public_snippet)   { create(:snippet, :public, project: project, content: 'password: XXX') }
-  let!(:project_internal_snippet) { create(:snippet, :internal, project: project, content: 'password: XXX') }
-  let!(:project_private_snippet)  { create(:snippet, :private, project: project, content: 'password: XXX') }
+    context 'searching snippets by code' do
+      let!(:author) { create(:user) }
+      let!(:project) { create(:project) }
 
-  describe '#execute' do
-    context 'unauthenticated' do
-      it 'returns public snippets only' do
+      let!(:public_snippet)   { create(:snippet, :public, content: 'password: XXX') }
+      let!(:internal_snippet) { create(:snippet, :internal, content: 'password: XXX') }
+      let!(:private_snippet)  { create(:snippet, :private, content: 'password: XXX', author: author) }
+
+      let!(:project_public_snippet)   { create(:snippet, :public, project: project, content: 'password: XXX') }
+      let!(:project_internal_snippet) { create(:snippet, :internal, project: project, content: 'password: XXX') }
+      let!(:project_private_snippet)  { create(:snippet, :private, project: project, content: 'password: XXX') }
+
+      before do
+        Snippet.__elasticsearch__.refresh_index!
+      end
+
+      it 'returns only public snippets when user is blank' do
         search = described_class.new(nil, search: 'password')
         results = search.execute
 
         expect(results.objects('snippet_blobs')).to match_array [public_snippet, project_public_snippet]
       end
-    end
 
-    context 'authenticated' do
-      it 'returns only public & internal snippets for regular users' do
-        user = create(:user)
-        search = described_class.new(user, search: 'password')
+      it 'returns only public and internal snippets for regular users' do
+        regular_user = create(:user)
+
+        search = described_class.new(regular_user, search: 'password')
         results = search.execute
 
         expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, project_public_snippet, project_internal_snippet]
       end
 
-      it 'returns public, internal snippets and project private snippets for project members' do
+      it 'returns public, internal snippets, and project private snippets for project members' do
         member = create(:user)
         project.team << [member, :developer]
+
         search = described_class.new(member, search: 'password')
         results = search.execute
 
         expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, project_public_snippet, project_internal_snippet, project_private_snippet]
       end
 
-      it 'returns public, internal and private snippets where user is the author' do
+      it 'returns private snippets where the user is the author' do
         search = described_class.new(author, search: 'password')
         results = search.execute
 
         expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, private_snippet, project_public_snippet, project_internal_snippet]
       end
 
-      it 'returns all snippets when user is admin' do
+      it 'returns all snippets for admins' do
         admin = create(:admin)
+
         search = described_class.new(admin, search: 'password')
         results = search.execute
 
         expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, private_snippet, project_public_snippet, project_internal_snippet, project_private_snippet]
+      end
+    end
+  end
+
+  context 'when Elasticsearch is disabled' do
+    let(:author) { create(:author) }
+    let(:project) { create(:empty_project) }
+
+    let!(:public_snippet)   { create(:snippet, :public, content: 'password: XXX') }
+    let!(:internal_snippet) { create(:snippet, :internal, content: 'password: XXX') }
+    let!(:private_snippet)  { create(:snippet, :private, content: 'password: XXX', author: author) }
+
+    let!(:project_public_snippet)   { create(:snippet, :public, project: project, content: 'password: XXX') }
+    let!(:project_internal_snippet) { create(:snippet, :internal, project: project, content: 'password: XXX') }
+    let!(:project_private_snippet)  { create(:snippet, :private, project: project, content: 'password: XXX') }
+
+    describe '#execute' do
+      context 'unauthenticated' do
+        it 'returns public snippets only' do
+          search = described_class.new(nil, search: 'password')
+          results = search.execute
+
+          expect(results.objects('snippet_blobs')).to match_array [public_snippet, project_public_snippet]
+        end
+      end
+
+      context 'authenticated' do
+        it 'returns only public & internal snippets for regular users' do
+          user = create(:user)
+          search = described_class.new(user, search: 'password')
+          results = search.execute
+
+          expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, project_public_snippet, project_internal_snippet]
+        end
+
+        it 'returns public, internal snippets and project private snippets for project members' do
+          member = create(:user)
+          project.team << [member, :developer]
+          search = described_class.new(member, search: 'password')
+          results = search.execute
+
+          expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, project_public_snippet, project_internal_snippet, project_private_snippet]
+        end
+
+        it 'returns public, internal and private snippets where user is the author' do
+          search = described_class.new(author, search: 'password')
+          results = search.execute
+
+          expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, private_snippet, project_public_snippet, project_internal_snippet]
+        end
+
+        it 'returns all snippets when user is admin' do
+          admin = create(:admin)
+          search = described_class.new(admin, search: 'password')
+          results = search.execute
+
+          expect(results.objects('snippet_blobs')).to match_array [public_snippet, internal_snippet, private_snippet, project_public_snippet, project_internal_snippet, project_private_snippet]
+        end
       end
     end
   end
