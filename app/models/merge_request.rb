@@ -247,6 +247,14 @@ class MergeRequest < ActiveRecord::Base
     source_branch_head.try(:sha)
   end
 
+  def source_branch_parent
+    first_commit.parent
+  end
+
+  def ff_merge_possible?
+    target_branch_head == source_branch_parent
+  end
+
   def diff_refs
     return nil unless diff_start_commit || diff_base_commit
 
@@ -678,14 +686,6 @@ class MergeRequest < ActiveRecord::Base
     ensure
       unlock_mr if locked?
     end
-  end
-
-  def source_sha_parent
-    source_project.repository.commit(first_commit.sha).parents.first.sha
-  end
-
-  def ff_merge_possible?
-    target_sha == source_sha_parent
   end
 
   def must_be_rebased?

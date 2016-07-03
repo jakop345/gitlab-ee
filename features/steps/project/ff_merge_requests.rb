@@ -54,7 +54,7 @@ class Spinach::Features::ProjectFfMergeRequests < Spinach::FeatureSteps
   step 'merge request "Bug NS-05" is rebased' do
     merge_request.source_branch = 'flatten-dir'
     merge_request.target_branch = 'improve/awesome'
-    merge_request.reload_code
+    merge_request.reload_diff
     merge_request.save!
   end
 
