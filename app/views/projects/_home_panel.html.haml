@@ -38,7 +38,7 @@
 
       .project-repo-buttons.btn-group.project-right-buttons
         - if current_user
-          = render 'shared/members/access_request_buttons', source: @project
+          .pull-left.append-right-10= render 'shared/members/access_request_buttons', source: @project
 
         = render "projects/buttons/update_mirror"
         = render "projects/buttons/download"

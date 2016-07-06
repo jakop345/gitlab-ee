@@ -73,7 +73,7 @@ class Event < ActiveRecord::Base
     elsif issue? || issue_note?
       Ability.abilities.allowed?(user, :read_issue, note? ? note_target : target)
     else
-      ((merge_request? || note?) && target) || milestone?
+      ((merge_request? || note?) && target.present?) || milestone?
     end
   end
 
@@ -142,7 +142,7 @@ class Event < ActiveRecord::Base
   end
 
   def note?
-    target_type == "Note"
+    target.is_a?(Note)
   end
 
   def issue?
