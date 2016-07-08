@@ -48,6 +48,7 @@ module Gitlab
         akismet_enabled: false,
         repository_checks_enabled: true,
         container_registry_token_expire_delay: 5,
+        user_default_external: false,
         elasticsearch_search: false,
         elasticsearch_indexing: false,
         elasticsearch_host: ENV['ELASTIC_HOST'] || 'localhost',
