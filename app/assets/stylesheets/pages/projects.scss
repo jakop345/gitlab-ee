@@ -475,10 +475,6 @@ pre.light-well {
       a:hover {
         text-decoration: none;
       }
-
-      > span {
-        margin-left: 10px;
-      }
     }
   }
 
@@ -638,5 +634,21 @@ pre.light-well {
 .project-refs-form {
   .dropdown-menu {
     width: 300px;
+  }
+}
+
+.project-mirror-text {
+  @media (min-width: $screen-sm-min) {
+    float: left;
+    line-height: 35px;
+  }
+}
+
+.project-mirror-button {
+  margin-top: 10px;
+
+  @media (min-width: $screen-sm-min) {
+    float: right;
+    margin-top: 0;
   }
 }

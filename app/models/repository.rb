@@ -17,8 +17,6 @@ class Repository
 
   attr_accessor :path_with_namespace, :project
 
-  delegate :push_remote_branches, :delete_remote_branches, to: :gitlab_shell
-
   def self.clean_old_archives
     Gitlab::Metrics.measure(:clean_old_archives) do
       repository_downloads_path = Gitlab.config.gitlab.repository_downloads_path
@@ -44,10 +42,14 @@ class Repository
     raw_repository.autocrlf = :input if raw_repository.autocrlf != :input
   end
 
+  def storage_path
+    @project.repository_storage_path
+  end
+
   # Return absolute path to repository
   def path_to_repo
     @path_to_repo ||= File.expand_path(
-      File.join(@project.repository_storage_path, path_with_namespace + ".git")
+      File.join(storage_path, path_with_namespace + ".git")
     )
   end
 
@@ -86,9 +88,9 @@ class Repository
     end
   end
 
-  def commit(id = 'HEAD')
+  def commit(ref = 'HEAD')
     return nil unless exists?
-    commit = Gitlab::Git::Commit.find(raw_repository, id)
+    commit = Gitlab::Git::Commit.find(raw_repository, ref)
     commit = ::Commit.new(commit, @project) if commit
     commit
   rescue Rugged::OdbError
@@ -162,6 +164,10 @@ class Repository
     find_branch(branch_name)
   end
 
+  def push_remote_branches(remote, branches)
+    gitlab_shell.push_remote_branches(storage_path, path_with_namespace, remote, branches)
+  end
+
   def add_tag(user, tag_name, target, message = nil)
     oldrev = Gitlab::Git::BLANK_SHA
     ref    = Gitlab::Git::TAG_REF_PREFIX + tag_name
@@ -192,6 +198,10 @@ class Repository
 
     after_remove_branch
     true
+  end
+
+  def delete_remote_branches(remote, branches)
+    gitlab_shell.delete_remote_branches(storage_path, path_with_namespace, remote, branches)
   end
 
   def rm_tag(tag_name)
@@ -230,17 +240,17 @@ class Repository
   end
 
   def fetch_remote(remote, forced: false, no_tags: false)
-    gitlab_shell.fetch_remote(path_with_namespace, remote, forced: forced, no_tags: no_tags)
+    gitlab_shell.fetch_remote(storage_path, path_with_namespace, remote, forced: forced, no_tags: no_tags)
   end
 
   def remote_tags(remote)
-    gitlab_shell.list_remote_tags(path_with_namespace, remote).map do |name, target|
+    gitlab_shell.list_remote_tags(storage_path, path_with_namespace, remote).map do |name, target|
       Gitlab::Git::Tag.new(name, target)
     end
   end
 
   def fetch_remote_forced!(remote)
-    gitlab_shell.fetch_remote(path_with_namespace, remote, forced: true)
+    gitlab_shell.fetch_remote(storage_path, path_with_namespace, remote, forced: true)
   end
 
   def ref_names
@@ -705,16 +715,6 @@ class Repository
     end
   end
 
-  def blob_for_diff(commit, diff)
-    blob_at(commit.id, diff.file_path)
-  end
-
-  def prev_blob_for_diff(commit, diff)
-    if commit.parent_id
-      blob_at(commit.parent_id, diff.old_path)
-    end
-  end
-
   def refs_contains_sha(ref_type, sha)
     args = %W(#{Gitlab.config.git.bin_path} #{ref_type} --contains #{sha})
     names = Gitlab::Popen.popen(args, path_to_repo).first
@@ -1090,7 +1090,7 @@ class Repository
       if line =~ /^.*:.*:\d+:/
         ref, filename, startline = line.split(':')
         startline = startline.to_i - index
-        extname = File.extname(filename)
+        extname = Regexp.escape(File.extname(filename))
         basename = filename.sub(/#{extname}$/, '')
         break
       end
