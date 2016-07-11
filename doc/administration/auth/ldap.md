@@ -315,3 +315,15 @@ If you are getting 'Connection Refused' errors when trying to connect to the
 LDAP server please double-check the LDAP `port` and `method` settings used by
 GitLab. Common combinations are `method: 'plain'` and `port: 389`, OR
 `method: 'ssl'` and `port: 636`.
+
+### Timeout error
+
+If active directory has nested groups timeouts may be experienced when enumerating LDAP groups. The symptoms are "LDAP search timed out after" errors in the `production.log`
+
+1. Look for a timeout error `LDAP search timed out after` in `production.log`
+   
+    ```
+    grep 'LDAP search timed out after' /var/log/gitlab/gitlab-rails/production.log
+    ```
+
+1. Increase the `timeout` value in the LDAP settings - e.g `timeout: 90` 
