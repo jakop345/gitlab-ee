@@ -70,6 +70,8 @@ Parameters:
     "subscribed" : false,
     "user_notes_count": 1,
     "approvals_before_merge": null
+    "should_remove_source_branch": true,
+    "force_remove_source_branch": false
   }
 ]
 ```
@@ -135,6 +137,8 @@ Parameters:
   "subscribed" : true,
   "user_notes_count": 1,
   "approvals_before_merge": null
+  "should_remove_source_branch": true,
+  "force_remove_source_branch": false
 }
 ```
 
@@ -236,6 +240,8 @@ Parameters:
   "subscribed" : true,
   "user_notes_count": 1,
   "approvals_before_merge": null,
+  "should_remove_source_branch": true,
+  "force_remove_source_branch": false,
   "changes": [
     {
     "old_path": "VERSION",
@@ -327,6 +333,8 @@ order for it to take effect:
   "subscribed" : true,
   "user_notes_count": 0,
   "approvals_before_merge": null
+  "should_remove_source_branch": true,
+  "force_remove_source_branch": false
 }
 ```
 
@@ -399,6 +407,8 @@ Parameters:
   "subscribed" : true,
   "user_notes_count": 1,
   "approvals_before_merge": null
+  "should_remove_source_branch": true,
+  "force_remove_source_branch": false
 }
 ```
 
@@ -498,6 +508,8 @@ Parameters:
   "subscribed" : true,
   "user_notes_count": 1,
   "approvals_before_merge": null
+  "should_remove_source_branch": true,
+  "force_remove_source_branch": false
 }
 ```
 
@@ -667,6 +679,8 @@ Parameters:
   "subscribed" : true,
   "user_notes_count": 1,
   "approvals_before_merge": null
+  "should_remove_source_branch": true,
+  "force_remove_source_branch": false
 }
 ```
 
@@ -986,7 +1000,9 @@ Example response:
     "merge_when_build_succeeds": false,
     "merge_status": "unchecked",
     "subscribed": true,
-    "user_notes_count": 7
+    "user_notes_count": 7,
+    "should_remove_source_branch": true,
+    "force_remove_source_branch": false
   },
   "target_url": "https://gitlab.example.com/gitlab-org/gitlab-ci/merge_requests/7",
   "body": "Et voluptas laudantium minus nihil recusandae ut accusamus earum aut non.",
