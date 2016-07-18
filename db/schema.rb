@@ -95,6 +95,7 @@ ActiveRecord::Schema.define(version: 20160716115710) do
     t.string   "elasticsearch_port",                    default: "9200"
     t.string   "repository_storage",                    default: "default"
     t.string   "enabled_git_access_protocol"
+    t.boolean  "usage_ping_enabled",                    default: true,        null: false
   end
 
   create_table "approvals", force: :cascade do |t|
