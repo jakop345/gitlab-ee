@@ -31,6 +31,8 @@ describe User, models: true do
     it { is_expected.to have_many(:spam_logs).dependent(:destroy) }
     it { is_expected.to have_many(:todos).dependent(:destroy) }
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
+    it { is_expected.to have_many(:builds).dependent(:nullify) }
+    it { is_expected.to have_many(:pipelines).dependent(:nullify) }
     it { is_expected.to have_many(:path_locks).dependent(:destroy) }
 
     describe '#group_members' do
