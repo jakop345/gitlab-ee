@@ -2,6 +2,7 @@ module Gitlab
   module Checks
     class ChangeAccess
       include PathLocksHelper
+
       attr_reader :user_access, :project
 
       def initialize(change, user_access:, project:)

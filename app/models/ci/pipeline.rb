@@ -51,6 +51,10 @@ module Ci
       commit.try(:message)
     end
 
+    def git_commit_title
+      commit.try(:title)
+    end
+
     def short_sha
       Ci::Pipeline.truncate_sha(sha)
     end
@@ -63,6 +67,10 @@ module Ci
 
     def branch?
       !tag?
+    end
+
+    def manual_actions
+      builds.latest.manual_actions
     end
 
     def retryable?

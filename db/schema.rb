@@ -708,7 +708,6 @@ ActiveRecord::Schema.define(version: 20160716115710) do
     t.string   "rebase_commit_sha"
     t.string   "in_progress_merge_commit_sha"
   end
-
   add_index "merge_requests", ["assignee_id"], name: "index_merge_requests_on_assignee_id", using: :btree
   add_index "merge_requests", ["author_id"], name: "index_merge_requests_on_author_id", using: :btree
   add_index "merge_requests", ["created_at", "id"], name: "index_merge_requests_on_created_at_and_id", using: :btree
