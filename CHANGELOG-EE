@@ -9,6 +9,7 @@ v 8.10.0 (unreleased)
   - Make Elasticsearch indexer run as an async task
   - Fix of removing wiki data from index when project is deleted
   - Ticket-based Kerberos authentication (SPNEGO)
+  - [Elastic] Suppress ActiveRecord::RecordNotFound error in ElasticIndexWorker
 
 v 8.9.6
   - Avoid adding index for key fingerprint if it already exists. !539
