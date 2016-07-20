@@ -272,7 +272,6 @@ describe Gitlab::GitAccess, lib: true do
       end
     end
 
-<<<<<<< HEAD
     describe 'deploy key permissions' do
       let(:key) { create(:deploy_key) }
       let(:actor) { key }
