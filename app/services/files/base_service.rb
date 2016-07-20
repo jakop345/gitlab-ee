@@ -70,5 +70,9 @@ module Files
         raise_error("Something went wrong when we tried to create #{@target_branch} for you: #{result[:message]}")
       end
     end
+
+    def push_rule
+      project.push_rule
+    end
   end
 end

@@ -612,7 +612,7 @@ pre.light-well {
 
 .cannot-be-merged,
 .cannot-be-merged:hover {
-  color: #e62958;
+  color: $error-exclamation-point;
   margin-top: 2px;
 }
 
@@ -637,6 +637,10 @@ pre.light-well {
   }
 }
 
+.disabled-item {
+  @extend .btn.disabled;
+}
+
 .custom-notifications-form {
   .is-loading {
     .custom-notification-event-loading {
@@ -657,6 +661,22 @@ pre.light-well {
 .project-refs-form {
   .dropdown-menu {
     width: 300px;
+  }
+}
+
+.project-mirror-text {
+  @media (min-width: $screen-sm-min) {
+    float: left;
+    line-height: 35px;
+  }
+}
+
+.project-mirror-button {
+  margin-top: 10px;
+
+  @media (min-width: $screen-sm-min) {
+    float: right;
+    margin-top: 0;
   }
 }
 

@@ -2,6 +2,7 @@ image: "ruby:2.1"
 
 services:
   - mysql:latest
+  - elasticsearch:latest
   - redis:alpine
 
 cache:
@@ -14,6 +15,7 @@ variables:
   MYSQL_ALLOW_EMPTY_PASSWORD: "1"
   # retry tests only in CI environment
   RSPEC_RETRY_RETRY_COUNT: "3"
+  ELASTIC_HOST: "elasticsearch"
   RAILS_ENV: "test"
   SIMPLECOV: "true"
   USE_DB: "true"

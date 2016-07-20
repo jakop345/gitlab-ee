@@ -169,6 +169,22 @@ describe GitPushService, services: true do
     end
   end
 
+  describe "ES indexing" do
+    before do
+      stub_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+    end
+
+    after do
+      stub_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
+    end
+
+    it "triggers indexer" do
+      expect_any_instance_of(Gitlab::Elastic::Indexer).to receive(:run)
+
+      execute_service(project, user, @oldrev, @newrev, @ref )
+    end
+  end
+
   describe "Push Event" do
     before do
       service = execute_service(project, user, @oldrev, @newrev, @ref )
@@ -396,11 +412,11 @@ describe GitPushService, services: true do
         WebMock.stub_request(:get, jira_api_test_url)
 
         allow(closing_commit).to receive_messages({
-                                                    issue_closing_regex: Regexp.new(Gitlab.config.gitlab.issue_closing_pattern),
-                                                    safe_message: message,
-                                                    author_name: commit_author.name,
-                                                    author_email: commit_author.email
-                                                  })
+          issue_closing_regex: Regexp.new(Gitlab.config.gitlab.issue_closing_pattern),
+          safe_message: message,
+          author_name: commit_author.name,
+          author_email: commit_author.email
+        })
 
         allow(project.repository).to receive_messages(commits_between: [closing_commit])
       end

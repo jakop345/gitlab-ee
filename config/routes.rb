@@ -58,6 +58,14 @@ Rails.application.routes.draw do
                 authorizations: 'oauth/authorizations'
   end
 
+  namespace :oauth do
+    scope path: 'geo', controller: :geo_auth, as: :geo do
+      get 'auth'
+      get 'callback'
+      get 'logout'
+    end
+  end
+
   # Autocomplete
   get '/autocomplete/users' => 'autocomplete#users'
   get '/autocomplete/users/:id' => 'autocomplete#user'
@@ -254,6 +262,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :push_rules, only: [:index, :update]
+
     resource :impersonation, only: :destroy
 
     resources :abuse_reports, only: [:index, :destroy]
@@ -280,6 +290,7 @@ Rails.application.routes.draw do
     resource :logs, only: [:show]
     resource :health_check, controller: 'health_check', only: [:show]
     resource :background_jobs, controller: 'background_jobs', only: [:show]
+    resource :email, only: [:show, :create]
     resource :system_info, controller: 'system_info', only: [:show]
 
     resources :namespaces, path: '/projects', constraints: { id: /[a-zA-Z.0-9_\-]+/ }, only: [] do
@@ -313,6 +324,16 @@ Rails.application.routes.draw do
       put :reset_runners_token
       put :reset_health_check_token
       put :clear_repository_check_states
+    end
+
+    resource :license, only: [:show, :new, :create, :destroy] do
+      get :download, on: :member
+    end
+
+    resources :geo_nodes, only: [:index, :create, :destroy] do
+      member do
+        post :repair
+      end
     end
 
     resources :labels
@@ -433,7 +454,19 @@ Rails.application.routes.draw do
       get :activity
     end
 
+    collection do
+      get :autocomplete
+    end
+
     scope module: :groups do
+      resource :analytics, only: [:show]
+      resource :ldap, only: [] do
+        member do
+          put :reset_access
+        end
+      end
+
+      resources :ldap_group_links, only: [:index, :create, :destroy]
       resources :group_members, only: [:index, :create, :update, :destroy], concerns: :access_requestable do
         post :resend_invite, on: :member
         delete :leave, on: :collection
@@ -441,9 +474,19 @@ Rails.application.routes.draw do
 
       resource :avatar, only: [:destroy]
       resources :milestones, constraints: { id: /[^\/]+/ }, only: [:index, :show, :update, :new, :create]
+      resource :notification_setting, only: [:update]
+      resources :audit_events, only: [:index]
+    end
+
+    resources :hooks, only: [:index, :create, :destroy], constraints: { id: /\d+/ }, module: :groups do
+      member do
+        get :test
+      end
     end
   end
 
+  get  'unsubscribes/:email', to: 'unsubscribes#show', as: :unsubscribe
+  post 'unsubscribes/:email', to: 'unsubscribes#create'
   resources :projects, constraints: { id: /[^\/]+/ }, only: [:index, :new, :create]
 
   devise_for :users, controllers: { omniauth_callbacks: :omniauth_callbacks,
@@ -455,6 +498,7 @@ Rails.application.routes.draw do
   devise_scope :user do
     get '/users/auth/:provider/omniauth_error' => 'omniauth_callbacks#omniauth_error', as: :omniauth_error
     get '/users/almost_there' => 'confirmations#almost_there'
+    get '/users/auth/kerberos_spnego/negotiate' => 'omniauth_kerberos_spnego#negotiate'
   end
 
   root to: "root#index"
@@ -619,6 +663,10 @@ Rails.application.routes.draw do
           end
         end
 
+        resource :pages, only: [:show, :destroy] do
+          resources :domains, only: [:show, :new, :create, :destroy], controller: 'pages_domains'
+        end
+
         resources :compare, only: [:index, :create] do
           collection do
             get :diff_for_path
@@ -709,6 +757,8 @@ Rails.application.routes.draw do
             post :cancel_merge_when_build_succeeds
             get :ci_status
             post :toggle_subscription
+            post :approve
+            post :rebase
             post :toggle_award_emoji
             post :remove_wip
             get :diff_for_path
@@ -720,16 +770,28 @@ Rails.application.routes.draw do
             get :update_branches
             get :diff_for_path
           end
+          resources :approvers, only: :destroy
         end
 
         resources :branches, only: [:index, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
         resources :tags, only: [:index, :show, :new, :create, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex } do
           resource :release, only: [:edit, :update]
         end
+        resources :path_locks, only: [:index, :destroy] do
+          collection do
+            post :toggle
+          end
+        end
 
         resources :protected_branches, only: [:index, :show, :create, :update, :destroy], constraints: { id: Gitlab::Regex.git_reference_regex }
         resources :variables, only: [:index, :show, :update, :create, :destroy]
         resources :triggers, only: [:index, :create, :destroy]
+        resource :mirror, only: [:show, :update] do
+          member do
+            post :update_now
+          end
+        end
+        resources :push_rules, constraints: { id: /\d+/ }
 
         resources :pipelines, only: [:index, :new, :create, :show] do
           collection do
@@ -850,6 +912,7 @@ Rails.application.routes.draw do
           end
         end
 
+        resources :approvers, only: :destroy
         resources :runner_projects, only: [:create, :destroy]
         resources :badges, only: [:index] do
           collection do
@@ -858,6 +921,7 @@ Rails.application.routes.draw do
             end
           end
         end
+        resources :audit_events, only: [:index]
       end
     end
   end

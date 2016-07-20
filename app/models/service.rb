@@ -189,6 +189,8 @@ class Service < ActiveRecord::Base
       gemnasium
       hipchat
       irker
+      jenkins
+      jenkins_deprecated
       jira
       pivotaltracker
       pushover

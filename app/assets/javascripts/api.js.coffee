@@ -7,6 +7,7 @@
   labelsPath: "/api/:version/projects/:id/labels"
   licensePath: "/api/:version/licenses/:key"
   gitignorePath: "/api/:version/gitignores/:key"
+  ldapGroupsPath: "/api/:version/ldap/:provider/groups.json"
   gitlabCiYmlPath: "/api/:version/gitlab_ci_ymls/:key"
 
   group: (group_id, callback) ->
@@ -120,3 +121,19 @@
   buildUrl: (url) ->
     url = gon.relative_url_root + url if gon.relative_url_root?
     return url.replace(':version', gon.api_version)
+
+  # Return LDAP groups list. Filtered by query
+  ldap_groups: (query, provider, callback) ->
+    url = Api.buildUrl(Api.ldapGroupsPath)
+    url = url.replace(':provider', provider);
+
+    $.ajax(
+      url: url
+      data:
+        private_token: gon.api_token
+        search: query
+        per_page: 20
+        active: true
+      dataType: "json"
+    ).done (groups) ->
+      callback(groups)

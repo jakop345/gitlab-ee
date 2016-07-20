@@ -143,6 +143,10 @@ if Gitlab::Metrics.enabled?
 
   Gitlab::Metrics::Sampler.new.start
 
+  Gitlab::Metrics::Instrumentation.configure do |config|
+    config.instrument_instance_methods(Gitlab::InsecureKeyFingerprint)
+  end
+
   module TrackNewRedisConnections
     def connect(*args)
       val = super

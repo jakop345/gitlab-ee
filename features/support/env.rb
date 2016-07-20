@@ -16,7 +16,7 @@ if ENV['CI']
   Knapsack::Adapters::SpinachAdapter.bind
 end
 
-%w(select2_helper test_env repo_helpers).each do |f|
+%w(select2_helper test_env repo_helpers license).each do |f|
   require Rails.root.join('spec', 'support', f)
 end
 
@@ -26,8 +26,11 @@ WebMock.allow_net_connect!
 
 Spinach.hooks.before_run do
   include RSpec::Mocks::ExampleMethods
+  include ActiveJob::TestHelper
   RSpec::Mocks.setup
   TestEnv.init(mailer: false)
+  License.destroy_all
+  TestLicense.init
 
   # skip pre-receive hook check so we can use
   # web editor and merge

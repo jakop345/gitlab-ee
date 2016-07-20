@@ -10,6 +10,7 @@ describe AutocompleteController do
     before do
       sign_in(user)
       project.team << [user, :master]
+      project.team << [user2, :developer]
     end
 
     describe 'GET #users with project ID' do
@@ -20,7 +21,7 @@ describe AutocompleteController do
       let(:body) { JSON.parse(response.body) }
 
       it { expect(body).to be_kind_of(Array) }
-      it { expect(body.size).to eq 1 }
+      it { expect(body.size).to eq 2 }
       it { expect(body.map { |u| u["username"] }).to include(user.username) }
     end
 
@@ -30,6 +31,18 @@ describe AutocompleteController do
       end
 
       it { expect(response).to have_http_status(404) }
+    end
+
+    describe "GET #users that can push to protected branches" do
+      before do
+        get(:users, project_id: project.id, push_code_to_protected_branches: 'true')
+      end
+
+      let(:body) { JSON.parse(response.body) }
+
+      it { expect(body).to be_kind_of(Array) }
+      it { expect(body.size).to eq 1 }
+      it { expect(body.first["username"]).to eq user.username }
     end
   end
 
@@ -161,6 +174,20 @@ describe AutocompleteController do
       get(:users, author_id: 99999)
 
       expect(body.collect { |u| u['id'] }).not_to include(99999)
+    end
+  end
+
+  context 'skip_users parameter included' do
+    before { sign_in(user) }
+
+    let(:response_user_ids) { JSON.parse(response.body).map { |user| user['id'] } }
+
+    it 'skips the user IDs passed' do
+      get(:users, skip_users: [user, user2].map(&:id))
+
+      expect(response_user_ids).not_to include(user.id)
+      expect(response_user_ids).not_to include(user2.id)
+      expect(response_user_ids).not_to be_empty
     end
   end
 end

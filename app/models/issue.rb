@@ -6,6 +6,12 @@ class Issue < ActiveRecord::Base
   include Referable
   include Sortable
   include Taskable
+  include Elastic::IssuesSearch
+
+  WEIGHT_RANGE = 1..9
+  WEIGHT_ALL = 'Everything'
+  WEIGHT_ANY = 'Any Weight'
+  WEIGHT_NONE = 'No Weight'
 
   DueDateStruct = Struct.new(:title, :name).freeze
   NoDueDate     = DueDateStruct.new('No Due Date', '0').freeze
@@ -33,6 +39,8 @@ class Issue < ActiveRecord::Base
 
   scope :order_due_date_asc, -> { reorder('issues.due_date IS NULL, issues.due_date ASC') }
   scope :order_due_date_desc, -> { reorder('issues.due_date IS NULL, issues.due_date DESC') }
+  scope :order_weight_desc, -> { reorder('weight IS NOT NULL, weight DESC') }
+  scope :order_weight_asc, -> { reorder('weight ASC') }
 
   state_machine :state, initial: :opened do
     event :close do
@@ -93,6 +101,8 @@ class Issue < ActiveRecord::Base
     case method.to_s
     when 'due_date_asc' then order_due_date_asc
     when 'due_date_desc' then order_due_date_desc
+    when 'weight_desc' then order_weight_desc
+    when 'weight_asc' then order_weight_asc
     else
       super
     end
@@ -159,6 +169,10 @@ class Issue < ActiveRecord::Base
     end
 
     ext.merge_requests.select { |mr| mr.open? && mr.closes_issue?(self) }
+  end
+
+  def self.weight_options
+    [WEIGHT_ALL, WEIGHT_ANY, WEIGHT_NONE] + WEIGHT_RANGE.to_a
   end
 
   def moved?

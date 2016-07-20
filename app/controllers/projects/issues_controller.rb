@@ -54,6 +54,12 @@ class Projects::IssuesController < Projects::ApplicationController
     )
 
     @issue = @noteable = @project.issues.new(issue_params)
+
+    # Set Issue description based on project template
+    if @project.issues_template.present?
+      @issue.description = @project.issues_template
+    end
+
     respond_with(@issue)
   end
 
@@ -215,7 +221,7 @@ class Projects::IssuesController < Projects::ApplicationController
 
   def issue_params
     params.require(:issue).permit(
-      :title, :assignee_id, :position, :description, :confidential,
+      :title, :assignee_id, :position, :description, :confidential, :weight,
       :milestone_id, :due_date, :state_event, :task_num, label_ids: []
     )
   end

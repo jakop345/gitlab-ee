@@ -39,6 +39,9 @@
         e.preventDefault()
         e.stopImmediatePropagation()
         return false
+  
+  gl.utils.capitalize = (str) ->
+    return str[0].toUpperCase() + str.slice(1);
 
   gl.utils.getPagePath = ->
     return $('body').data('page').split(':')[0]

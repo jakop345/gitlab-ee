@@ -30,9 +30,11 @@ describe Project, models: true do
     it { is_expected.to have_many(:runners) }
     it { is_expected.to have_many(:variables) }
     it { is_expected.to have_many(:triggers) }
+    it { is_expected.to have_many(:pages_domains) }
     it { is_expected.to have_many(:environments).dependent(:destroy) }
     it { is_expected.to have_many(:deployments).dependent(:destroy) }
     it { is_expected.to have_many(:todos).dependent(:destroy) }
+    it { is_expected.to have_many(:path_locks).dependent(:destroy) }
 
     describe '#members & #requesters' do
       let(:project) { create(:project) }
@@ -242,6 +244,14 @@ describe Project, models: true do
 
     it 'returns the web URL without the protocol for this repo' do
       expect(project.web_url_without_protocol).to eq("#{Gitlab.config.gitlab.url.split('://')[1]}/#{project.namespace.path}/somewhere")
+    end
+  end
+
+  describe "#kerberos_url_to_repo" do
+    let(:project) { create(:empty_project, path: "somewhere") }
+
+    it 'should return valid kerberos url for this repo' do
+      expect(project.kerberos_url_to_repo).to eq("#{Gitlab.config.build_gitlab_kerberos_url}/#{project.namespace.path}/somewhere.git")
     end
   end
 
@@ -549,6 +559,23 @@ describe Project, models: true do
     end
   end
 
+  describe '#execute_hooks' do
+    it "triggers project and group hooks" do
+      group = create :group, name: 'gitlab'
+      project = create(:project, name: 'gitlabhq', namespace: group)
+      project_hook = create(:project_hook, push_events: true, project: project)
+      group_hook = create(:group_hook, push_events: true, group: group)
+
+      stub_request(:post, project_hook.url)
+      stub_request(:post, group_hook.url)
+
+      expect_any_instance_of(GroupHook).to receive(:async_execute).and_return(true)
+      expect_any_instance_of(ProjectHook).to receive(:async_execute).and_return(true)
+
+      project.execute_hooks({}, :push_hooks)
+    end
+  end
+
   describe '#avatar_url' do
     subject { project.avatar_url }
 
@@ -583,6 +610,19 @@ describe Project, models: true do
       let(:project) { create(:empty_project) }
 
       it { should eq nil }
+    end
+  end
+
+  describe '#allowed_to_share_with_group?' do
+    let(:project) { create(:project) }
+
+    it "returns true" do
+      expect(project.allowed_to_share_with_group?).to be_truthy
+    end
+
+    it "returns false" do
+      project.namespace.update(share_with_group_lock: true)
+      expect(project.allowed_to_share_with_group?).to be_falsey
     end
   end
 
@@ -767,6 +807,49 @@ describe Project, models: true do
       it { expect(forked_project.visibility_level_allowed?(Gitlab::VisibilityLevel::PRIVATE)).to be_truthy }
       it { expect(forked_project.visibility_level_allowed?(Gitlab::VisibilityLevel::INTERNAL)).to be_truthy }
       it { expect(forked_project.visibility_level_allowed?(Gitlab::VisibilityLevel::PUBLIC)).to be_falsey }
+    end
+  end
+
+  describe '#pages_deployed?' do
+    let(:project) { create :empty_project }
+
+    subject { project.pages_deployed? }
+
+    context 'if public folder does exist' do
+      before { allow(Dir).to receive(:exist?).with(project.public_pages_path).and_return(true) }
+
+      it { is_expected.to be_truthy }
+    end
+
+    context "if public folder doesn't exist" do
+      it { is_expected.to be_falsey }
+    end
+  end
+
+  describe '#pages_url' do
+    let(:group) { create :group, name: group_name }
+    let(:project) { create :empty_project, namespace: group, name: project_name }
+    let(:domain) { 'Example.com' }
+
+    subject { project.pages_url }
+
+    before do
+      allow(Settings.pages).to receive(:host).and_return(domain)
+      allow(Gitlab.config.pages).to receive(:url).and_return('http://example.com')
+    end
+
+    context 'group page' do
+      let(:group_name) { 'Group' }
+      let(:project_name) { 'group.example.com' }
+
+      it { is_expected.to eq("http://group.example.com") }
+    end
+
+    context 'project page' do
+      let(:group_name) { 'Group' }
+      let(:project_name) { 'Project' }
+
+      it { is_expected.to eq("http://group.example.com/project") }
     end
   end
 
@@ -972,6 +1055,29 @@ describe Project, models: true do
     end
   end
 
+  describe 'handling import URL' do
+    context 'when project is a mirror' do
+      it 'returns the full URL' do
+        project = create(:project, :mirror, import_url: 'http://user:pass@test.com')
+
+        project.import_finish
+
+        expect(project.reload.import_url).to eq('http://user:pass@test.com')
+      end
+    end
+
+    context 'when project is not a mirror' do
+      it 'returns the sanitized URL' do
+        project = create(:project, import_status: 'started', import_url: 'http://user:pass@test.com')
+
+        project.import_finish
+
+        expect(project.reload.import_url).to eq('http://test.com')
+      end
+    end
+
+  end
+
   describe '#protected_branch?' do
     let(:project) { create(:empty_project) }
 
@@ -1114,6 +1220,39 @@ describe Project, models: true do
     end
   end
 
+  describe 'Project import job' do
+
+    let(:project) { create(:empty_project) }
+    let(:mirror) { false }
+
+    before do
+      allow_any_instance_of(Gitlab::Shell).to receive(:import_repository).with(project.repository_storage_path, project.path_with_namespace, project.import_url).and_return(true)
+      allow(project).to receive(:repository_exists?).and_return(true)
+    end
+
+    it 'imports a project' do
+      expect_any_instance_of(RepositoryImportWorker).to receive(:perform).and_call_original
+
+      project.import_start
+      project.add_import_job
+
+      expect(project.reload.import_status).to eq('finished')
+    end
+
+    it 'imports a mirrored project' do
+      allow_any_instance_of(RepositoryUpdateMirrorWorker).to receive(:perform)
+      expect_any_instance_of(RepositoryImportWorker).to receive(:perform).and_call_original
+
+      project.import_start
+
+      project.mirror = true
+
+      project.add_import_job
+
+      expect(project.reload.import_status).to eq('finished')
+    end
+  end
+
   describe '.where_paths_in' do
     context 'without any paths' do
       it 'returns an empty relation' do
@@ -1145,5 +1284,20 @@ describe Project, models: true do
         expect(projects).to contain_exactly(project1, project2)
       end
     end
+  end
+
+  describe '#find_path_lock' do
+    let(:project) { create :empty_project }
+    let(:path_lock) { create :path_lock, project: project }
+    let(:path) { path_lock.path }
+
+    it 'returns path_lock' do
+      expect(project.find_path_lock(path)).to eq(path_lock)
+    end
+
+    it 'returns nil' do
+      expect(project.find_path_lock('app/controllers')).to be_falsey
+    end
+
   end
 end

@@ -52,6 +52,11 @@ module API
       expose :enable_ssl_verification
     end
 
+    class ProjectPushRule < Grape::Entity
+      expose :id, :project_id, :created_at
+      expose :commit_message_regex, :deny_delete_tag
+    end
+
     class BasicProjectDetails < Grape::Entity
       expose :id
       expose :http_url_to_repo, :web_url
@@ -97,8 +102,18 @@ module API
       end
     end
 
+    class LdapGroupLink < Grape::Entity
+      expose :cn, :group_access, :provider
+    end
+
     class Group < Grape::Entity
       expose :id, :name, :path, :description, :visibility_level
+
+      expose :ldap_cn, :ldap_access
+      expose :ldap_group_links,
+        using: Entities::LdapGroupLink,
+        if: lambda { |group, options| group.ldap_group_links.any? }
+
       expose :avatar_url
       expose :web_url
     end
@@ -211,6 +226,7 @@ module API
         merge_request.subscribed?(options[:current_user])
       end
       expose :user_notes_count
+      expose :approvals_before_merge
       expose :should_remove_source_branch?, as: :should_remove_source_branch
       expose :force_remove_source_branch?, as: :force_remove_source_branch
     end
@@ -219,6 +235,17 @@ module API
       expose :diffs, as: :changes, using: Entities::RepoDiff do |compare, _|
         compare.diffs(all_diffs: true).to_a
       end
+    end
+
+    class Approvals < Grape::Entity
+      expose :user, using: Entities::UserBasic
+    end
+
+    class MergeRequestApprovals < ProjectEntity
+      expose :merge_status
+      expose :approvals_required
+      expose :approvals_left
+      expose :approvals, as: :approved_by, using: Entities::Approvals
     end
 
     class SSHKey < Grape::Entity
@@ -283,6 +310,10 @@ module API
           event.author.username
         end
       end
+    end
+
+    class LdapGroup < Grape::Entity
+      expose :cn
     end
 
     class ProjectGroupLink < Grape::Entity
@@ -435,6 +466,18 @@ module API
 
       expose :release, using: Entities::Release do |repo_tag, options|
         options[:project].releases.find_by(tag: repo_tag.name)
+      end
+    end
+
+    class License < Grape::Entity
+      expose :starts_at, :expires_at, :licensee
+
+      expose :user_limit do |license, options|
+        license.restricted?(:active_user_count) ? license.restrictions[:active_user_count] : 0
+      end
+
+      expose :active_users do |license, options|
+        ::User.active.count
       end
     end
 

@@ -868,6 +868,54 @@ describe Repository, models: true do
     end
   end
 
+  describe "Elastic search", elastic: true do
+    before do
+      stub_application_setting(elasticsearch_search: true, elasticsearch_indexing: true)
+      Repository.__elasticsearch__.create_index!
+    end
+
+    after do
+      Repository.__elasticsearch__.delete_index!
+      stub_application_setting(elasticsearch_search: false, elasticsearch_indexing: false)
+    end
+
+    describe :find_commits_by_message_with_elastic do
+      it "returns commits" do
+        project = create :project
+
+        project.repository.index_commits
+
+        Repository.__elasticsearch__.refresh_index!
+
+        expect(project.repository.find_commits_by_message_with_elastic('initial').first).to be_a(Commit)
+        expect(project.repository.find_commits_by_message_with_elastic('initial').count).to eq(1)
+      end
+    end
+
+    describe :parse_search_result_from_elastic do
+      it "returns parsed result" do
+        project = create :project
+
+        project.repository.index_blobs
+
+        Repository.__elasticsearch__.refresh_index!
+
+        result = project.repository.search(
+          'def popen',
+          type: :blob,
+          options: { highlight: true }
+        )[:blobs][:results][0]
+
+        parsed_result = project.repository.parse_search_result_from_elastic(result)
+
+        expect(parsed_result.ref). to eq('5937ac0a7beb003549fc5fd26fc247adbce4a52e')
+        expect(parsed_result.filename).to eq('files/ruby/popen.rb')
+        expect(parsed_result.startline).to eq(2)
+        expect(parsed_result.data).to include("Popen")
+      end
+    end
+  end
+
   describe '#after_create' do
     it 'flushes the exists cache' do
       expect(repository).to receive(:expire_exists_cache)
@@ -1113,6 +1161,48 @@ describe Repository, models: true do
     end
   end
 
+  describe '#push_remote_branches' do
+    it 'push branches to the remote repo' do
+      expect_any_instance_of(Gitlab::Shell).to receive(:push_remote_branches).
+        with(repository.storage_path, repository.path_with_namespace, 'remote_name', ['branch'])
+
+      repository.push_remote_branches('remote_name', ['branch'])
+    end
+  end
+
+  describe '#delete_remote_branches' do
+    it 'delete branches to the remote repo' do
+      expect_any_instance_of(Gitlab::Shell).to receive(:delete_remote_branches).
+        with(repository.storage_path, repository.path_with_namespace, 'remote_name', ['branch'])
+
+      repository.delete_remote_branches('remote_name', ['branch'])
+    end
+  end
+
+  describe '#remove_remote' do
+    it 'remove a remote reference' do
+      repository.add_remote('upstream', 'http://repo.test')
+
+      expect(repository.remove_remote('upstream')).to eq(true)
+    end
+  end
+
+  describe '#remote_tags' do
+    it 'gets the remote tags' do
+      masterrev = repository.find_branch('master').target
+
+      expect_any_instance_of(Gitlab::Shell).to receive(:list_remote_tags).
+        with(repository.storage_path, repository.path_with_namespace, 'upstream').
+        and_return({ 'v0.0.1' => masterrev })
+
+      tags = repository.remote_tags('upstream')
+
+      expect(tags.first).to be_an_instance_of(Gitlab::Git::Tag)
+      expect(tags.first.name).to eq('v0.0.1')
+      expect(tags.first.target).to eq(masterrev)
+    end
+  end
+
   describe '#local_branches' do
     it 'returns the local branches' do
       masterrev = repository.find_branch('master').target
@@ -1121,6 +1211,28 @@ describe Repository, models: true do
 
       expect(repository.local_branches.any? { |branch| branch.name == 'remote_branch' }).to eq(false)
       expect(repository.local_branches.any? { |branch| branch.name == 'local_branch' }).to eq(true)
+    end
+  end
+
+  describe '#remote_branches' do
+    it 'returns the remote branches' do
+      masterrev = repository.find_branch('master').target
+      create_remote_branch('joe', 'remote_branch', masterrev)
+      repository.add_branch(user, 'local_branch', masterrev)
+
+      expect(repository.remote_branches('joe').any? { |branch| branch.name == 'local_branch' }).to eq(false)
+      expect(repository.remote_branches('joe').any? { |branch| branch.name == 'remote_branch' }).to eq(true)
+    end
+  end
+
+  describe '#upstream_branches' do
+    it 'returns branches from the upstream remote' do
+      masterrev = repository.find_branch('master').target
+      create_remote_branch('upstream', 'upstream_branch', masterrev)
+
+      expect(repository.upstream_branches.size).to eq(1)
+      expect(repository.upstream_branches.first).to be_an_instance_of(Gitlab::Git::Branch)
+      expect(repository.upstream_branches.first.name).to eq('upstream_branch')
     end
   end
 
@@ -1160,4 +1272,5 @@ describe Repository, models: true do
     rugged = repository.rugged
     rugged.references.create("refs/remotes/#{remote_name}/#{branch_name}", target)
   end
+
 end

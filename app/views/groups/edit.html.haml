@@ -23,6 +23,15 @@
 
       .form-group
         %hr
+        = f.label :membership_lock, class: 'control-label' do
+          Member lock
+        .col-sm-10
+          .checkbox
+            = f.check_box :membership_lock
+            %span.descr Prevent adding new members to project membership within this group
+
+      .form-group
+        %hr
         = f.label :share_with_group_lock, class: 'control-label' do
           Share with group lock
         .col-sm-10

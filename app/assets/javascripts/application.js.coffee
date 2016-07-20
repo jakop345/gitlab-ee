@@ -18,6 +18,7 @@
 #= require jquery.atwho
 #= require jquery.scrollTo
 #= require jquery.turbolinks
+#= require jquery.tablesorter
 #= require turbolinks
 #= require autosave
 #= require bootstrap/affix
@@ -110,6 +111,8 @@ window.shiftWindow = ->
 document.addEventListener("page:fetch", unbindEvents)
 
 window.addEventListener "hashchange", shiftWindow
+
+$.timeago.settings.allowFuture = true
 
 window.onload = ->
   # Scroll the window to avoid the topnav bar
@@ -217,8 +220,9 @@ $ ->
     e.preventDefault()
     btn = $(e.target)
     text = btn.data("confirm-danger-message")
+    warningMessage = btn.data("warning-message")
     form = btn.closest("form")
-    new ConfirmDangerModal(form, text)
+    new ConfirmDangerModal(form, text, warningMessage: warningMessage)
 
 
   $document.on 'click', 'button', ->

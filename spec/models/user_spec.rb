@@ -31,6 +31,7 @@ describe User, models: true do
     it { is_expected.to have_many(:spam_logs).dependent(:destroy) }
     it { is_expected.to have_many(:todos).dependent(:destroy) }
     it { is_expected.to have_many(:award_emoji).dependent(:destroy) }
+    it { is_expected.to have_many(:path_locks).dependent(:destroy) }
     it { is_expected.to have_many(:builds).dependent(:nullify) }
     it { is_expected.to have_many(:pipelines).dependent(:nullify) }
 
@@ -148,6 +149,19 @@ describe User, models: true do
           expect(user).to be_valid
         end
       end
+    end
+  end
+
+  describe "non_ldap" do
+    it "retuns non-ldap user" do
+      User.delete_all
+      create :user
+      ldap_user = create :omniauth_user, provider: "ldapmain"
+      create :omniauth_user, provider: "gitlub"
+
+      users = User.non_ldap
+      expect(users.count).to eq 2
+      expect(users.detect { |user| user.username == ldap_user.username }).to be_nil
     end
   end
 
@@ -769,6 +783,27 @@ describe User, models: true do
       expect(user.starred?(project)).to be_truthy
       user.toggle_star(project)
       expect(user.starred?(project)).to be_falsey
+    end
+  end
+
+  describe "#existing_member?" do
+    it "returns true for exisitng user" do
+      create :user, email: "bruno@example.com"
+
+      expect(User.existing_member?("bruno@example.com")).to be_truthy
+    end
+
+    it "returns false for unknown exisitng user" do
+      create :user, email: "bruno@example.com"
+
+      expect(User.existing_member?("rendom@example.com")).to be_falsey
+    end
+
+    it "returns true if additional email exists" do
+      user = create :user
+      user.emails.create(email: "bruno@example.com")
+
+      expect(User.existing_member?("bruno@example.com")).to be_truthy
     end
   end
 

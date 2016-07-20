@@ -28,6 +28,9 @@ module Gitlab
 
     config.generators.templates.push("#{config.root}/generator_templates")
 
+    # EE specific paths.
+    config.eager_load_paths.push("#{config.root}/app/workers/concerns")
+
     # Only load the plugins named here, in the order given (default is alphabetical).
     # :all can be used as a placeholder for all plugins not explicitly named.
     # config.plugins = [ :exception_notification, :ssl_requirement, :all ]
@@ -118,6 +121,9 @@ module Gitlab
 
     # This is needed for gitlab-shell
     ENV['GITLAB_PATH_OUTSIDE_HOOK'] = ENV['PATH']
+
+    # Gitlab Geo Middleware support
+    config.middleware.insert_after ActionDispatch::Flash, 'Gitlab::Middleware::ReadonlyGeo'
 
     config.generators do |g|
       g.factory_girl false

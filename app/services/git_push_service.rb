@@ -64,13 +64,19 @@ class GitPushService < BaseService
 
   def update_merge_requests
     @project.update_merge_requests(params[:oldrev], params[:newrev], params[:ref], current_user)
+    mirror_update = @project.mirror? && @project.repository.up_to_date_with_upstream?(branch_name)
 
     EventCreateService.new.push(@project, current_user, build_push_data)
     SystemHooksService.new.execute_hooks(build_push_data_system_hook.dup, :push_hooks)
     @project.execute_hooks(build_push_data.dup, :push_hooks)
     @project.execute_services(build_push_data.dup, :push_hooks)
-    CreateCommitBuildsService.new.execute(@project, current_user, build_push_data)
+
+    CreateCommitBuildsService.new.execute(@project, current_user, build_push_data, mirror_update: mirror_update)
     ProjectCacheWorker.perform_async(@project.id)
+
+    if current_application_settings.elasticsearch_indexing?
+      ElasticCommitIndexerWorker.perform_async(@project.id, params[:oldrev], params[:newrev])
+    end
   end
 
   def perform_housekeeping

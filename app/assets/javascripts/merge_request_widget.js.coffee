@@ -47,7 +47,18 @@ class @MergeRequestWidget
           $('.mr-widget-body').html("<h4>" + data.merge_error + "</h4>")
         else
           callback = -> merge_request_widget.mergeInProgress(deleteSourceBranch)
-          setTimeout(callback, 2000)
+          setTimeout(callback, 1000)
+      dataType: 'json'
+
+  rebaseInProgress: ->
+    $.ajax
+      type: 'GET'
+      url: $('.merge-request').data('url')
+      success: (data) =>
+        if data["rebase_in_progress?"]
+          setTimeout(merge_request_widget.rebaseInProgress, 1000)
+        else
+          location.reload()
       dataType: 'json'
 
   getMergeStatus: ->

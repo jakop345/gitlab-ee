@@ -119,6 +119,10 @@ class Dispatcher
         new GroupsSelect()
       when 'search:show'
         new Search()
+      when 'projects:mirrors:show', 'projects:mirrors:update'
+        new UsersSelect()
+      when 'admin:emails:show'
+        new AdminEmailSelect()
 
     switch path.first()
       when 'admin'

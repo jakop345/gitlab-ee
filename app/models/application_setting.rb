@@ -55,6 +55,14 @@ class ApplicationSetting < ActiveRecord::Base
             presence: true,
             numericality: { only_integer: true, greater_than: 0 }
 
+  validates :elasticsearch_host,
+            presence: { message: "can't be blank when indexing is enabled" },
+            if: :elasticsearch_indexing?
+
+  validates :elasticsearch_port,
+            presence: { message: "can't be blank when indexing is enabled" },
+            if: :elasticsearch_indexing?
+
   validates :repository_storage,
     presence: true,
     inclusion: { in: ->(_object) { Gitlab.config.repositories.storages.keys } }
@@ -141,9 +149,16 @@ class ApplicationSetting < ActiveRecord::Base
       disabled_oauth_sign_in_sources: [],
       send_user_confirmation_email: false,
       container_registry_token_expire_delay: 5,
+      elasticsearch_host: ENV['ELASTIC_HOST'] || 'localhost',
+      elasticsearch_port: ENV['ELASTIC_PORT'] || '9200',
+      usage_ping_enabled: true,
       repository_storage: 'default',
       user_default_external: false,
     )
+  end
+
+  def elasticsearch_host
+    read_attribute(:elasticsearch_host).split(',').map(&:strip)
   end
 
   def home_page_url_column_exist

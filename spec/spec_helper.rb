@@ -37,12 +37,18 @@ RSpec.configure do |config|
   config.include ActiveJob::TestHelper
   config.include StubGitlabCalls
   config.include StubGitlabData
+  config.include Rails.application.routes.url_helpers, type: :routing
 
   config.infer_spec_type_from_file_location!
   config.raise_errors_for_deprecations!
 
   config.before(:suite) do
     TestEnv.init
+  end
+
+  config.before(:all) do
+    License.destroy_all
+    TestLicense.init
   end
 end
 
