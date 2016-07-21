@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160718153603) do
+ActiveRecord::Schema.define(version: 20160721081015) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -51,7 +51,7 @@ ActiveRecord::Schema.define(version: 20160718153603) do
     t.integer  "max_attachment_size",                   default: 10,          null: false
     t.integer  "default_project_visibility"
     t.integer  "default_snippet_visibility"
-    t.text     "restricted_signup_domains"
+    t.text     "domain_whitelist"
     t.boolean  "user_oauth_applications",               default: true
     t.string   "after_sign_out_path"
     t.integer  "session_expire_delay",                  default: 10080,       null: false
@@ -95,6 +95,8 @@ ActiveRecord::Schema.define(version: 20160718153603) do
     t.string   "elasticsearch_port",                    default: "9200"
     t.string   "repository_storage",                    default: "default"
     t.string   "enabled_git_access_protocol"
+    t.boolean  "domain_blacklist_enabled",              default: false
+    t.text     "domain_blacklist"
     t.boolean  "usage_ping_enabled",                    default: true,        null: false
   end
 

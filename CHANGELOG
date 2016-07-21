@@ -16,6 +16,8 @@ v 8.10.0 (unreleased)
   - Add Application Setting to configure default Repository Path for new projects
   - Delete award emoji when deleting a user
   - Remove pinTo from Flash and make inline flash messages look nicer !4854 (winniehell)
+  - Add an API for downloading latest successful build from a particular branch or tag !5347
+  - Add link to profile to commit avatar !5163 (winniehell)
   - Wrap code blocks on Activies and Todos page. !4783 (winniehell)
   - Align flash messages with left side of page content !4959 (winniehell)
   - Display tooltip for "Copy to Clipboard" button !5164 (winniehell)
@@ -23,20 +25,28 @@ v 8.10.0 (unreleased)
   - Store when and yaml variables in builds table
   - Display last commit of deleted branch in push events !4699 (winniehell)
   - Escape file extension when parsing search results !5141 (winniehell)
+  - Add "passing with warnings" to the merge request pipeline possible statuses, this happens when builds that allow failures have failed. !5004
+  - Add image border in Markdown preview !5162 (winniehell)
   - Apply the trusted_proxies config to the rack request object for use with rack_attack
+  - Added the ability to block sign ups using a domain blacklist !5259
   - Upgrade to Rails 4.2.7. !5236
   - Extend exposed environment variables for CI builds
+  - Deprecate APIs "projects/:id/keys/...". Use "projects/:id/deploy_keys/..." instead
+  - Add API "deploy_keys" for admins to get all deploy keys
   - Allow to pull code with deploy key from public projects
+  - Use limit parameter rather than hardcoded value in `ldap:check` rake task (Mike Ricketts)
   - Add Sidekiq queue duration to transaction metrics.
   - Add a new column `artifacts_size` to table `ci_builds` !4964
   - Let Workhorse serve format-patch diffs
   - Display tooltip for mentioned users and groups !5261 (winniehell)
   - Allow build email service to be tested
   - Added day name to contribution calendar tooltips
+  - Refactor user authorization check for a single project to avoid querying all user projects
   - Make images fit to the size of the viewport !4810
   - Fixed misplaced mirror repository button on tags page
   - Fix check for New Branch button on Issue page !4630 (winniehell)
   - Fix GFM autocomplete not working on wiki pages
+  - Fixed enter key not triggering click on first row when searching in a dropdown
   - Fix MR-auto-close text added to description. !4836
   - Support U2F devices in Firefox. !5177
   - Fix issue, preventing users w/o push access to sort tags !5105 (redetection)
@@ -79,6 +89,7 @@ v 8.10.0 (unreleased)
   - Allow expanding and collapsing files in diff view (!4990)
   - Collapse large diffs by default (!4990)
   - Fix mentioned users list on diff notes
+  - Add support for inline videos in GitLab Flavored Markdown. !5215 (original implementation by Eric Hayes)
   - Fix creation of deployment on build that is retried, redeployed or rollback
   - Don't parse Rinku returned value to DocFragment when it didn't change the original html string.
   - Check for conflicts with existing Project's wiki path when creating a new project.
@@ -104,6 +115,7 @@ v 8.10.0 (unreleased)
   - Don't render discussion notes when requesting diff tab through AJAX
   - Add basic system information like memory and disk usage to the admin panel
   - Don't garbage collect commits that have related DB records like comments
+  - Allow to setup event by channel on slack service
   - More descriptive message for git hooks and file locks
   - Aliases of award emoji should be stored as original name. !5060 (dixpac)
   - Handle custom Git hook result in GitLab UI
@@ -124,12 +136,14 @@ v 8.10.0 (unreleased)
   - Optimistic locking for Issues and Merge Requests (Title and description overriding prevention)
   - Redesign Builds and Pipelines pages
   - Change status color and icon for running builds
+  - Fix commenting issue in side by side diff view for unchanged lines
   - Fix markdown rendering for: consecutive labels references, label references that begin with a digit or contains `.`
   - Project export filename now includes the project and namespace path
   - Fix last update timestamp on issues not preserved on gitlab.com and project imports
   - Fix issues importing projects from EE to CE
   - Fix creating group with space in group path
   - Improve cron_jobs loading error messages !5318 / !5360
+  - Prevent toggling sidebar when clipboard icon clicked
   - Create Todos for Issue author when assign or mention himself (Katarzyna Kobierska)
   - Limit the number of retries on error to 3 for exporting projects
   - Allow empty repositories on project import/export
@@ -242,6 +256,7 @@ v 8.9.1
   - Remove width restriction for logo on sign-in page. !4888
   - Bump gitlab_git to 10.2.3 to fix false truncated warnings with ISO-8559 files. !4884
   - Apply selected value as label. !4886
+  - Change Retry to Re-deploy on Deployments page
   - Fix temp file being deleted after the request while importing a GitLab project. !4894
   - Fix pagination when sorting by columns with lots of ties (like priority)
   - Implement Subresource Integrity for CSS and JavaScript assets. This prevents malicious assets from loading in the case of a CDN compromise.
