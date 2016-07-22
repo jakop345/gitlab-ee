@@ -50,9 +50,8 @@ describe Repository, models: true do
           double_first = double(committed_date: Time.now)
           double_last = double(committed_date: Time.now - 1.second)
 
-          allow(tag_a).to receive(:target).and_return(double_first)
-          allow(tag_b).to receive(:target).and_return(double_last)
-          allow(repository).to receive(:tags).and_return([tag_a, tag_b])
+          allow(repository).to receive(:commit).with(tag_a.target).and_return(double_first)
+          allow(repository).to receive(:commit).with(tag_b.target).and_return(double_last)
         end
 
         it { is_expected.to eq(['v1.0.0', 'v1.1.0']) }
@@ -65,9 +64,8 @@ describe Repository, models: true do
           double_first = double(committed_date: Time.now - 1.second)
           double_last = double(committed_date: Time.now)
 
-          allow(tag_a).to receive(:target).and_return(double_last)
-          allow(tag_b).to receive(:target).and_return(double_first)
-          allow(repository).to receive(:tags).and_return([tag_a, tag_b])
+          allow(repository).to receive(:commit).with(tag_a.target).and_return(double_last)
+          allow(repository).to receive(:commit).with(tag_b.target).and_return(double_first)
         end
 
         it { is_expected.to eq(['v1.1.0', 'v1.0.0']) }
@@ -1250,6 +1248,17 @@ describe Repository, models: true do
       expect(tags.first).to be_an_instance_of(Gitlab::Git::Tag)
       expect(tags.first.name).to eq('v0.0.1')
       expect(tags.first.target).to eq(masterrev)
+    end
+  end
+
+  describe '#local_branches' do
+    it 'returns the local branches' do
+      masterrev = repository.find_branch('master').target
+      create_remote_branch('joe', 'remote_branch', masterrev)
+      repository.add_branch(user, 'local_branch', masterrev)
+
+      expect(repository.local_branches.any? { |branch| branch.name == 'remote_branch' }).to eq(false)
+      expect(repository.local_branches.any? { |branch| branch.name == 'local_branch' }).to eq(true)
     end
   end
 
