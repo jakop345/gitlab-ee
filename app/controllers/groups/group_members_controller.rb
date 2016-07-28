@@ -50,10 +50,7 @@ class Groups::GroupMembersController < Groups::ApplicationController
   end
 
   def destroy
-    @group_member = @group.members.find_by(id: params[:id]) ||
-      @group.requesters.find_by(id: params[:id])
-
-    Members::DestroyService.new(@group_member, current_user).execute
+    Members::DestroyService.new(@group, current_user, id: params[:id]).execute(:all)
     log_audit_event(@group_member, action: :destroy)
 
     respond_to do |format|
