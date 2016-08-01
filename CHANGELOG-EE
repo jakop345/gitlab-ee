@@ -4,7 +4,9 @@ v 8.11.0 (unreleased)
   - Performance improvement of push rules
   - Change LdapGroupSyncWorker to use new LDAP group sync classes
 
-v 8.10.3 (unreleased)
+v 8.10.4 (unreleased)
+
+v 8.10.3
   - Fix regression in Git Annex permission check. !599
   - [Elastic] Fix commit search for some URLs. !605
 
