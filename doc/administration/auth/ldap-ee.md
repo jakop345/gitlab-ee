@@ -65,6 +65,18 @@ production:
         # snip...
         group_base: ou=groups,dc=example,dc=com
 ```
+### External Groups
+
+>**Note:** External Groups configuration is only available in GitLab EE Version
+8.9 and above.
+
+Using the `external_groups` setting will allow you to mark all users belonging
+to these groups as [external users](../../user/permissions.md). Group membership is
+checked periodically through the `LdapGroupSync` background task.
+
+**Configuration**
+
+```yaml
 # An array of CNs of groups containing users that should be considered external
 #
 #   Ex. ['interns', 'contractors']
@@ -72,6 +84,7 @@ production:
 #   Note: Not `cn=interns` or the full DN
 #
 external_groups: []
+```
   
 [Restart GitLab][restart] for the changes to take effect.
 
