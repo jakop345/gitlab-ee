@@ -65,7 +65,14 @@ production:
         # snip...
         group_base: ou=groups,dc=example,dc=com
 ```
-
+# An array of CNs of groups containing users that should be considered external
+#
+#   Ex. ['interns', 'contractors']
+#
+#   Note: Not `cn=interns` or the full DN
+#
+external_groups: []
+  
 [Restart GitLab][restart] for the changes to take effect.
 
 ---
