@@ -47,7 +47,7 @@ Edit `/etc/gitlab/gitlab.rb`:
 gitlab_rails['ldap_servers'] = YAML.load <<-EOS
 main:
   # snip...
-  group_base: ou=groups,dc=example,dc=com
+  group_base: 'ou=groups,dc=example,dc=com'
 EOS
 ```
 
@@ -63,7 +63,7 @@ production:
     servers:
       main:
         # snip...
-        group_base: ou=groups,dc=example,dc=com
+        group_base: 'ou=groups,dc=example,dc=com'
 ```
 
 [Restart GitLab][restart] for the changes to take effect.
@@ -94,8 +94,8 @@ Edit `/etc/gitlab/gitlab.rb`:
 gitlab_rails['ldap_servers'] = YAML.load <<-EOS
 main:
   # snip...
-  group_base: ou=groups,dc=example,dc=com
-  admin_group: my_admin_group
+  group_base: 'ou=groups,dc=example,dc=com'
+  admin_group: 'my_admin_group'
 EOS
 ```
 
@@ -111,8 +111,8 @@ production:
     servers:
       main:
         # snip...
-        group_base: ou=groups,dc=example,dc=com
-        admin_group: my_admin_group
+        group_base: 'ou=groups,dc=example,dc=com'
+        admin_group: 'my_admin_group'
 ```
 
 [Restart GitLab][restart] for the changes to take effect.
