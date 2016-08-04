@@ -6,13 +6,14 @@ class @UsersSelect
       @currentUser = JSON.parse(currentUser)
 
     $('.js-user-search').each (i, dropdown) =>
+      options = {}
       $dropdown = $(dropdown)
-      @projectId = $dropdown.data('project-id')
-      @showCurrentUser = $dropdown.data('current-user')
+      options.projectId = $dropdown.data('project-id')
+      options.showCurrentUser = $dropdown.data('current-user')
       showNullUser = $dropdown.data('null-user')
       showAnyUser = $dropdown.data('any-user')
       firstUser = $dropdown.data('first-user')
-      @authorId = $dropdown.data('author-id')
+      options.authorId = $dropdown.data('author-id')
       selectedId = $dropdown.data('selected')
       defaultLabel = $dropdown.data('default-label')
       issueURL = $dropdown.data('issueUpdate')
@@ -99,7 +100,7 @@ class @UsersSelect
         data: (term, callback) =>
           isAuthorFilter = $('.js-author-search')
 
-          @users term, (users) =>
+          @users term, options, (users) =>
             if term.length is 0
               showDivider = 0
 
@@ -211,13 +212,14 @@ class @UsersSelect
       )
 
     $('.ajax-users-select').each (i, select) =>
-      @skipLdap = $(select).hasClass('skip_ldap')
-      @projectId = $(select).data('project-id')
-      @groupId = $(select).data('group-id')
-      @showCurrentUser = $(select).data('current-user')
-      @pushCodeToProtectedBranches = $(select).data('push-code-to-protected-branches')
-      @authorId = $(select).data('author-id')
-      @skipUsers = $(select).data('skip-users')
+      options = {}
+      options.skipLdap = $(select).hasClass('skip_ldap')
+      options.projectId = $(select).data('project-id')
+      options.groupId = $(select).data('group-id')
+      options.showCurrentUser = $(select).data('current-user')
+      options.pushCodeToProtectedBranches = $(select).data('push-code-to-protected-branches')
+      options.authorId = $(select).data('author-id')
+      options.skipUsers = $(select).data('skip-users')
       showNullUser = $(select).data('null-user')
       showAnyUser = $(select).data('any-user')
       showEmailUser = $(select).data('email-user')
@@ -228,7 +230,7 @@ class @UsersSelect
         multiple: $(select).hasClass('multiselect')
         minimumInputLength: 0
         query: (query) =>
-          @users query.term, (users) =>
+          @users query.term, options, (users) =>
             data = { results: users }
 
             if query.term.length == 0
@@ -311,7 +313,7 @@ class @UsersSelect
 
   # Return users list. Filtered by query
   # Only active users retrieved
-  users: (query, callback) =>
+  users: (query, options, callback) =>
     url = @buildUrl(@usersPath)
 
     $.ajax(
@@ -320,13 +322,13 @@ class @UsersSelect
         search: query
         per_page: 20
         active: true
-        project_id: @projectId
-        group_id: @groupId
-        skip_ldap: @skipLdap
-        current_user: @showCurrentUser
-        push_code_to_protected_branches: @pushCodeToProtectedBranches
-        author_id: @authorId
-        skip_users: @skipUsers
+        project_id: options.projectId || null
+        group_id: options.groupId || null
+        skip_ldap: options.skipLdap || null
+        current_user: options.showCurrentUser || null
+        push_code_to_protected_branches: options.pushCodeToProtectedBranches || null
+        author_id: options.authorId || null
+        skip_users: options.skipUsers || null
       dataType: "json"
     ).done (users) ->
       callback(users)

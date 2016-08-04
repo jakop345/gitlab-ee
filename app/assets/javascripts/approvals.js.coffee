@@ -1,6 +1,16 @@
 $ ->
   $(".approver-list").on "click", ".project-approvers .btn-remove", ->
-    $(this).closest("li").remove()
+    removeElement = $(this).closest("li")
+    approverId = parseInt(removeElement.attr("id").replace("user_",""))
+    approverIds = $("input#merge_request_approver_ids")
+    skipUsers = approverIds.data("skip-users") || []
+    approverIndex = skipUsers.indexOf(approverId)
+
+    removeElement.remove()
+
+    if approverIndex > -1
+      approverIds.data("skip-users", skipUsers.splice(approverIndex, 1))
+
     return false
 
   $("form.merge-request-form").submit ->
