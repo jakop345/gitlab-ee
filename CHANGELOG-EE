@@ -4,7 +4,9 @@ v 8.11.0 (unreleased)
   - Performance improvement of push rules
   - Change LdapGroupSyncWorker to use new LDAP group sync classes
 
-v 8.10.4 (unreleased)
+v 8.10.5 (unreleased)
+
+v 8.10.4
   - Fix available users in userselect dropdown when there is more than one userselect on the page. !604 (Rik de Groot)
   - Fix updating skipped approvers in search list on removal. !604 (Rik de Groot)
 
