@@ -47,6 +47,13 @@ RSpec.configure do |config|
     TestEnv.init
   end
 
+  config.around(:each, :caching) do |example|
+    caching_store = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new if example.metadata[:caching]
+    example.run
+    Rails.cache = caching_store
+  end
+
   config.before(:all) do
     License.destroy_all
     TestLicense.init
