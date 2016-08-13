@@ -161,16 +161,16 @@ describe HipchatService, models: true do
         expect(WebMock).to have_requested(:post, api_url).once
       end
 
-      context 'merge request message' do
-        it 'creates a message for opened merge requests' do
-          message = hipchat.send(:create_merge_request_message, merge_sample_data)
+      it "creates a merge request message" do
+        message = hipchat.send(:create_merge_request_message,
+                               merge_sample_data)
 
-          obj_attr = merge_sample_data[:object_attributes]
-          expect(message).to eq("#{user.name} opened " \
-            "<a href=\"#{obj_attr[:url]}\">merge request !#{obj_attr['iid']}</a> in " \
-            "<a href=\"#{project.web_url}\">#{project_name}</a>: " \
-            '<b>Awesome merge request</b>' \
-            '<pre>please fix</pre>')
+        obj_attr = merge_sample_data[:object_attributes]
+        expect(message).to eq("#{user.name} opened " \
+          "<a href=\"#{obj_attr[:url]}\">merge request !#{obj_attr['iid']}</a> in " \
+          "<a href=\"#{project.web_url}\">#{project_name}</a>: " \
+          '<b>Awesome merge request</b>' \
+          '<pre>please fix</pre>')
         end
 
         it 'creates a message for approved merge requests' do
@@ -304,7 +304,8 @@ describe HipchatService, models: true do
     end
 
     context 'build events' do
-      let(:build) { create(:ci_build) }
+      let(:pipeline) { create(:ci_empty_pipeline) }
+      let(:build) { create(:ci_build, pipeline: pipeline) }
       let(:data) { Gitlab::BuildDataBuilder.build(build) }
 
       context 'for failed' do
