@@ -27,7 +27,11 @@ class ElasticIndexerWorker
       clear_project_indexes(record_id) if klass == Project
     end
   rescue Elasticsearch::Transport::Transport::Errors::NotFound, ActiveRecord::RecordNotFound
-    true # Less work to do!
+    # These types of the errors can be raised when
+    # record is updated then immidiately removed before updating is handled.
+    # One more case - if you have enabled indexing but not every item is already indexed, in this case
+    # you will also get the error on updating or removing those records. There is a planty of other cases
+    true
   end
 
   def update_issue_notes(record, changed_fields)

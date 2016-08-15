@@ -1,3 +1,7 @@
+# The idea behind creating this indexer is that we want to prevent situations when
+# the whole application suffer from memory leaks in the indexer
+# So the process will die after indexing each repository.
+# Also we don't load rails environment here to save memory.
 module Gitlab
   module Elastic
     class Indexer
