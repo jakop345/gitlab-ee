@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160810153405) do
+ActiveRecord::Schema.define(version: 20160812054342) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -723,9 +723,11 @@ ActiveRecord::Schema.define(version: 20160810153405) do
     t.datetime "ldap_sync_last_update_at"
     t.datetime "ldap_sync_last_successful_update_at"
     t.datetime "ldap_sync_last_sync_at"
+    t.datetime "deleted_at"
   end
 
   add_index "namespaces", ["created_at"], name: "index_namespaces_on_created_at", using: :btree
+  add_index "namespaces", ["deleted_at"], name: "index_namespaces_on_deleted_at", using: :btree
   add_index "namespaces", ["ldap_sync_last_successful_update_at"], name: "index_namespaces_on_ldap_sync_last_successful_update_at", using: :btree
   add_index "namespaces", ["ldap_sync_last_update_at"], name: "index_namespaces_on_ldap_sync_last_update_at", using: :btree
   add_index "namespaces", ["name"], name: "index_namespaces_on_name", unique: true, using: :btree
@@ -882,7 +884,6 @@ ActiveRecord::Schema.define(version: 20160810153405) do
     t.datetime "updated_at"
     t.integer  "creator_id"
     t.boolean  "issues_enabled",                     default: true,      null: false
-    t.boolean  "wall_enabled",                       default: true,      null: false
     t.boolean  "merge_requests_enabled",             default: true,      null: false
     t.boolean  "wiki_enabled",                       default: true,      null: false
     t.integer  "namespace_id"
@@ -926,9 +927,9 @@ ActiveRecord::Schema.define(version: 20160810153405) do
     t.boolean  "only_allow_merge_if_build_succeeds", default: false,     null: false
     t.boolean  "has_external_issue_tracker"
     t.string   "repository_storage",                 default: "default", null: false
+    t.boolean  "repository_read_only"
     t.boolean  "request_access_enabled",             default: true,      null: false
     t.boolean  "has_external_wiki"
-    t.boolean  "repository_read_only"
   end
 
   add_index "projects", ["ci_id"], name: "index_projects_on_ci_id", using: :btree
@@ -948,21 +949,27 @@ ActiveRecord::Schema.define(version: 20160810153405) do
 
   create_table "protected_branch_merge_access_levels", force: :cascade do |t|
     t.integer  "protected_branch_id",              null: false
-    t.integer  "access_level",        default: 40, null: false
+    t.integer  "access_level",        default: 40
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
+    t.integer  "user_id"
+    t.integer  "group_id"
   end
 
   add_index "protected_branch_merge_access_levels", ["protected_branch_id"], name: "index_protected_branch_merge_access", using: :btree
+  add_index "protected_branch_merge_access_levels", ["user_id"], name: "index_protected_branch_merge_access_levels_on_user_id", using: :btree
 
   create_table "protected_branch_push_access_levels", force: :cascade do |t|
     t.integer  "protected_branch_id",              null: false
-    t.integer  "access_level",        default: 40, null: false
+    t.integer  "access_level",        default: 40
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
+    t.integer  "user_id"
+    t.integer  "group_id"
   end
 
   add_index "protected_branch_push_access_levels", ["protected_branch_id"], name: "index_protected_branch_push_access", using: :btree
+  add_index "protected_branch_push_access_levels", ["user_id"], name: "index_protected_branch_push_access_levels_on_user_id", using: :btree
 
   create_table "protected_branches", force: :cascade do |t|
     t.integer  "project_id", null: false
@@ -1079,12 +1086,12 @@ ActiveRecord::Schema.define(version: 20160810153405) do
     t.string   "source_ip"
     t.string   "user_agent"
     t.boolean  "via_api"
-    t.integer  "project_id"
     t.string   "noteable_type"
     t.string   "title"
     t.text     "description"
-    t.datetime "created_at",    null: false
-    t.datetime "updated_at",    null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.boolean  "submitted_as_ham", default: false, null: false
   end
 
   create_table "subscriptions", force: :cascade do |t|
@@ -1151,6 +1158,16 @@ ActiveRecord::Schema.define(version: 20160810153405) do
 
   add_index "u2f_registrations", ["key_handle"], name: "index_u2f_registrations_on_key_handle", using: :btree
   add_index "u2f_registrations", ["user_id"], name: "index_u2f_registrations_on_user_id", using: :btree
+
+  create_table "user_agent_details", force: :cascade do |t|
+    t.string   "user_agent",                   null: false
+    t.string   "ip_address",                   null: false
+    t.integer  "subject_id",                   null: false
+    t.string   "subject_type",                 null: false
+    t.boolean  "submitted",    default: false, null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
 
   create_table "users", force: :cascade do |t|
     t.string   "email",                       default: "",    null: false
@@ -1254,8 +1271,8 @@ ActiveRecord::Schema.define(version: 20160810153405) do
     t.boolean  "note_events",                          default: false,         null: false
     t.boolean  "enable_ssl_verification",              default: true
     t.boolean  "build_events",                         default: false,         null: false
-    t.string   "token"
     t.boolean  "wiki_page_events",                     default: false,         null: false
+    t.string   "token"
   end
 
   add_index "web_hooks", ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
@@ -1263,8 +1280,12 @@ ActiveRecord::Schema.define(version: 20160810153405) do
   add_foreign_key "path_locks", "projects"
   add_foreign_key "path_locks", "users"
   add_foreign_key "personal_access_tokens", "users"
+  add_foreign_key "protected_branch_merge_access_levels", "namespaces", column: "group_id"
   add_foreign_key "protected_branch_merge_access_levels", "protected_branches"
+  add_foreign_key "protected_branch_merge_access_levels", "users"
+  add_foreign_key "protected_branch_push_access_levels", "namespaces", column: "group_id"
   add_foreign_key "protected_branch_push_access_levels", "protected_branches"
+  add_foreign_key "protected_branch_push_access_levels", "users"
   add_foreign_key "remote_mirrors", "projects"
   add_foreign_key "u2f_registrations", "users"
 end

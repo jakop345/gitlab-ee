@@ -262,7 +262,11 @@ Rails.application.routes.draw do
     resource :impersonation, only: :destroy
 
     resources :abuse_reports, only: [:index, :destroy]
-    resources :spam_logs, only: [:index, :destroy]
+    resources :spam_logs, only: [:index, :destroy] do
+      member do
+        post :mark_as_ham
+      end
+    end
 
     resources :applications
 
@@ -875,6 +879,7 @@ Rails.application.routes.draw do
           member do
             post :toggle_subscription
             post :toggle_award_emoji
+            post :mark_as_spam
             get :referenced_merge_requests
             get :related_branches
             get :can_create_branch
@@ -932,7 +937,10 @@ Rails.application.routes.draw do
         resources :badges, only: [:index] do
           collection do
             scope '*ref', constraints: { ref: Gitlab::Regex.git_reference_regex } do
-              get :build, constraints: { format: /svg/ }
+              constraints format: /svg/ do
+                get :build
+                get :coverage
+              end
             end
           end
         end
