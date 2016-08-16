@@ -3,7 +3,12 @@ FactoryGirl.define do
     name
     project
 
-    before(:create) do |protected_branch|
+    transient do
+      authorize_user_to_push nil
+      authorize_user_to_merge nil
+    end
+
+    after(:build) do |protected_branch|
       protected_branch.push_access_levels.new(access_level: Gitlab::Access::MASTER)
       protected_branch.merge_access_levels.new(access_level: Gitlab::Access::MASTER)
     end
