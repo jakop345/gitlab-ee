@@ -114,7 +114,7 @@ module Gitlab
         # Prevent tag removal
         if tag_name(@ref)
           if push_rule.deny_delete_tag && protected_tag?(tag_name(@ref)) && Gitlab::Git.blank_ref?(@newrev)
-            "You can not delete tag"
+            return "You can not delete a tag"
           end
         else
           # if newrev is blank, the branch was deleted

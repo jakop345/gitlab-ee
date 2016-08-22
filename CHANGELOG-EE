@@ -1,5 +1,8 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.10.8
+  - Fix a bug where deny_delete_tag push rules weren't applied
+
 v 8.10.7
   - No EE-specific changes
 
