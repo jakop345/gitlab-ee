@@ -143,7 +143,7 @@ describe ElasticIndexerWorker, elastic: true do
         Gitlab::Elastic::Helper.refresh_index
 
         ## All database objects + data from repository. The absolute value does not matter
-        expect(Elasticsearch::Model.search('*').total_count).to be > 40
+        expect(Elasticsearch::Model.search('*').total_count).to be >  0
 
         subject.perform("delete", "Project", project.id)
         Gitlab::Elastic::Helper.refresh_index

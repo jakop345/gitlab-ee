@@ -146,6 +146,10 @@ module Ci
       end
     end
 
+    def mark_as_processable_after_stage(stage_idx)
+      builds.skipped.where('stage_idx > ?', stage_idx).find_each(&:process)
+    end
+
     def latest?
       return false unless ref
       commit = project.commit(ref)
@@ -250,7 +254,13 @@ module Ci
     end
 
     def update_duration
-      self.duration = statuses.latest.duration
+      self.duration = calculate_duration
+    end
+
+    def execute_hooks
+      data = pipeline_data
+      project.execute_hooks(data, :pipeline_hooks)
+      project.execute_services(data, :pipeline_hooks)
     end
 
     def execute_hooks
