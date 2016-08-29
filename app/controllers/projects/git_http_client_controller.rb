@@ -132,7 +132,6 @@ class Projects::GitHttpClientController < Projects::ApplicationController
   end
 
   def lfs_deploy_key?
-    key = user
-    @lfs_deploy_key.present? && (key && key.projects.include?(project))
+    @lfs_deploy_key.present? && (user && user.projects.include?(project))
   end
 end
