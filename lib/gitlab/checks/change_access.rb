@@ -146,7 +146,7 @@ module Gitlab
 
         return if validations.empty?
 
-        commit.raw_diffs(deltas_only: true).each do |diff|
+        commit.raw_diffs.each do |diff|
           validations.each do |validation|
             if error = validation.call(diff)
               return error
@@ -168,6 +168,12 @@ module Gitlab
 
         if push_rule.max_file_size > 0
           validations << file_size_validation(commit, push_rule.max_file_size)
+        end
+
+        custom_rules = push_rule.custom_rules.enabled_rules
+
+        if custom_rules.any?
+          validations << diff_content_validation(custom_rules)
         end
 
         validations
@@ -212,6 +218,18 @@ module Gitlab
           blob = project.repository.blob_at(commit.id, diff.new_path)
           if blob && blob.size && blob.size > max_file_size.megabytes
             return "File #{diff.new_path.inspect} is larger than the allowed size of #{max_file_size} MB"
+          end
+        end
+      end
+
+      def diff_content_validation(rules)
+        lambda do |diff|
+          return if diff.deleted_file || diff.renamed_file
+
+          forbidden_rules = rules.select { |rule| (diff.diff =~ Regexp.new(rule.regex)).present? }
+
+          if forbidden_rules.any?
+            forbidden_rules.map { |rule| "Commit files contains forbidden content especified in #{rule.title}." }.join('/n')
           end
         end
       end

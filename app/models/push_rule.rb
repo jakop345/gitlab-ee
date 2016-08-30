@@ -1,5 +1,6 @@
 class PushRule < ActiveRecord::Base
   belongs_to :project
+  has_many :custom_rules
 
   validates :project, presence: true, unless: "is_sample?"
   validates :max_file_size, numericality: { greater_than_or_equal_to: 0, only_integer: true }
