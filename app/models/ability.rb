@@ -375,7 +375,7 @@ class Ability
         rules += named_abilities('project_snippet')
       end
 
-      unless project.wiki_enabled
+      unless project.has_wiki?
         rules += named_abilities('wiki')
       end
 

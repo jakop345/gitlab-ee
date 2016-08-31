@@ -1,8 +1,18 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.11.4
+  - Fix broken gitlab:backup:restore because of bad permissions on repo storage !6098 (Dirk Hörner)
+  - Fix resolving conflicts on forks. !6082
+  - Fix diff commenting on merge requests created prior to 8.10. !6029
+  - Fix pipelines tab layout regression. !5952
+  - Fix "Wiki" link not appearing in navigation for projects with external wiki. !6057
+  - Do not enforce using hash with hidden key in CI configuration. !6079
+  - Fix hover leading space bug in pipeline graph !5980
+  - Do not enforce using hash with hidden key in CI configuration. !6079
+
 v 8.11.3
   - Don't show resolve conflicts link before MR status is updated
-  - Fix IE11 fork button bug !598
+  - Fix IE11 fork button bug !5982
   - Don't prevent viewing the MR when git refs for conflicts can't be found on disk
   - Allow system info page to handle case where info is unavailable
   - Fix external issue tracker "Issues" link leading to 404s
