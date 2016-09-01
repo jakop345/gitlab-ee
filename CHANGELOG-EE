@@ -2,10 +2,8 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.11.3
   - [ES] Add logging to indexer
-  - [ES] Add logging to indexer
   - [ES] Elasticsearch workers checks ES settings before running
   - Fix missing EE-specific service parameters for Jenkins CI
-  - Set the correct `GL_PROTOCOL` when rebasing !691
   - Set the correct `GL_PROTOCOL` when rebasing !691
 
 v 8.11.2
