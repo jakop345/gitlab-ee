@@ -44,6 +44,113 @@ describe 'Git LFS API and storage' do
     end
   end
 
+  context 'project specific LFS settings' do
+    let(:project) { create(:empty_project) }
+    let(:body) do
+      {
+        'objects' => [
+          { 'oid' => '91eff75a492a3ed0dfcb544d7f31326bc4014c8551849c192fd1e48d4dd2c897',
+            'size' => 1575078
+          },
+          { 'oid' => sample_oid,
+            'size' => sample_size
+          }
+        ],
+        'operation' => 'upload'
+      }
+    end
+    let(:authorization) { authorize_user }
+
+    context 'with LFS disabled globally' do
+      before do
+        project.team << [user, :master]
+        allow(Gitlab.config.lfs).to receive(:enabled).and_return(false)
+      end
+
+      describe 'LFS disabled in project' do
+        before do
+          project.update_attribute(:lfs_enabled, false)
+        end
+
+        it 'responds with a 501 message on upload' do
+          post_lfs_json "#{project.http_url_to_repo}/info/lfs/objects/batch", body, headers
+
+          expect(response).to have_http_status(501)
+        end
+
+        it 'responds with a 501 message on download' do
+          get "#{project.http_url_to_repo}/gitlab-lfs/objects/#{sample_oid}", nil, headers
+
+          expect(response).to have_http_status(501)
+        end
+      end
+
+      describe 'LFS enabled in project' do
+        before do
+          project.update_attribute(:lfs_enabled, true)
+        end
+
+        it 'responds with a 501 message on upload' do
+          post_lfs_json "#{project.http_url_to_repo}/info/lfs/objects/batch", body, headers
+
+          expect(response).to have_http_status(501)
+        end
+
+        it 'responds with a 501 message on download' do
+          get "#{project.http_url_to_repo}/gitlab-lfs/objects/#{sample_oid}", nil, headers
+
+          expect(response).to have_http_status(501)
+        end
+      end
+    end
+
+    context 'with LFS enabled globally' do
+      before do
+        project.team << [user, :master]
+        enable_lfs
+      end
+
+      describe 'LFS disabled in project' do
+        before do
+          project.update_attribute(:lfs_enabled, false)
+        end
+
+        it 'responds with a 403 message on upload' do
+          post_lfs_json "#{project.http_url_to_repo}/info/lfs/objects/batch", body, headers
+
+          expect(response).to have_http_status(403)
+          expect(json_response).to include('message' => 'Access forbidden. Check your access level.')
+        end
+
+        it 'responds with a 403 message on download' do
+          get "#{project.http_url_to_repo}/gitlab-lfs/objects/#{sample_oid}", nil, headers
+
+          expect(response).to have_http_status(403)
+          expect(json_response).to include('message' => 'Access forbidden. Check your access level.')
+        end
+      end
+
+      describe 'LFS enabled in project' do
+        before do
+          project.update_attribute(:lfs_enabled, true)
+        end
+
+        it 'responds with a 200 message on upload' do
+          post_lfs_json "#{project.http_url_to_repo}/info/lfs/objects/batch", body, headers
+
+          expect(response).to have_http_status(200)
+          expect(json_response['objects'].first['size']).to eq(1575078)
+        end
+
+        it 'responds with a 200 message on download' do
+          get "#{project.http_url_to_repo}/gitlab-lfs/objects/#{sample_oid}", nil, headers
+
+          expect(response).to have_http_status(200)
+        end
+      end
+    end
+  end
+
   describe 'deprecated API' do
     let(:project) { create(:empty_project) }
 
@@ -133,6 +240,18 @@ describe 'Git LFS API and storage' do
 
             it_behaves_like 'responds with a file'
           end
+        end
+
+        context 'when deploy key is authorized' do
+          let(:key) { create(:deploy_key) }
+          let(:authorization) { authorize_deploy_key }
+
+          let(:update_permissions) do
+            project.deploy_keys << key
+            project.lfs_objects << lfs_object
+          end
+
+          it_behaves_like 'responds with a file'
         end
 
         context 'when CI is authorized' do
@@ -780,6 +899,10 @@ describe 'Git LFS API and storage' do
 
   def authorize_user
     ActionController::HttpAuthentication::Basic.encode_credentials(user.username, user.password)
+  end
+
+  def authorize_deploy_key
+    ActionController::HttpAuthentication::Basic.encode_credentials("lfs-deploy-key-#{key.id}", Gitlab::LfsToken.new(key).generate)
   end
 
   def fork_project(project, user, object = nil)
