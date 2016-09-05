@@ -1,5 +1,11 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.11.5
+  - API: Restore backward-compatibility for POST /projects/:id/members when membership is locked
+
+v 8.11.4
+  - No EE-specific changes
+
 v 8.11.3
   - [ES] Add logging to indexer
   - [ES] Elasticsearch workers checks ES settings before running
