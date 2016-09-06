@@ -204,6 +204,12 @@
     position: relative;
     top: 2px;
   }
+
+  svg, .fa {
+    &:not(:last-child) {
+      margin-right: 3px;
+    }
+  }
 }
 
 .btn-lg {
