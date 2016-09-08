@@ -80,6 +80,10 @@
     border-top-width: 1px;
   }
 
+  .build.retried {
+    background-color: $gray-lightest;
+  }
+
   .commit-link {
 
     .ci-status {
