@@ -20,31 +20,14 @@ module Elastic
         end
       end
 
-      def as_indexed_json(options = {})
-        data = {}
-
-        # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
-        # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
-        [:id, :note, :project_id, :created_at, :updated_at].each do |attr|
-          data[attr.to_s] = self.send(attr)
-        end
-
-        if noteable.is_a?(Issue)
-          data['issue'] = {
-            assignee_id: noteable.assignee_id,
-            author_id: noteable.author_id,
-            confidential: noteable.confidential
-          }
-        end
-
-        data
-      end
-
+      # This method has to in the included block to avoid being overridden by include ApplicationSearch above
       def self.nested?
         true
       end
+    end
 
-      def self.elastic_search(query, options: {})
+    module ClassMethods
+      def elastic_search(query, options: {})
         options[:in] = ['note']
 
         query_hash = {
@@ -73,7 +56,7 @@ module Elastic
         self.__elasticsearch__.search(query_hash)
       end
 
-      def self.confidentiality_filter(query_hash, current_user)
+      def confidentiality_filter(query_hash, current_user)
         return query_hash if current_user && current_user.admin?
 
         filter = {
@@ -106,6 +89,26 @@ module Elastic
         query_hash[:query][:bool][:must] << filter
         query_hash
       end
+    end
+
+    def as_indexed_json(options = {})
+      data = {}
+
+      # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
+      # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
+      [:id, :note, :project_id, :created_at, :updated_at].each do |attr|
+        data[attr.to_s] = self.send(attr)
+      end
+
+      if noteable.is_a?(Issue)
+        data['issue'] = {
+          assignee_id: noteable.assignee_id,
+          author_id: noteable.author_id,
+          confidential: noteable.confidential
+        }
+      end
+
+      data
     end
   end
 end

@@ -20,25 +20,10 @@ module Elastic
         indexes :author_id,        type: :integer
         indexes :visibility_level, type: :integer
       end
+    end
 
-      def as_indexed_json(options = {})
-        as_json({
-          only: [
-            :id,
-            :title,
-            :file_name,
-            :content,
-            :created_at,
-            :updated_at,
-            :state,
-            :project_id,
-            :author_id,
-            :visibility_level
-          ]
-        })
-      end
-
-      def self.elastic_search(query, options: {})
+    module ClassMethods
+      def elastic_search(query, options: {})
         query_hash = basic_query_hash(%w(title file_name), query)
 
         query_hash = filter(query_hash, options[:user])
@@ -46,7 +31,7 @@ module Elastic
         self.__elasticsearch__.search(query_hash)
       end
 
-      def self.elastic_search_code(query, options: {})
+      def elastic_search_code(query, options: {})
         query_hash = {
           query: {
             bool: {
@@ -67,7 +52,7 @@ module Elastic
         self.__elasticsearch__.search(query_hash)
       end
 
-      def self.filter(query_hash, user)
+      def filter(query_hash, user)
         return query_hash if user && user.admin?
 
         filter = if user
@@ -87,6 +72,23 @@ module Elastic
         query_hash[:query][:bool][:filter] = filter
         query_hash
       end
+    end
+
+    def as_indexed_json(options = {})
+      as_json({
+        only: [
+          :id,
+          :title,
+          :file_name,
+          :content,
+          :created_at,
+          :updated_at,
+          :state,
+          :project_id,
+          :author_id,
+          :visibility_level
+        ]
+      })
     end
   end
 end

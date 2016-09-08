@@ -25,41 +25,18 @@ module Elastic
         indexes :author_id,         type: :integer
       end
 
-      def as_indexed_json(options = {})
-        # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
-        # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
-        data = {}
-
-        [
-          :id,
-          :iid,
-          :target_branch,
-          :source_branch,
-          :title,
-          :description,
-          :created_at,
-          :updated_at,
-          :state,
-          :merge_status,
-          :source_project_id,
-          :target_project_id,
-          :author_id
-        ].each do |attr|
-          data[attr.to_s] = self.send(attr)
-        end
-
-        data
+      # This method has to in the included block to avoid being overridden by include ApplicationSearch above
+      def self.nested?
+        true
       end
 
       def es_parent
         target_project_id
       end
+    end
 
-      def self.nested?
-        true
-      end
-
-      def self.elastic_search(query, options: {})
+    module ClassMethods
+      def elastic_search(query, options: {})
         if query =~ /#(\d+)\z/
           query_hash = iid_query_hash(query_hash, $1)
         else
@@ -70,6 +47,32 @@ module Elastic
 
         self.__elasticsearch__.search(query_hash)
       end
+    end
+
+    def as_indexed_json(options = {})
+      # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
+      # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
+      data = {}
+
+      [
+        :id,
+        :iid,
+        :target_branch,
+        :source_branch,
+        :title,
+        :description,
+        :created_at,
+        :updated_at,
+        :state,
+        :merge_status,
+        :source_project_id,
+        :target_project_id,
+        :author_id
+      ].each do |attr|
+        data[attr.to_s] = self.send(attr)
+      end
+
+      data
     end
   end
 end

@@ -16,17 +16,14 @@ module Elastic
         indexes :updated_at,  type: :date
       end
 
-      def as_indexed_json(options = {})
-        as_json(
-          only: [:id, :title, :description, :project_id, :created_at, :updated_at]
-        )
-      end
-
+      # This method has to in the included block to avoid being overridden by include ApplicationSearch above
       def self.nested?
         true
       end
+    end
 
-      def self.elastic_search(query, options: {})
+    module ClassMethods
+      def elastic_search(query, options: {})
         options[:in] = %w(title^2 description)
 
         query_hash = basic_query_hash(options[:in], query)
@@ -35,6 +32,12 @@ module Elastic
 
         self.__elasticsearch__.search(query_hash)
       end
+    end
+
+    def as_indexed_json(options = {})
+      as_json(
+        only: [:id, :title, :description, :project_id, :created_at, :updated_at]
+      )
     end
   end
 end

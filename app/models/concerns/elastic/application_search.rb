@@ -53,15 +53,6 @@ module Elastic
           )
         end
       end
-
-      # Should be overridden in the models where some records should be skipped
-      def searchable?
-        true
-      end
-
-      def es_parent
-        project_id if respond_to?(:project_id)
-      end
     end
 
     module ClassMethods
@@ -171,6 +162,15 @@ module Elastic
 
         conditions
       end
+    end
+
+    # Should be overridden in the models where some records should be skipped
+    def searchable?
+      true
+    end
+
+    def es_parent
+      project_id if respond_to?(:project_id)
     end
   end
 end

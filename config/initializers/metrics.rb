@@ -153,16 +153,17 @@ if Gitlab::Metrics.enabled?
     config.instrument_instance_methods(Search::ProjectService)
     config.instrument_instance_methods(Gitlab::Elastic::SearchResults)
     config.instrument_instance_methods(Gitlab::Elastic::ProjectSearchResults)
-    config.instrument_instance_methods(Elastic::ApplicationSearch)
-    config.instrument_instance_methods(Elastic::IssuesSearch)
-    config.instrument_instance_methods(Elastic::MergeRequestsSearch)
-    config.instrument_instance_methods(Elastic::MilestonesSearch)
-    config.instrument_instance_methods(Elastic::NotesSearch)
-    config.instrument_instance_methods(Elastic::ProjectsSearch)
-    config.instrument_instance_methods(Elastic::RepositoriesSearch)
-    config.instrument_instance_methods(Elastic::SnippetsSearch)
-    config.instrument_instance_methods(Elastic::WikiRepositoriesSearch)
-    
+
+    %i(
+      ApplicationSearch IssuesSearch MergeRequestsSearch MilestonesSearch
+      NotesSearch ProjectsSearch RepositoriesSearch SnippetsSearch WikiRepositoriesSearch
+    ).each do |name|
+      klass = Elastic.const_get(name)
+
+      config.instrument_instance_methods(klass)
+      config.instrument_instance_methods(klass::ClassMethods) if klass.const_defined?(:ClassMethods)
+    end
+
     # This is a Rails scope so we have to instrument it manually.
     config.instrument_method(Project, :visible_to_user)
   end

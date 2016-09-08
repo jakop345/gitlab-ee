@@ -21,23 +21,14 @@ module Elastic
         indexes :confidential, type: :boolean
       end
 
-      def as_indexed_json(options = {})
-        data = {}
-
-        # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
-        # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
-        [:id, :iid, :title, :description, :created_at, :updated_at, :state, :project_id, :author_id, :assignee_id, :confidential].each do |attr|
-          data[attr.to_s] = self.send(attr)
-        end
-
-        data
-      end
-
+      # This method has to in the included block to avoid being overridden by include ApplicationSearch above
       def self.nested?
         true
       end
+    end
 
-      def self.elastic_search(query, options: {})
+    module ClassMethods
+      def elastic_search(query, options: {})
         if query =~ /#(\d+)\z/
           query_hash = iid_query_hash(query_hash, $1)
         else
@@ -50,7 +41,7 @@ module Elastic
         self.__elasticsearch__.search(query_hash)
       end
 
-      def self.confidentiality_filter(query_hash, current_user)
+      def confidentiality_filter(query_hash, current_user)
         return query_hash if current_user && current_user.admin?
 
         filter = if current_user
@@ -82,6 +73,18 @@ module Elastic
         query_hash[:query][:bool][:must] << filter
         query_hash
       end
+    end
+
+    def as_indexed_json(options = {})
+      data = {}
+
+      # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
+      # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
+      [:id, :iid, :title, :description, :created_at, :updated_at, :state, :project_id, :author_id, :assignee_id, :confidential].each do |attr|
+        data[attr.to_s] = self.send(attr)
+      end
+
+      data
     end
   end
 end

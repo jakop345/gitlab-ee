@@ -25,33 +25,10 @@ module Elastic
         indexes :last_activity_at,    type: :date
         indexes :last_pushed_at,      type: :date
       end
+    end
 
-      def as_indexed_json(options = {})
-        # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
-        # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
-        data = {}
-
-        [
-          :id,
-          :name,
-          :path,
-          :description,
-          :namespace_id,
-          :created_at,
-          :updated_at,
-          :archived,
-          :visibility_level,
-          :last_activity_at,
-          :name_with_namespace,
-          :path_with_namespace
-        ].each do |attr|
-          data[attr.to_s] = self.send(attr)
-        end
-
-        data
-      end
-
-      def self.elastic_search(query, options: {})
+    module ClassMethods
+      def elastic_search(query, options: {})
         options[:in] = %w(name^10 name_with_namespace^2 path_with_namespace path^9)
 
         query_hash = basic_query_hash(options[:in], query)
@@ -96,6 +73,31 @@ module Elastic
 
         self.__elasticsearch__.search(query_hash)
       end
+    end
+
+    def as_indexed_json(options = {})
+      # We don't use as_json(only: ...) because it calls all virtual and serialized attributtes
+      # https://gitlab.com/gitlab-org/gitlab-ee/issues/349
+      data = {}
+
+      [
+        :id,
+        :name,
+        :path,
+        :description,
+        :namespace_id,
+        :created_at,
+        :updated_at,
+        :archived,
+        :visibility_level,
+        :last_activity_at,
+        :name_with_namespace,
+        :path_with_namespace
+      ].each do |attr|
+        data[attr.to_s] = self.send(attr)
+      end
+
+      data
     end
   end
 end
