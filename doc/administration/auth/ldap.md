@@ -2,7 +2,7 @@
 
 GitLab integrates with LDAP to support user authentication.
 This integration works with most LDAP-compliant directory
-servers, including Microsoft Active Directory, Apple Open Directory, Open LDAP,
+servers, including Microsoft Active Directory, Apple Open Directory, OpenLDAP,
 and 389 Server. GitLab EE includes enhanced integration, including group
 membership syncing.
 
@@ -53,9 +53,9 @@ The configuration inside `gitlab_rails['ldap_servers']` below is sensitive to
 incorrect indentation. Be sure to retain the indentation given in the example.
 Copy/paste can sometimes cause problems.
 
-> **Note:** The `method` value `ssl` corresponds to 'Simple TLS' in the LDAP
+> **Note:** The `method` value `ssl` corresponds to 'Simple TLS' in the Net::LDAP
   library. `tls` corresponds to StartTLS, not to be confused with regular TLS.
-  Normally, if you specify `ssl` is will be on port 636 while `tls` (StartTLS)
+  Normally, if you specify `ssl` this will be on port 636 while `tls` (StartTLS)
   would be on port 389. `plain` also operates on port 389.
 
 **Omnibus configuration**
