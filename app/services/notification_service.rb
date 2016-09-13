@@ -337,7 +337,7 @@ class NotificationService
       action: pipeline.status)
 
     recipients.each do |to|
-      Notify.public_send(email_template, pipeline, to).deliver_later
+      mailer.public_send(email_template, pipeline, to).deliver_later
     end
   end
 
