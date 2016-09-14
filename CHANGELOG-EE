@@ -1,6 +1,7 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
 v 8.11.7
+  - Refactor Protected Branches dropdown. !687
   - Fix mirrored projects allowing empty import urls. !700
 
 v 8.11.6
