@@ -1,8 +1,15 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+v 8.11.6
+  - Fix an error where we were unable to create a CommitStatus for running state.
+  - Restore SSH Key title auto-population behavior. !6186
+  - Optimize discussion notes resolving and unresolving.
+  - Fix GitLab import button.
+  - Make merge conflict file size limit 200 KB, to match the docs.
+
 v 8.11.5
-  - Optimize branch lookups and force a repository reload for Repository#find_branch. !6087
-  - Fix member expiration date picker after update. !6184
+  - Optimize branch lookups and force a repository reload for Repository#find_branch
+  - Fix member expiration date picker after update
   - Fix suggested colors options for new labels in the admin area. !6138
   - Fix GitLab import button
   - Fix confidential issues being exposed as public using gitlab.com export
