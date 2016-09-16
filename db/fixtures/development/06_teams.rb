@@ -1,11 +1,8 @@
 Gitlab::Seeder.quiet do
   Group.all.each do |group|
     User.all.sample(4).each do |user|
-      if group.add_users([user.id], Gitlab::Access.values.sample)
-        print '.'
-      else
-        print 'F'
-      end
+      group.add_users([user.id], Gitlab::Access.values.sample)
+      print '.'
     end
   end
 

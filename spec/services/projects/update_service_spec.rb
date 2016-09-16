@@ -140,7 +140,7 @@ describe Projects::UpdateService, services: true do
   end
 
   describe 'repository_storage' do
-    let(:admin_user) { create(:user, admin: true) }
+    let(:admin_user) { create(:admin) }
     let(:user) { create(:user) }
     let(:project) { create(:project, repository_storage: 'a') }
     let(:opts) { { repository_storage: 'b' } }

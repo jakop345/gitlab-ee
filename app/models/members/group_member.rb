@@ -17,6 +17,24 @@ class GroupMember < Member
     Gitlab::Access.options_with_owner
   end
 
+  def self.access_levels
+    Gitlab::Access.sym_options_with_owner
+  end
+
+  def self.add_users_to_group(group, users, access_level, current_user: nil, expires_at: nil, skip_notification: false, ldap: false)
+    self.transaction do
+      add_users_to_source(
+        group,
+        users,
+        access_level,
+        current_user: current_user,
+        expires_at: expires_at,
+        skip_notification: skip_notification,
+        ldap: ldap
+      )
+    end
+  end
+
   def group
     source
   end
