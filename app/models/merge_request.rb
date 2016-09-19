@@ -13,6 +13,7 @@ class MergeRequest < ActiveRecord::Base
 
   has_many :approvals, dependent: :destroy
   has_many :approvers, as: :target, dependent: :destroy
+  has_many :approver_groups, as: :target, dependent: :destroy
   has_many :merge_request_diffs, dependent: :destroy
   has_one :merge_request_diff,
     -> { order('merge_request_diffs.id DESC') }
@@ -679,7 +680,7 @@ class MergeRequest < ActiveRecord::Base
   def number_of_potential_approvers
     has_access = ['access_level > ?', Member::REPORTER]
     wheres = [
-      "id IN (#{overall_approvers.select(:user_id).to_sql})",
+      "id IN (#{all_approvers_including_groups.map(&:id).join(', ')})",
       "id IN (#{project.members.where(has_access).select(:user_id).to_sql})"
     ]
 
@@ -696,7 +697,7 @@ class MergeRequest < ActiveRecord::Base
   # Users in the list of approvers who have not already approved this MR.
   #
   def approvers_left
-    User.where(id: overall_approvers.select(:user_id)).where.not(id: approvals.select(:user_id))
+    User.where(id: all_approvers_including_groups.map(&:id)).where.not(id: approvals.select(:user_id))
   end
 
   # The list of approvers from either this MR (if they've been set on the MR) or the
@@ -707,9 +708,45 @@ class MergeRequest < ActiveRecord::Base
   #
   def overall_approvers(exclude_user: nil)
     exclude_user ||= author
-    approvers_relation = approvers.any? ? approvers : target_project.approvers
+    approvers_relation = approvers_overwritten? ? approvers : target_project.approvers
 
     exclude_user ? approvers_relation.where.not(user_id: exclude_user.id) : approvers_relation
+  end
+
+  def final_approver_groups
+    approvers_overwritten? ? approver_groups : target_project.approver_groups
+  end
+
+  def all_approvers_including_groups(exclude_user: nil)
+    exclude_user ||= author
+    approvers = []
+
+    # Approvers from direct assignment
+    approvers_relation = approvers_overwritten? ? self.approvers : target_project.approvers
+    approvers_relation = approvers_relation.where.not(user_id: exclude_user.id) if exclude_user
+    approvers << approvers_relation.map(&:user)
+
+    approvers << approvers_from_groups(exclude_user: exclude_user)
+
+    approvers.flatten
+  end
+
+  def approvers_from_groups(exclude_user: nil)
+    group_approvers = []
+
+    final_approver_groups.each do |approver_group|
+      group_approvers << approver_group.users
+    end
+
+    group_approvers.flatten!
+
+    group_approvers.delete_if{|user| user == exclude_user} if exclude_user
+
+    group_approvers
+  end
+
+  def approvers_overwritten?
+    approvers.any? || approver_groups.any?
   end
 
   def can_approve?(user)
@@ -737,6 +774,12 @@ class MergeRequest < ActiveRecord::Base
       next if author && user_id == author.id
 
       approvers.find_or_initialize_by(user_id: user_id, target_id: id)
+    end
+  end
+
+  def approver_group_ids=(value)
+    value.split(",").map(&:strip).each do |group_id|
+      approver_groups.find_or_initialize_by(group_id: group_id, target_id: id)
     end
   end
 

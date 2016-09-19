@@ -159,23 +159,28 @@
         Approvers
       .col-sm-10
         - author = @merge_request.author || current_user
-        - skip_users = @merge_request.overall_approvers.map(&:user) + [author]
+        - skip_users = @merge_request.all_approvers_including_groups + [author]
         = users_select_tag("merge_request[approver_ids]", multiple: true, class: 'input-large', scope: :all, email_user: true, skip_users: skip_users)
         .help-block
           This merge request must be approved by these users.
           You can override the project settings by setting your own list of approvers.
 
+        = groups_select_tag('merge_request[approver_group_ids]', multiple: true, skip_group: @merge_request.approver_groups.map{ |ag| ag.group.path }, class: 'input-large')
+        .help-block
+          The list of the groups that will be considered as approvers list.
+          You can override the project settings by setting your own list of groups.
+
         .panel.panel-default.prepend-top-10
           .panel-heading
             Approvers
           %ul.well-list.approver-list
-            - using_project_approvers = @merge_request.approvers.empty?
-            - item_class = 'project-approvers' if using_project_approvers
+            - unsaved_approvers = !@merge_request.approvers_overwritten?
+            - item_classes = unsaved_approvers ? ['unsaved-approvers'] : []
             - @merge_request.overall_approvers(exclude_user: author).each do |approver|
-              %li{id: dom_id(approver.user), class: item_class}
+              %li{id: dom_id(approver.user), class: item_classes + ['approver']}
                 = link_to approver.user.name, approver.user
                 .pull-right
-                  - if using_project_approvers
+                  - if unsaved_approvers
                     = link_to "#", data: { confirm: "Are you sure you want to remove approver #{approver.user.name}"}, class: "btn-xs btn btn-remove", title: 'Remove approver' do
                       = icon("sign-out")
                       Remove
@@ -183,7 +188,20 @@
                     = link_to namespace_project_merge_request_approver_path(@project.namespace, @project, @merge_request, approver), data: { confirm: "Are you sure you want to remove approver #{approver.user.name}"}, method: :delete, class: "btn-xs btn btn-remove", title: 'Remove approver' do
                       = icon("sign-out")
                       Remove
-            - if @merge_request.overall_approvers.empty?
+            - @merge_request.final_approver_groups.each do |approver_group|
+              %li{id: dom_id(approver_group.group), class: item_classes + ['approver-group']}
+                Group:
+                = link_to approver_group.group.name, approver_group.group
+                .pull-right
+                  - if unsaved_approvers
+                    = link_to "#", data: { confirm: "Are you sure you want to remove group #{approver_group.group.name}"}, class: "btn-xs btn btn-remove", title: 'Remove group' do
+                      = icon("sign-out")
+                      Remove
+                  - else
+                    = link_to namespace_project_merge_request_approver_group_path(@project.namespace, @project, @merge_request, approver_group), data: { confirm: "Are you sure you want to remove group #{approver_group.group.name}"}, method: :delete, class: "btn-xs btn btn-remove", title: 'Remove group' do
+                      = icon("sign-out")
+                      Remove
+            - if @merge_request.all_approvers_including_groups(exclude_user: author).empty?
               %li.no-approvers There are no approvers
         .help-block.suggested-approvers
           - if @suggested_approvers.any?
@@ -236,7 +254,7 @@
                                                                                                   method: :delete, class: 'btn btn-danger btn-grouped'
       = link_to 'Cancel', polymorphic_path([@project.namespace.becomes(Namespace), @project, issuable]), class: 'btn btn-grouped btn-cancel'
 
-%li.project-approvers.hide.approver-template{id: "user_{user_id}"}
+%li.unsaved-approvers.hide.approver.approver-template{id: "user_{user_id}"}
   = link_to "{approver_name}", "#"
   .pull-right
     = link_to "#", data: { confirm: "Are you sure you want to remove approver {approver_name}"}, class: "btn-xs btn btn-remove", title: 'Remove approver' do

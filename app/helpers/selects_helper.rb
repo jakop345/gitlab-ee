@@ -34,6 +34,7 @@ module SelectsHelper
   def groups_select_tag(id, opts = {})
     opts[:class] ||= ''
     opts[:class] << ' ajax-groups-select'
+    opts[:class] << ' multiselect' if opts[:multiple]
     select2_tag(id, opts)
   end
 

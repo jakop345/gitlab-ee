@@ -802,6 +802,7 @@ Rails.application.routes.draw do
           end
 
           resources :approvers, only: :destroy
+          resources :approver_groups, only: :destroy
 
           resources :discussions, only: [], constraints: { id: /\h{40}/ } do
             member do
@@ -982,6 +983,7 @@ Rails.application.routes.draw do
         end
 
         resources :approvers, only: :destroy
+        resources :approver_groups, only: :destroy
         resources :runner_projects, only: [:create, :destroy]
         resources :badges, only: [:index] do
           collection do

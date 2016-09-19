@@ -17,7 +17,8 @@
                 url: url,
                 data: {
                   search: query.term,
-                  per_page: 20
+                  per_page: 20,
+                  skip_group: skip_group
                 },
                 dataType: "json"
               }).done(function(groups) {
@@ -27,9 +28,6 @@
                 };
                 for (j = 0, len = groups.length; j < len; j++) {
                   group = groups[j];
-                  if (skip_group && group.path === skip_group) {
-                    continue;
-                  }
                   data.results.push(group);
                 }
                 return query.callback(data);

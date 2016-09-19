@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20160915201649) do
+ActiveRecord::Schema.define(version: 20160916101334) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -110,6 +110,17 @@ ActiveRecord::Schema.define(version: 20160915201649) do
     t.datetime "updated_at"
   end
 
+  create_table "approver_groups", force: :cascade do |t|
+    t.integer  "target_id",   null: false
+    t.string   "target_type"
+    t.integer  "group_id",    null: false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "approver_groups", ["group_id"], name: "index_approver_groups_on_group_id", using: :btree
+  add_index "approver_groups", ["target_id", "target_type"], name: "index_approver_groups_on_target_id_and_target_type", using: :btree
+
   create_table "approvers", force: :cascade do |t|
     t.integer  "target_id",   null: false
     t.string   "target_type"
@@ -185,9 +196,9 @@ ActiveRecord::Schema.define(version: 20160915201649) do
     t.text     "commands"
     t.integer  "job_id"
     t.string   "name"
-    t.boolean  "deploy",              default: false
+    t.boolean  "deploy",                        default: false
     t.text     "options"
-    t.boolean  "allow_failure",       default: false, null: false
+    t.boolean  "allow_failure",                 default: false, null: false
     t.string   "stage"
     t.integer  "trigger_request_id"
     t.integer  "stage_idx"
@@ -620,11 +631,11 @@ ActiveRecord::Schema.define(version: 20160915201649) do
   add_index "lists", ["label_id"], name: "index_lists_on_label_id", using: :btree
 
   create_table "members", force: :cascade do |t|
-    t.integer  "access_level",       null: false
-    t.integer  "source_id",          null: false
-    t.string   "source_type",        null: false
+    t.integer  "access_level",                       null: false
+    t.integer  "source_id",                          null: false
+    t.string   "source_type",                        null: false
     t.integer  "user_id"
-    t.integer  "notification_level", null: false
+    t.integer  "notification_level",                 null: false
     t.string   "type"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -1297,18 +1308,18 @@ ActiveRecord::Schema.define(version: 20160915201649) do
     t.datetime "updated_at"
     t.string   "type",                                    default: "ProjectHook"
     t.integer  "service_id"
-    t.boolean  "push_events",                          default: true,          null: false
-    t.boolean  "issues_events",                        default: false,         null: false
-    t.boolean  "merge_requests_events",                default: false,         null: false
-    t.boolean  "tag_push_events",                      default: false
+    t.boolean  "push_events",                             default: true,          null: false
+    t.boolean  "issues_events",                           default: false,         null: false
+    t.boolean  "merge_requests_events",                   default: false,         null: false
+    t.boolean  "tag_push_events",                         default: false
     t.integer  "group_id"
-    t.boolean  "note_events",                          default: false,         null: false
-    t.boolean  "enable_ssl_verification",              default: true
-    t.boolean  "build_events",                         default: false,         null: false
+    t.boolean  "note_events",                             default: false,         null: false
+    t.boolean  "enable_ssl_verification",                 default: true
+    t.boolean  "build_events",                            default: false,         null: false
     t.string   "token"
-    t.boolean  "wiki_page_events",                     default: false,         null: false
-    t.boolean  "pipeline_events",                      default: false,         null: false
-    t.boolean  "confidential_issues_events",           default: false,         null: false
+    t.boolean  "wiki_page_events",                        default: false,         null: false
+    t.boolean  "pipeline_events",                         default: false,         null: false
+    t.boolean  "confidential_issues_events",              default: false,         null: false
   end
 
   add_index "web_hooks", ["project_id"], name: "index_web_hooks_on_project_id", using: :btree
