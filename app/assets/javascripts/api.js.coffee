@@ -16,8 +16,6 @@
 
     $.ajax(
       url: url
-      data:
-        private_token: gon.api_token
       dataType: "json"
     ).done (group) ->
       callback(group)
@@ -30,7 +28,6 @@
     $.ajax(
       url: url
       data:
-        private_token: gon.api_token
         search: query
         per_page: 20
       dataType: "json"
@@ -44,7 +41,6 @@
     $.ajax(
       url: url
       data:
-        private_token: gon.api_token
         search: query
         per_page: 20
       dataType: "json"
@@ -58,7 +54,6 @@
     $.ajax(
       url: url
       data:
-        private_token: gon.api_token
         search: query
         order_by: order
         per_page: 20
@@ -70,7 +65,6 @@
     url = Api.buildUrl(Api.labelsPath)
     url = url.replace(':id', project_id)
 
-    data.private_token = gon.api_token
     $.ajax(
       url: url
       type: "POST"
@@ -89,7 +83,6 @@
     $.ajax(
       url: url
       data:
-        private_token: gon.api_token
         search: query
         per_page: 20
       dataType: "json"
