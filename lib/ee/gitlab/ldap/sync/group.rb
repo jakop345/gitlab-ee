@@ -172,18 +172,9 @@ module EE
             if access < ::Gitlab::Access::OWNER && group.last_owner?(user)
               warn_cannot_remove_last_owner(user, group)
             else
-              # Temporarily handle access requests until
-              # gitlab-org/gitlab-ee#825 is properly resolved.
-              member = group.requesters.find_by(user_id: user.id)
-              if member.present?
-                member.access_level = access
-                member.requested_at = nil
-                member.save
-              else
-                # If you pass the user object, instead of just user ID,
-                # it saves an extra user database query.
-                group.add_users([user], access, skip_notification: true, ldap: true)
-              end
+              # If you pass the user object, instead of just user ID,
+              # it saves an extra user database query.
+              group.add_user(user, access, skip_notification: true, ldap: true)
             end
           end
 
