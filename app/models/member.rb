@@ -81,7 +81,7 @@ class Member < ActiveRecord::Base
       find_by(invite_token: invite_token)
     end
 
-    def add_user(source, user, access_level, current_user: nil, expires_at: nil, skip_notification: false, ldap: false)
+    def add_user(source, user, access_level, current_user: nil, expires_at: nil, ldap: false)
       user = retrieve_user(user)
       access_level = retrieve_access_level(access_level)
 
@@ -101,7 +101,7 @@ class Member < ActiveRecord::Base
         created_by: member.created_by || current_user,
         access_level: access_level,
         expires_at: expires_at,
-        skip_notification: skip_notification,
+        skip_notification: ldap,
         ldap: ldap
       }
 
@@ -137,16 +137,14 @@ class Member < ActiveRecord::Base
       !current_user || current_user.can?(:"update_#{member.type.underscore}", member)
     end
 
-    def add_users_to_source(source, users, access_level, current_user: nil, expires_at: nil, skip_notification: false, ldap: false)
+    def add_users_to_source(source, users, access_level, current_user: nil, expires_at: nil)
       users.each do |user|
         add_user(
           source,
           user,
           access_level,
           current_user: current_user,
-          expires_at: expires_at,
-          skip_notification: skip_notification,
-          ldap: ldap
+          expires_at: expires_at
         )
       end
     end

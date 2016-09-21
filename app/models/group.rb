@@ -117,26 +117,23 @@ class Group < Namespace
     self[:lfs_enabled]
   end
 
-  def add_users(users, access_level, current_user: nil, expires_at: nil, skip_notification: false, ldap: false)
+  def add_users(users, access_level, current_user: nil, expires_at: nil)
     GroupMember.add_users_to_group(
       self,
       users,
       access_level,
       current_user: current_user,
-      expires_at: expires_at,
-      skip_notification: skip_notification,
-      ldap: ldap
+      expires_at: expires_at
     )
   end
 
-  def add_user(user, access_level, current_user: nil, expires_at: nil, skip_notification: false, ldap: false)
+  def add_user(user, access_level, current_user: nil, expires_at: nil, ldap: false)
     GroupMember.add_user(
       self,
       user,
       access_level,
       current_user: current_user,
       expires_at: expires_at,
-      skip_notification: skip_notification,
       ldap: ldap
     )
   end
@@ -157,8 +154,8 @@ class Group < Namespace
     add_user(user, :master, current_user: current_user)
   end
 
-  def add_owner(user, current_user = nil, skip_notification: false)
-    add_user(user, :owner, current_user: current_user, skip_notification: skip_notification)
+  def add_owner(user, current_user = nil)
+    add_user(user, :owner, current_user: current_user)
   end
 
   def has_owner?(user)

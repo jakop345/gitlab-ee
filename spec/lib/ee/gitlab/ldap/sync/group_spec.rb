@@ -160,7 +160,7 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
         it 'downgrades existing member access' do
           # Create user with higher access
           group.add_users([user],
-                          ::Gitlab::Access::MASTER, skip_notification: true)
+                          ::Gitlab::Access::MASTER)
 
           sync_group.update_permissions
 
@@ -171,7 +171,7 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
         it 'upgrades existing member access' do
           # Create user with lower access
           group.add_users([user],
-                          ::Gitlab::Access::GUEST, skip_notification: true)
+                          ::Gitlab::Access::GUEST)
 
           sync_group.update_permissions
 
@@ -182,8 +182,7 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
         it 'sets an existing member ldap attribute to true' do
           group.add_users(
             [user],
-            ::Gitlab::Access::DEVELOPER,
-            skip_notification: true
+            ::Gitlab::Access::DEVELOPER
           )
 
           sync_group.update_permissions
@@ -213,7 +212,7 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
 
         it 'removes the user from the group' do
           group.add_users([user],
-                          Gitlab::Access::MASTER, skip_notification: true)
+                          Gitlab::Access::MASTER)
 
           sync_group.update_permissions
 
@@ -222,7 +221,7 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
 
         it 'refuses to delete the last owner' do
           group.add_users([user],
-                          Gitlab::Access::OWNER, skip_notification: true)
+                          Gitlab::Access::OWNER)
 
           sync_group.update_permissions
 
@@ -242,7 +241,7 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
           create(:identity, user: user1, extern_uid: user_dn(user1.username))
           create(:identity, user: user2, extern_uid: user_dn(user2.username))
           group.add_users([user1, user2],
-                          Gitlab::Access::OWNER, skip_notification: true)
+                          Gitlab::Access::OWNER)
 
           sync_group.update_permissions
 

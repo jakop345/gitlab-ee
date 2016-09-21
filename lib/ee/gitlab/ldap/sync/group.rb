@@ -174,7 +174,7 @@ module EE
             else
               # If you pass the user object, instead of just user ID,
               # it saves an extra user database query.
-              group.add_user(user, access, skip_notification: true, ldap: true)
+              group.add_user(user, access, ldap: true)
             end
           end
 
