@@ -680,9 +680,14 @@ class MergeRequest < ActiveRecord::Base
   def number_of_potential_approvers
     has_access = ['access_level > ?', Member::REPORTER]
     wheres = [
-      "id IN (#{all_approvers_including_groups.map(&:id).join(', ')})",
       "id IN (#{project.members.where(has_access).select(:user_id).to_sql})"
     ]
+
+    all_approvers = all_approvers_including_groups
+
+    if all_approvers.any?
+      wheres << "id IN (#{all_approvers.map(&:id).join(', ')})"
+    end
 
     if project.group
       wheres << "id IN (#{project.group.members.where(has_access).select(:user_id).to_sql})"
