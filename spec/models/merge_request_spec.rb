@@ -299,6 +299,31 @@ describe MergeRequest, models: true do
 
       expect(merge_request.approvers_left).to eq [user]
     end
+
+    it "returns correct value when there is group approver" do
+      user = create(:user)
+      user1 = create(:user)
+      user2 = create(:user)
+      group = create(:group)
+
+      group.add_developer(user2)
+      merge_request.approver_groups.create(group: group)
+      merge_request.approvers.create(user_id: user.id)
+      merge_request.approvers.create(user_id: user1.id)
+      merge_request.approvals.create(user_id: user1.id)
+
+      expect(merge_request.approvers_left).to match_array [user, user2]
+    end
+
+    it "returns correct value when there is only group approver" do
+      user = create(:user)
+      group = create(:group)
+      group.add_developer(user)
+
+      merge_request.approver_groups.create(group: group)
+
+      expect(merge_request.approvers_left).to eq [user]
+    end
   end
 
   describe "#number_of_potential_approvers" do
@@ -309,6 +334,14 @@ describe MergeRequest, models: true do
     it "includes approvers set on the MR" do
       expect do
         create(:approver, user: create(:user), target: merge_request)
+      end.to change { merge_request.number_of_potential_approvers }.by(1)
+    end
+
+    it "includes approvers from group" do
+      group = create(:group_with_members)
+
+      expect do
+        create(:approver_group, group: group, target: merge_request)
       end.to change { merge_request.number_of_potential_approvers }.by(1)
     end
 

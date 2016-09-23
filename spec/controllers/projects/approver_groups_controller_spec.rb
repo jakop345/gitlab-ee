@@ -19,8 +19,8 @@ describe Projects::ApproverGroupsController do
       end
 
       it 'destroys the provided approver group' do
-        merge    = create(:merge_request)
-        project  = stub_project(merge.target_project)
+        merge          = create(:merge_request)
+        project        = stub_project(merge.target_project)
         approver_group = create(:approver_group, target: merge)
 
         allow(controller).to receive(:authorize_create_merge_request!)
@@ -32,7 +32,7 @@ describe Projects::ApproverGroupsController do
 
     context 'on a project' do
       it 'authorizes admin_project' do
-        project  = stub_project
+        project        = stub_project
         approver_group = create(:approver_group, target: project)
 
         expect(controller).to receive(:authorize_admin_project!)
@@ -41,7 +41,7 @@ describe Projects::ApproverGroupsController do
       end
 
       it 'destroys the provided approver' do
-        project  = stub_project
+        project        = stub_project
         approver_group = create(:approver_group, target: project)
 
         allow(controller).to receive(:authorize_admin_project!).and_return(true)
