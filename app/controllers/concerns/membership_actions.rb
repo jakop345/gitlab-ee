@@ -11,7 +11,9 @@ module MembershipActions
   def approve_access_request
     member = Members::ApproveAccessRequestService.new(membershipable, current_user, params).execute
 
+    ## EE specific
     log_audit_event(member, action: :create)
+    ## EE specific
 
     redirect_to polymorphic_url([membershipable, :members])
   end
@@ -28,7 +30,9 @@ module MembershipActions
         "You left the \"#{membershipable.human_name}\" #{source_type}."
       end
 
+    ## EE specific
     log_audit_event(member, action: :destroy) unless member.request?
+    ## EE specific
 
     redirect_path = member.request? ? member.source : [:dashboard, membershipable.class.to_s.tableize]
 
@@ -41,8 +45,10 @@ module MembershipActions
     raise NotImplementedError
   end
 
+  ## EE specific
   def log_audit_event(member, options = {})
     AuditEventService.new(current_user, membershipable, options).
       for_member(member).security_event
   end
+  ## EE specific
 end
