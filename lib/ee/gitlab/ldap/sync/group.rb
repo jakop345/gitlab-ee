@@ -99,6 +99,8 @@ module EE
           def update_existing_group_membership(group, access_levels)
             logger.debug { "Updating existing membership for '#{group.name}' group" }
 
+            first_group_owner = group.members.owners.first.try(:user)
+
             select_and_preload_group_members(group).each do |member|
               user = member.user
               identity = user.identities.select(:id, :extern_uid)
@@ -137,7 +139,12 @@ module EE
 
                 next if member.ldap? && member.override?
 
-                add_or_update_user_membership(user, group, desired_access)
+                add_or_update_user_membership(
+                  user,
+                  group,
+                  desired_access,
+                  current_user: first_group_owner
+                )
               elsif group.last_owner?(user)
                 warn_cannot_remove_last_owner(user, group)
               else
@@ -149,11 +156,18 @@ module EE
           def add_new_members(group, access_levels)
             logger.debug { "Adding new members to '#{group.name}' group" }
 
+            first_group_owner = group.members.owners.first.try(:user)
+
             access_levels.each do |member_dn, access_level|
               user = ::Gitlab::LDAP::User.find_by_uid_and_provider(member_dn, provider)
 
               if user.present?
-                add_or_update_user_membership(user, group, access_level)
+                add_or_update_user_membership(
+                  user,
+                  group,
+                  access_level,
+                  current_user: first_group_owner
+                )
               else
                 logger.debug do
                   <<-MSG.strip_heredoc.tr("\n", ' ')
@@ -167,14 +181,19 @@ module EE
             end
           end
 
-          def add_or_update_user_membership(user, group, access)
+          def add_or_update_user_membership(user, group, access, current_user: nil)
             # Prevent the last owner of a group from being demoted
             if access < ::Gitlab::Access::OWNER && group.last_owner?(user)
               warn_cannot_remove_last_owner(user, group)
             else
               # If you pass the user object, instead of just user ID,
               # it saves an extra user database query.
-              group.add_user(user, access, ldap: true)
+              group.add_user(
+                user,
+                access,
+                current_user: current_user,
+                ldap: true
+              )
             end
           end
 

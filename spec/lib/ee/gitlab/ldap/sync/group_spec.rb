@@ -112,8 +112,13 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
   end
 
   describe '#update_permissions' do
-    before { group.start_ldap_sync }
-    after { group.finish_ldap_sync }
+    before do
+      group.start_ldap_sync
+    end
+
+    after do
+      group.finish_ldap_sync
+    end
 
     let(:group) do
       create(:group_with_ldap_group_link,
@@ -142,17 +147,15 @@ describe EE::Gitlab::LDAP::Sync::Group, lib: true do
         end
 
         it 'converts an existing membership access request to a real member' do
-          group.members.create(
-            user: user,
-            access_level: ::Gitlab::Access::MASTER,
-            requested_at: DateTime.now
-          )
+          group.add_owner(create(:user))
+          access_requester = group.request_access(user)
+          access_requester.update(access_level: ::Gitlab::Access::MASTER)
           # Validate that the user is properly created as a requester first.
-          expect(group.requesters.pluck(:user_id)).to include(user.id)
+          expect(group.requesters.pluck(:id)).to include(access_requester.id)
 
           sync_group.update_permissions
 
-          expect(group.members.pluck(:user_id)).to include(user.id)
+          expect(group.members.pluck(:id)).to include(access_requester.id)
           expect(group.members.find_by(user_id: user.id).access_level)
             .to eq(::Gitlab::Access::DEVELOPER)
         end
