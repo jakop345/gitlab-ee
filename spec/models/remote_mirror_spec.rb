@@ -71,6 +71,25 @@ describe RemoteMirror do
 
         expect(repo.config["remote.#{mirror.ref_name}.url"]).to eq('http://foo:baz@test.com')
       end
+
+      context 'URL same as import URL' do
+        let(:mirror) { create_mirror(url: 'http://random.url') }
+        let(:url) { 'http://foo:bar@test.com' }
+
+        before do
+          mirror.project.update(import_url: url)
+          mirror.project.repository.add_remote(mirror.ref_name, url)
+          mirror.update(url: url)
+        end
+
+        it 'updates the URL with no errors' do
+          expect(mirror).to be_valid
+        end
+
+        it 'repo has only origin and one remote mirror' do
+          expect(mirror.project.repository.raw_repository.remote_names).to match(['origin', mirror.ref_name])
+        end
+      end
     end
   end
 

@@ -31,7 +31,6 @@ class RemoteMirror < ActiveRecord::Base
   belongs_to :project
 
   validates :url, presence: true, url: { protocols: %w(ssh git http https), allow_blank: true }
-  validate  :url_availability, if: :url_changed?
 
   after_save :refresh_remote, if: :mirror_url_changed?
   after_update :reset_fields, if: :mirror_url_changed?
@@ -126,12 +125,6 @@ class RemoteMirror < ActiveRecord::Base
   end
 
   private
-
-  def url_availability
-    if project.import_url == url
-      errors.add(:url, 'is already in use')
-    end
-  end
 
   def reset_fields
     update_columns(
