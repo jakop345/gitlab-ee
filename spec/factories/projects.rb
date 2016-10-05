@@ -138,12 +138,4 @@ FactoryGirl.define do
       )
     end
   end
-
-  factory :project_with_board, parent: :empty_project do
-    after(:create) do |project|
-      board = project.boards.create
-      board.lists.create(list_type: :backlog)
-      board.lists.create(list_type: :done)
-    end
-  end
 end
