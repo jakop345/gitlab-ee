@@ -141,9 +141,9 @@ FactoryGirl.define do
 
   factory :project_with_board, parent: :empty_project do
     after(:create) do |project|
-      project.create_board
-      project.board.lists.create(list_type: :backlog)
-      project.board.lists.create(list_type: :done)
+      board = project.boards.create
+      board.lists.create(list_type: :backlog)
+      board.lists.create(list_type: :done)
     end
   end
 end
