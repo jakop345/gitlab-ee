@@ -2,33 +2,51 @@ require 'spec_helper'
 
 describe Boards::CreateService, services: true do
   describe '#execute' do
-    subject(:service) { described_class.new(project, double) }
+    let(:project) { create(:empty_project) }
 
-    context 'when project does not have a board' do
-      let(:project) { create(:empty_project, board: nil) }
+    context 'with valid params' do
+      subject(:service) { described_class.new(project, double, name: 'Backend') }
 
-      it 'creates a new board' do
-        expect { service.execute }.to change(Board, :count).by(1)
+      it 'creates a new project board' do
+        expect { service.execute }.to change(project.boards, :count).by(1)
       end
 
-      it 'creates default lists' do
-        service.execute
+      it "creates board's default lists" do
+        board = service.execute
 
-        expect(project.board.lists.size).to eq 2
-        expect(project.board.lists.first).to be_backlog
-        expect(project.board.lists.last).to be_done
+        expect(board.lists.size).to eq 2
+        expect(board.lists.first).to be_backlog
+        expect(board.lists.last).to be_done
       end
     end
 
-    context 'when project has a board' do
-      let!(:project) { create(:project_with_board) }
+    context 'with invalid params' do
+      subject(:service) { described_class.new(project, double, name: nil) }
 
-      it 'does not create a new board' do
-        expect { service.execute }.not_to change(Board, :count)
+      it 'does not create a new project board' do
+        expect { service.execute }.not_to change(project.boards, :count)
       end
 
-      it 'does not create board lists' do
-        expect { service.execute }.not_to change(project.board.lists, :count)
+      it "does not create board's default lists" do
+        board = service.execute
+
+        expect(board.lists.size).to eq 0
+      end
+    end
+
+    context 'without params' do
+      subject(:service) { described_class.new(project, double) }
+
+      it 'creates a new project board' do
+        expect { service.execute }.to change(project.boards, :count).by(1)
+      end
+
+      it "creates board's default lists" do
+        board = service.execute
+
+        expect(board.lists.size).to eq 2
+        expect(board.lists.first).to be_backlog
+        expect(board.lists.last).to be_done
       end
     end
   end
