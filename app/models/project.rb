@@ -58,7 +58,7 @@ class Project < ActiveRecord::Base
 
   has_one :push_rule, dependent: :destroy
   has_one :last_event, -> {order 'events.created_at DESC'}, class_name: 'Event', foreign_key: 'project_id'
-  has_one :board, dependent: :destroy
+  has_many :boards, dependent: :destroy
 
   # Project services
   has_many :services
