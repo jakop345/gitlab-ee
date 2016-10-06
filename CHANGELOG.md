@@ -24,6 +24,7 @@ Please view this file on the master branch, on stable branches it's out of date.
   - Move Pipeline Metrics to separate worker
   - AbstractReferenceFilter caches project_refs on RequestStore when active
   - Replaced the check sign to arrow in the show build view. !6501
+  - Ignore references to internal issues when using external issues tracker
   - Add a /wip slash command to toggle the Work In Progress status of a merge request. !6259 (tbalthazar)
   - Fix Error 500 when viewing old merge requests with bad diff data
   - Create a new /templates namespace for the /licenses, /gitignores and /gitlab_ci_ymls API endpoints. !5717 (tbalthazar)
