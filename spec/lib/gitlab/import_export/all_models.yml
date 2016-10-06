@@ -122,7 +122,7 @@ project:
 - creator
 - group
 - namespace
-- board
+- boards
 - last_event
 - services
 - campfire_service
