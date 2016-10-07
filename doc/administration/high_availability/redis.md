@@ -161,16 +161,57 @@ servers.
 We provide an automated way to setup and run the Sentinel daemon
 with GitLab EE.
 
-See the instructions below how to setup it by yourself.
+To setup sentinel, you must edit `/etc/gitlab/gitlab.rb` file.
+This is a minimal configuration required to run the daemon:
 
-Here is an example configuration file (`sentinel.conf`) for a Sentinel node:
 
-```conf
-port 26379
-sentinel monitor gitlab-redis 10.0.0.1 6379 1
-sentinel down-after-milliseconds gitlab-redis 10000
-sentinel config-epoch gitlab-redis 0
-sentinel leader-epoch gitlab-redis 0
+```ruby
+##
+## Replication support
+##
+
+# ...
+
+## Slave and Sentinel shared configuration
+## Both need to point to the master redis instance to get replication and heartbeat monitoring
+
+redis['master_name'] = 'gitlab-redis' # must be the same in every sentinel node
+# redis['master_ip'] = nil
+# redis['master_port'] = nil
+redis['master_password'] = 'your-secure-password-here' # the same value defined in redis['password'] in the master instance
+
+########################
+# GitLab Sentinel (EE) #
+########################
+
+## Make sure you configured all redis['master_*'] keys above before continuing.
+
+sentinel['enable'] = true
+# sentinel['port'] = 26379
+
+## Quorum must reflect the amount of voting sentinels it take to start a failover.
+# sentinel['quorum'] = 1
+
+## Consider unresponsive server down after x amount of ms.
+# sentinel['down_after_milliseconds'] = 10000
+
+# sentinel['failover_timeout'] = 60000
+```
+
+If you want to install sentinel in a separate machine or control which other
+services will be running in the same machine, take a look at the following
+variables and enable or disable whenever it fits your strategy:
+
+```ruby
+# Disable all other services
+redis['enable'] = false
+bootstrap['enable'] = false
+nginx['enable'] = false
+unicorn['enable'] = false
+sidekiq['enable'] = false
+postgresql['enable'] = false
+gitlab_workhorse['enable'] = false
+mailroom['enable'] = false
 ```
 
 ---
@@ -204,7 +245,7 @@ The following steps should be performed in the [GitLab application server](gitla
     ```ruby
     redis['master_name'] = "gitlab-redis"
     redis['master_password'] = 'redis-password-goes-here'
-    gitlab_rails['redis_sentinels'] = [
+    gitlab_rails['redis_sentinels'] = [ # list a few sentinels here (you don't need to list all of them)
       {'host' => '10.10.10.1', 'port' => 26379},
       {'host' => '10.10.10.2', 'port' => 26379},
       {'host' => '10.10.10.3', 'port' => 26379}
