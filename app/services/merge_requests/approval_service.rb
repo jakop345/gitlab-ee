@@ -6,6 +6,7 @@ module MergeRequests
       if approval.save
         create_approval_note(merge_request)
         mark_pending_todos_as_done(merge_request)
+        merge_request.expire_approvals_left
 
         if merge_request.approvals_left.zero?
           notification_service.approve_mr(merge_request, current_user)

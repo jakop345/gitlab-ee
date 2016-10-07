@@ -45,7 +45,7 @@
           != markdown issues_sentence(mr_closes_issues), pipeline: :gfm, author: @merge_request.author
         = mr_assign_issues_link
 
-  - if @merge_request.approvals.any?
+  - if @merge_request.approved_by_users.any?
     .mr-widget-footer.approved-by-users
       Approved by
       - @merge_request.approved_by_users.each do |user|

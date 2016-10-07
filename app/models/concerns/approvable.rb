@@ -15,10 +15,14 @@ module Approvable
     # choose the lower so the MR doesn't get 'stuck' in a state where it can't be approved.
     #
     def approvals_left
-      [
+      @approvals_left ||= [
         [approvals_required - approvals.count, number_of_potential_approvers].min,
         0
       ].max
+    end
+
+    def expire_approvals_left
+      @approvals_left = nil
     end
 
     def approvals_required
@@ -58,9 +62,14 @@ module Approvable
     end
 
     # Users in the list of approvers who have not already approved this MR.
+    # Memoized because it's used a lot of times during a request.
     #
     def approvers_left
-      User.where(id: all_approvers_including_groups.map(&:id)).where.not(id: approvals.select(:user_id))
+      @approvers_left ||= User.where(id: all_approvers_including_groups.map(&:id)).where.not(id: approvals.select(:user_id)).to_a
+    end
+
+    def approvers_left_names
+      approvers_left.map(&:name)
     end
 
     # The list of approvers from either this MR (if they've been set on the MR) or the
@@ -82,14 +91,10 @@ module Approvable
     end
 
     def all_approvers_including_groups
-      approvers = []
-
-      # Approvers from direct assignment
-      approvers << approvers_from_users
-
-      approvers << approvers_from_groups
-
-      approvers.flatten
+      @all_approvers_including_groups ||= begin
+        # Approvers from direct assignment
+        [approvers_from_users, approvers_from_groups].flatten
+      end
     end
 
     def approvers_from_users
@@ -120,14 +125,22 @@ module Approvable
       return false if user == author
       return false unless user.can?(:update_merge_request, self)
 
-      any_approver_allowed? && approvals.where(user: user).empty?
+      approval?(user) && any_approver_allowed?
+    end
+
+    def approval?(user)
+      if approvals.loaded?
+        approvals.none? { |approval| approval.user_id == user.id }
+      else
+        !approvals.where(user_id: user.id).exists?
+      end
     end
 
     # Once there are fewer approvers left in the list than approvals required, allow other
     # project members to approve the MR.
     #
     def any_approver_allowed?
-      approvals_left > approvers_left.count
+      approvals_left > approvers_left.size
     end
 
     def approved_by_users
