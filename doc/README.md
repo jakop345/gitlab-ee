@@ -7,7 +7,7 @@
 - [CI/CD](ci/README.md) GitLab Continuous Integration (CI) and Continuous Delivery (CD) getting started, `.gitlab-ci.yml` options, and examples.
 - [Custom templates for issues and merge requests](customization/issue_and_merge_request_template.md) Pre-fill the description of issues and merge requests to your liking.
 - [GitLab as OAuth2 authentication service provider](integration/oauth_provider.md). It allows you to login to other applications from GitLab.
-- [Container Registry](container_registry/README.md) Learn how to use GitLab Container Registry.
+- [Container Registry](user/project/container_registry.md) Learn how to use GitLab Container Registry.
 - [GitLab Basics](gitlab-basics/README.md) Find step by step how to start working on your commandline and on GitLab.
 - [GitLab Pages](pages/README.md) Using GitLab Pages.
 - [Importing to GitLab](workflow/importing/README.md).
@@ -69,7 +69,7 @@
 - [High Availability](administration/high_availability/README.md) Configure multiple servers for scaling or high availability.
 - [Container Registry](administration/container_registry.md) Configure Docker Registry with GitLab.
 - [Multiple mountpoints for the repositories storage](administration/repository_storages.md) Define multiple repository storage paths to distribute the storage load.
-- [Repository restrictions](administration/repository_restrictions.md) Define size restrictions for your repositories to limit the space they occupy in your storage device. Includes LFS objects.
+- [Repository restrictions](user/admin_area/settings/account_and_limit_settings.md#repository-size-limit) Define size restrictions for your repositories to limit the space they occupy in your storage device. Includes LFS objects.
 
 ## Contributor documentation
 
