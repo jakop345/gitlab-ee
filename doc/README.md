@@ -45,7 +45,7 @@
 - [Libravatar](customization/libravatar.md) Use Libravatar instead of Gravatar for user avatars.
 - [Log system](administration/logs.md) Log system.
 - [Environment Variables](administration/environment_variables.md) to configure GitLab.
-- [Operations](operations/README.md) Keeping GitLab up and running.
+- [Operations](administration/operations.md) Keeping GitLab up and running.
 - [Raketasks](raketasks/README.md) Backups, maintenance, automatic webhook setup and the importing of projects.
 - [Repository checks](administration/repository_checks.md) Periodic Git repository checks.
 - [Repository storages](administration/repository_storages.md) Manage the paths used to store repositories.
@@ -53,7 +53,7 @@
 - [System hooks](system_hooks/system_hooks.md) Notifications when users, projects and keys are changed.
 - [Update](update/README.md) Update guides to upgrade your installation.
 - [Welcome message](customization/welcome_message.md) Add a custom welcome message to the sign-in page.
-- [Reply by email](incoming_email/README.md) Allow users to comment on issues and merge requests by replying to notification emails.
+- [Reply by email](administration/reply_by_email.md) Allow users to comment on issues and merge requests by replying to notification emails.
 - [Migrate GitLab CI to CE/EE](migrate_ci_to_ce/README.md) Follow this guide to migrate your existing GitLab CI data to GitLab CE/EE.
 - [Downgrade back to CE](downgrade_ee_to_ce/README.md) Follow this guide if you need to downgrade from EE to CE.
 - [git-annex configuration](workflow/git_annex.md#configuration)
@@ -62,8 +62,8 @@
 - [GitLab Pages configuration](pages/administration.md) Configure GitLab Pages.
 - [Elasticsearch](integration/elasticsearch.md) Enable Elasticsearch.
 - [GitLab GEO](gitlab-geo/README.md) Configure GitLab GEO, a secondary read-only GitLab instance.
-- [GitLab Performance Monitoring](monitoring/performance/introduction.md) Configure GitLab and InfluxDB for measuring performance metrics.
-- [Monitoring uptime](monitoring/health_check.md) Check the server status using the health check endpoint.
+- [GitLab Performance Monitoring](administration/monitoring/performance/introduction.md) Configure GitLab and InfluxDB for measuring performance metrics.
+- [Monitoring uptime](user/admin_area/monitoring/health_check.md) Check the server status using the health check endpoint.
 - [Debugging Tips](administration/troubleshooting/debug.md) Tips to debug problems when things go wrong
 - [Sidekiq Troubleshooting](administration/troubleshooting/sidekiq.md) Debug when Sidekiq appears hung and is not processing jobs.
 - [High Availability](administration/high_availability/README.md) Configure multiple servers for scaling or high availability.
