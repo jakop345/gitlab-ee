@@ -245,7 +245,7 @@ gem 'base32',             '~> 0.3.0'
 gem "gitlab-license", "~> 1.0"
 
 # Sentry integration
-gem 'sentry-raven', '~> 1.1.0'
+gem 'sentry-raven', '~> 2.0.0'
 
 gem 'premailer-rails', '~> 1.9.0'
 
@@ -342,7 +342,7 @@ gem 'newrelic_rpm', '~> 3.16'
 
 gem 'octokit', '~> 4.3.0'
 
-gem 'mail_room', '~> 0.8'
+gem 'mail_room', '~> 0.8.1'
 
 gem 'email_reply_parser', '~> 0.5.8'
 
