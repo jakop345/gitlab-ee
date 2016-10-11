@@ -245,7 +245,7 @@ gem 'base32',             '~> 0.3.0'
 gem "gitlab-license", "~> 1.0"
 
 # Sentry integration
-gem 'sentry-raven', '~> 1.1.0'
+gem 'sentry-raven', '~> 2.0.0'
 
 gem 'premailer-rails', '~> 1.9.0'
 
