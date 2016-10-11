@@ -166,6 +166,10 @@
     white-space: nowrap;
     overflow: hidden;
 
+    &.text-danger {
+      color: $gl-danger;
+    }
+
     &:hover,
     &:focus,
     &.is-focused {
