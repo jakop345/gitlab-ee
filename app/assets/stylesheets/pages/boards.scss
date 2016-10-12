@@ -55,7 +55,6 @@
 .boards-list {
   height: calc(100vh - 152px);
   width: 100%;
-  padding-top: 25px;
   padding-bottom: 25px;
   padding-right: ($gl-padding / 2);
   padding-left: ($gl-padding / 2);
@@ -63,16 +62,16 @@
   white-space: nowrap;
 
   @media (min-width: $screen-sm-min) {
-    height: 475px; // Needed for PhantomJS
-    height: calc(100vh - 220px);
-    min-height: 477px;
+    height: 400px; // Needed for PhantomJS
+    height: calc(100vh - 290px);
+    min-height: 400px;
   }
 }
 
 .board {
   display: inline-block;
   width: calc(85vw - 15px);
-  height: calc(100% - 45px);
+  height: 100%;
   padding-right: ($gl-padding / 2);
   padding-left: ($gl-padding / 2);
   white-space: normal;
@@ -234,7 +233,7 @@
 }
 
 .boards-title-holder {
-  padding: 0 8px $gl-padding;
+  padding: 25px 13px $gl-padding;
 
   .dropdown-menu {
     margin-top: -15px;
