@@ -4,12 +4,9 @@ describe 'Issue Boards shortcut', feature: true, js: true do
   include WaitForVueResource
 
   let(:project) { create(:empty_project) }
+  let!(:board)  { create(:board, project: project) }
 
   before do
-    project.create_board
-    project.board.lists.create(list_type: :backlog)
-    project.board.lists.create(list_type: :done)
-
     login_as :admin
 
     visit namespace_project_path(project.namespace, project)
