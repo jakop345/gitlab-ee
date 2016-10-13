@@ -1,6 +1,7 @@
 module BoardsHelper
   def board_data
     board = @board || @boards.first
+
     {
       endpoint: namespace_project_boards_path(@project.namespace, @project),
       board_id: board.id,
