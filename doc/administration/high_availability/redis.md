@@ -59,15 +59,24 @@ Redis.
 
 ## Experimental Redis Sentinel support
 
-> [Introduced][ce-1877] in GitLab 8.11.
+> [Introduced][ce-1877] in GitLab 8.11, improved in 8.13.
 
 Since GitLab 8.11, you can configure a list of Redis Sentinel servers that
 will monitor a group of Redis servers to provide you with a standard failover
 support.
 
+Redis Sentinel can handle the most important tasks in a HA environment to help
+keep servers online with minimal to no downtime:
+
+- Monitors master and slave instances to see if they are available
+- Promote a slave to master when the master fails.
+- Demote a master to slave when failed master comes back online (to prevent
+  data-partitioning).
+- Can be queried by clients to always connect to the correct master server.
+
 There is currently one exception to the Sentinel support: `mail_room`, the
 component that processes incoming emails. It doesn't support Sentinel yet, but
-we hope to integrate a future release that does support it.
+we hope to integrate a future release that does support it soon.
 
 To get a better understanding on how to correctly setup Sentinel, please read
 the [Redis Sentinel documentation](http://redis.io/topics/sentinel) first, as
@@ -75,81 +84,145 @@ failing to configure it correctly can lead to data loss.
 
 The configuration consists of three parts:
 
-- Redis setup
-- Sentinel setup
-- GitLab setup
+- Setup Redis Master and Slave nodes
+- Setup Sentinel nodes
+- Setup GitLab
+
+> **IMPORTANT**: You need at least 3 independent machines: physical, or VMs
+running into distinct physical machines. If you fail to provision the
+machines in that specific way, any issue with the shared environment can
+bring your entire setup down.
 
 Read carefully how to configure those components below.
 
 ### Redis setup
 
-You must have at least 2 Redis servers: 1 Master, 1 or more Slaves.
+You must have at least 3 Redis servers: 1 Master, 2 Slaves, and they need to
+be each in a independent machine (see explanation above).
+
 They should be configured the same way and with similar server specs, as
 in a failover situation, any Slave can be elected as the new Master by
 the Sentinel servers.
 
-In a minimal setup, the only required change for the slaves in `redis.conf`
-is the addition of a `slaveof` line pointing to the initial master.
-You can increase the security by defining a `requirepass` configuration in
-the master, and `masterauth` in slaves.
+With Sentinel, you must define a password to protect the access as both
+Sentinel instances and other redis instances should be able to talk to
+each other over the network.
 
----
+You'll need to define both `requirepass` and `masterauth` in all
+nodes because they can be re-configured at any time by the Sentinels
+during a failover, and change it's status as `Master` or `Slave`.
 
-**Configuring your own Redis server**
+Initial `Slave` nodes will have in `redis.conf` an additional `slaveof` line
+pointing to the initial `Master`.
 
-1. Add to the slaves' `redis.conf`:
+#### Source install
+
+**Master Redis instance**
+
+You need to make the following changes in `redis.conf`:
+
+1. Define a `bind` address pointing to a local IP that your other machines
+   can reach you. If you really need to bind to an external acessible IP, make
+   sure you add extra firewall rules to prevent unauthorized access:
+
+   ```conf
+   # By default, if no "bind" configuration directive is specified, Redis listens
+   # for connections from all the network interfaces available on the server.
+   # It is possible to listen to just one or multiple selected interfaces using
+   # the "bind" configuration directive, followed by one or more IP addresses.
+   #
+   # Examples:
+   #
+   # bind 192.168.1.100 10.0.0.1
+   # bind 127.0.0.1 ::1
+   bind 0.0.0.0 # This will bind to all interfaces
+   ```
+
+1. Define a `port` to force redis to listin on TCP so other machines can
+   connect to it:
+
+   ```conf
+   # Accept connections on the specified port, default is 6379 (IANA #815344).
+   # If port 0 is specified Redis will not listen on a TCP socket.
+   port 6379
+   ```
+
+1. Set up password authentication (use the same password in all nodes)
 
     ```conf
-    # IP and port of the master Redis server
-    slaveof 10.10.10.10 6379
-    ```
-
-1. Optionally, set up password authentication for increased security.
-   Add the following to master's `redis.conf`:
-
-    ```conf
-    # Optional password authentication for increased security
-    requirepass "<password>"
-    ```
-
-1. Then add this line to all the slave servers' `redis.conf`:
-
-    ```conf
-    masterauth "<password>"
+    requirepass "redis-password-goes-here"
+    masterauth "redis-password-goes-here"
     ```
 
 1. Restart the Redis services for the changes to take effect.
 
----
+**Slave Redis instance**
 
-**Using Redis via Omnibus**
+1. Follow same instructions from master with the extra change in `redis.conf`:
 
-1. Edit `/etc/gitlab/gitlab.rb` of a master Redis machine (usualy a single machine):
+   ```conf
+   # IP and port of the master Redis server
+   slaveof 10.10.10.10 6379
+   ```
 
-    ```ruby
-    ## Redis TCP support (will disable UNIX socket transport)
-    redis['bind'] = '0.0.0.0' # or specify an IP to bind to a single one
-    redis['port'] = 6379
+1. Restart the Redis services for the changes to take effect.
 
-    ## Master redis instance
-    redis['password'] = 'redis-password-goes-here'
-    ```
+#### Omnibus Install
 
-1. Edit `/etc/gitlab/gitlab.rb` of a slave Redis machine (should be one or more machines):
+You need to install the omnibus package in 3 different and independent machines.
+We will elect one as the initial `Master` and the other 2 as `Slaves`.
 
-    ```ruby
-    ## Redis TCP support (will disable UNIX socket transport)
-    redis['bind'] = '0.0.0.0' # or specify an IP to bind to a single one
-    redis['port'] = 6379
+If you are migrating from a single machine install, you may want to setup the
+machines as Slaves, pointing to the original machine as `Master`, to migrate
+the data first, and than switch to this setup.
 
-    ## Slave redis instance
-    redis['master'] = false
-    redis['master_ip'] = '10.10.10.10' # IP of master Redis server
-    redis['master_port'] = 6379 # Port of master Redis server
-    redis['master_password'] = "redis-password-goes-here"
-    ```
+To disable redis in the single install, edit `/etc/gitlab/gitlab.rb`:
 
-1. Reconfigure the GitLab for the changes to take effect: `sudo gitlab-ctl reconfigure`
+```ruby
+redis['enable'] = false
+```
+
+**Master Redis instances**
+
+You need to make the following changes in `/etc/gitlab/gitlab.rb`:
+
+1. Define a `redis['bind']` address pointing to a local IP that your other machines
+   can reach you. If you really need to bind to an external acessible IP, make
+   sure you add extra firewall rules to prevent unauthorized access.
+1. Define a `redis['port']` to force redis to listin on TCP so other machines can
+   connect to it.
+1. Set up password authentication with `redis['master_password']` (use the same
+   password in all nodes).
+
+```ruby
+## Redis TCP support (will disable UNIX socket transport)
+redis['bind'] = '0.0.0.0' # or specify an IP to bind to a single one
+redis['port'] = 6379
+redis['requirepass'] = 'redis-password-goes-here'
+redis['master_password'] = 'redis-password-goes-here'
+```
+
+Reconfigure GitLab Omnibus for the changes to take effect: `sudo gitlab-ctl reconfigure`
+
+**Slave Redis instances**
+
+You need to make the same changes listed for the `Master` instance,
+with an additional `Slave` section as in the example below:
+
+```ruby
+## Redis TCP support (will disable UNIX socket transport)
+redis['bind'] = '0.0.0.0' # or specify an IP to bind to a single one
+redis['port'] = 6379
+redis['requirepass'] = 'redis-password-goes-here'
+redis['master_password'] = 'redis-password-goes-here'
+
+## Slave redis instance
+redis['master'] = false
+redis['master_ip'] = '10.10.10.10' # IP of master Redis server
+redis['master_port'] = 6379 # Port of master Redis server
+```
+
+Reconfigure GitLab Omnibus for the changes to take effect: `sudo gitlab-ctl reconfigure`
 
 ---
 
