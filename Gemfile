@@ -113,7 +113,7 @@ gem 'gitlab-elasticsearch-git', '~> 1.0.1', require: "elasticsearch/git"
 # Markdown and HTML processing
 gem 'html-pipeline', '~> 1.11.0'
 gem 'task_list',     '~> 1.0.2', require: 'task_list/railtie'
-gem 'github-markup', '~> 1.4'
+gem 'gitlab-markup', '~> 1.5.0'
 gem 'redcarpet',     '~> 3.3.3'
 gem 'RedCloth',      '~> 4.3.2'
 gem 'rdoc',          '~>3.6'
