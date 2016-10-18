@@ -17,6 +17,9 @@ class Project < ActiveRecord::Base
 
   extend Gitlab::ConfigHelper
 
+  class BoardLimitExceeded < StandardError; end
+
+  NUMBER_OF_PERMITTED_BOARDS = 1
   UNKNOWN_IMPORT_URL = 'http://unknown.git'
 
   cache_markdown_field :description, pipeline: :description
@@ -61,7 +64,7 @@ class Project < ActiveRecord::Base
 
   has_one :push_rule, dependent: :destroy
   has_one :last_event, -> {order 'events.created_at DESC'}, class_name: 'Event', foreign_key: 'project_id'
-  has_one :board, dependent: :destroy
+  has_many :boards, before_add: :validate_board_limit, dependent: :destroy
 
   # Project services
   has_many :services
@@ -122,6 +125,7 @@ class Project < ActiveRecord::Base
   has_many :users_star_projects, dependent: :destroy
   has_many :starrers, through: :users_star_projects, source: :user
   has_many :approvers, as: :target, dependent: :destroy
+  has_many :approver_groups, as: :target, dependent: :destroy
   has_many :releases, dependent: :destroy
   has_many :lfs_objects_projects, dependent: :destroy
   has_many :lfs_objects, through: :lfs_objects_projects
@@ -932,11 +936,6 @@ class Project < ActiveRecord::Base
     end
   end
 
-  def update_merge_requests(oldrev, newrev, ref, user)
-    MergeRequests::RefreshService.new(self, user).
-      execute(oldrev, newrev, ref)
-  end
-
   def valid_repo?
     repository.exists?
   rescue
@@ -1225,6 +1224,12 @@ class Project < ActiveRecord::Base
   def approver_ids=(value)
     value.split(",").map(&:strip).each do |user_id|
       approvers.find_or_create_by(user_id: user_id, target_id: id)
+    end
+  end
+
+  def approver_group_ids=(value)
+    value.split(",").map(&:strip).each do |group_id|
+      approver_groups.find_or_initialize_by(group_id: group_id, target_id: id)
     end
   end
 
@@ -1607,5 +1612,9 @@ class Project < ActiveRecord::Base
     end
 
     shared_projects.any?
+  end
+
+  def validate_board_limit(board)
+    raise BoardLimitExceeded, 'Number of permitted boards exceeded' if boards.size >= NUMBER_OF_PERMITTED_BOARDS
   end
 end

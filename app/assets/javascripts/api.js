@@ -6,12 +6,11 @@
     groupProjectsPath: "/api/:version/groups/:id/projects.json",
     projectsPath: "/api/:version/projects.json?simple=true",
     labelsPath: "/:namespace_path/:project_path/labels",
-    licensePath: "/api/:version/licenses/:key",
-    gitignorePath: "/api/:version/gitignores/:key",
+    licensePath: "/api/:version/templates/licenses/:key",
+    gitignorePath: "/api/:version/templates/gitignores/:key",
+    gitlabCiYmlPath: "/api/:version/templates/gitlab_ci_ymls/:key",
     ldapGroupsPath: "/api/:version/ldap/:provider/groups.json",
-    gitlabCiYmlPath: "/api/:version/gitlab_ci_ymls/:key",
     issuableTemplatePath: "/:namespace_path/:project_path/templates/:type/:key",
-
     group: function(group_id, callback) {
       var url = Api.buildUrl(Api.groupPath)
         .replace(':id', group_id);
@@ -23,16 +22,14 @@
       });
     },
     // Return groups list. Filtered by query
-    // Only active groups retrieved
-    groups: function(query, skip_ldap, skip_groups, callback) {
+    groups: function(query, options, callback) {
       var url = Api.buildUrl(Api.groupsPath);
       return $.ajax({
         url: url,
-        data: {
-          search: query,
-          skip_groups: skip_groups,
-          per_page: 20
-        },
+        data: $.extend({
+                search: query,
+                per_page: 20
+              }, options),
         dataType: "json"
       }).done(function(groups) {
         return callback(groups);

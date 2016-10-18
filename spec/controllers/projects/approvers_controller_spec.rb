@@ -15,7 +15,7 @@ describe Projects::ApproversController do
 
         expect(controller).to receive(:authorize_create_merge_request!)
 
-        go(project, merge_request_id: merge.to_param, id: approver.id)
+        go_delete(project, merge_request_id: merge.to_param, id: approver.id)
       end
 
       it 'destroys the provided approver' do
@@ -25,7 +25,7 @@ describe Projects::ApproversController do
 
         allow(controller).to receive(:authorize_create_merge_request!)
 
-        expect { go(project, merge_request_id: merge.to_param, id: approver.id) }.
+        expect { go_delete(project, merge_request_id: merge.to_param, id: approver.id) }.
           to change { merge.reload.approvers.count }.by(-1)
       end
     end
@@ -37,7 +37,7 @@ describe Projects::ApproversController do
 
         expect(controller).to receive(:authorize_admin_project!)
 
-        go(project, id: approver.id)
+        go_delete(project, id: approver.id)
       end
 
       it 'destroys the provided approver' do
@@ -46,12 +46,12 @@ describe Projects::ApproversController do
 
         allow(controller).to receive(:authorize_admin_project!).and_return(true)
 
-        expect { go(project, id: approver.id) }.
+        expect { go_delete(project, id: approver.id) }.
           to change { project.approvers.count }.by(-1)
       end
     end
 
-    def go(project, params = {})
+    def go_delete(project, params = {})
       delete :destroy, {
         namespace_id: project.namespace.to_param,
         project_id: project.to_param

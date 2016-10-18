@@ -178,6 +178,12 @@ describe 'Git HTTP requests', lib: true do
                   expect(response.status).to eq(200)
                 end
               end
+
+              it 'updates the user last activity' do
+                download(path, env) do |response|
+                  expect(user.reload.last_activity_at).not_to be_nil
+                end
+              end
             end
 
             it "complies with RFC4559" do
@@ -516,9 +522,10 @@ describe 'Git HTTP requests', lib: true do
 
         context "when the params are anything else" do
           let(:params) { { service: 'git-implode-pack' } }
+          before { get path, params }
 
-          it "fails to find a route" do
-            expect { get(path, params) }.to raise_error(ActionController::RoutingError)
+          it "redirects to the sign-in page" do
+            expect(response).to redirect_to(new_user_session_path)
           end
         end
       end
@@ -543,8 +550,8 @@ describe 'Git HTTP requests', lib: true do
         before do
           # Provide a dummy file in its place
           allow_any_instance_of(Repository).to receive(:blob_at).and_call_original
-          allow_any_instance_of(Repository).to receive(:blob_at).with('5937ac0a7beb003549fc5fd26fc247adbce4a52e', 'info/refs') do
-            Gitlab::Git::Blob.find(project.repository, 'master', '.gitignore')
+          allow_any_instance_of(Repository).to receive(:blob_at).with('b83d6e391c22777fca1ed3012fce84f633d7fed0', 'info/refs') do
+            Gitlab::Git::Blob.find(project.repository, 'master', 'bar/branch-test.txt')
           end
 
           get "/#{project.path_with_namespace}/blob/master/info/refs"

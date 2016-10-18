@@ -6,6 +6,7 @@ class MergeRequest < ActiveRecord::Base
   include Taskable
   include Elastic::MergeRequestsSearch
   include Importable
+  include Approvable
 
   belongs_to :target_project, foreign_key: :target_project_id, class_name: "Project"
   belongs_to :source_project, foreign_key: :source_project_id, class_name: "Project"
@@ -13,6 +14,7 @@ class MergeRequest < ActiveRecord::Base
 
   has_many :approvals, dependent: :destroy
   has_many :approvers, as: :target, dependent: :destroy
+  has_many :approver_groups, as: :target, dependent: :destroy
   has_many :merge_request_diffs, dependent: :destroy
   has_one :merge_request_diff,
     -> { order('merge_request_diffs.id DESC') }
@@ -678,102 +680,6 @@ class MergeRequest < ActiveRecord::Base
     locked_at.nil? || locked_at < (Time.now - 1.day)
   end
 
-  def requires_approve?
-    approvals_required.nonzero?
-  end
-
-  def approved?
-    approvals_left < 1
-  end
-
-  # Number of approvals remaining (excluding existing approvals) before the MR is
-  # considered approved. If there are fewer potential approvers than approvals left,
-  # choose the lower so the MR doesn't get 'stuck' in a state where it can't be approved.
-  #
-  def approvals_left
-    [
-      [approvals_required - approvals.count, number_of_potential_approvers].min,
-      0
-    ].max
-  end
-
-  def approvals_required
-    approvals_before_merge || target_project.approvals_before_merge
-  end
-
-  # An MR can potentially be approved by:
-  # - anyone in the approvers list
-  # - any other project member with developer access or higher (if there are no approvers
-  #   left)
-  #
-  # It cannot be approved by:
-  # - a user who has already approved the MR
-  # - the MR author
-  #
-  def number_of_potential_approvers
-    has_access = ['access_level > ?', Member::REPORTER]
-    wheres = [
-      "id IN (#{overall_approvers.select(:user_id).to_sql})",
-      "id IN (#{project.members.where(has_access).select(:user_id).to_sql})"
-    ]
-
-    if project.group
-      wheres << "id IN (#{project.group.members.where(has_access).select(:user_id).to_sql})"
-    end
-
-    User.
-      active.
-      where("(#{wheres.join(' OR ')}) AND id NOT IN (#{approvals.select(:user_id).to_sql}) AND id != #{author.id}").
-      count
-  end
-
-  # Users in the list of approvers who have not already approved this MR.
-  #
-  def approvers_left
-    User.where(id: overall_approvers.select(:user_id)).where.not(id: approvals.select(:user_id))
-  end
-
-  # The list of approvers from either this MR (if they've been set on the MR) or the
-  # target project. Excludes the author by default.
-  #
-  # Before a merge request has been created, author will be nil, so pass the current user
-  # on the MR create page.
-  #
-  def overall_approvers(exclude_user: nil)
-    exclude_user ||= author
-    approvers_relation = approvers.any? ? approvers : target_project.approvers
-
-    exclude_user ? approvers_relation.where.not(user_id: exclude_user.id) : approvers_relation
-  end
-
-  def can_approve?(user)
-    return false unless user
-    return true if approvers_left.include?(user)
-    return false if user == author
-    return false unless user.can?(:update_merge_request, self)
-
-    any_approver_allowed? && approvals.where(user: user).empty?
-  end
-
-  # Once there are fewer approvers left in the list than approvals required, allow other
-  # project members to approve the MR.
-  #
-  def any_approver_allowed?
-    approvals_left > approvers_left.count
-  end
-
-  def approved_by_users
-    approvals.map(&:user)
-  end
-
-  def approver_ids=(value)
-    value.split(",").map(&:strip).each do |user_id|
-      next if author && user_id == author.id
-
-      approvers.find_or_initialize_by(user_id: user_id, target_id: id)
-    end
-  end
-
   def has_ci?
     source_project.ci_service && commits.any?
   end
@@ -805,12 +711,15 @@ class MergeRequest < ActiveRecord::Base
   def environments
     return [] unless diff_head_commit
 
-    environments = source_project.environments_for(
-      source_branch, diff_head_commit)
-    environments += target_project.environments_for(
-      target_branch, diff_head_commit, with_tags: true)
+    @environments ||=
+      begin
+        environments = source_project.environments_for(
+          source_branch, diff_head_commit)
+        environments += target_project.environments_for(
+          target_branch, diff_head_commit, with_tags: true)
 
-    environments.uniq
+        environments.uniq
+      end
   end
 
   def state_human_name
@@ -1001,7 +910,7 @@ class MergeRequest < ActiveRecord::Base
       # files.
       conflicts.files.each(&:lines)
       @conflicts_can_be_resolved_in_ui = conflicts.files.length > 0
-    rescue Rugged::OdbError, Gitlab::Conflict::Parser::ParserError, Gitlab::Conflict::FileCollection::ConflictSideMissing
+    rescue Rugged::OdbError, Gitlab::Conflict::Parser::UnresolvableError, Gitlab::Conflict::FileCollection::ConflictSideMissing
       @conflicts_can_be_resolved_in_ui = false
     end
   end

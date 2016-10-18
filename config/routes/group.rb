@@ -1,8 +1,14 @@
 require 'constraints/group_url_constrainer'
 
 constraints(GroupUrlConstrainer.new) do
-  scope(path: ':id', as: :group, controller: :groups) do
+  scope(path: ':id',
+        as: :group,
+        constraints: { id: /[a-zA-Z.0-9_\-]+(?<!\.atom)/ },
+        controller: :groups) do
     get '/', action: :show
+    patch '/', action: :update
+    put '/', action: :update
+    delete '/', action: :destroy
   end
 end
 
@@ -13,12 +19,6 @@ resources :groups, constraints: { id: /[a-zA-Z.0-9_\-]+(?<!\.atom)/ }  do
     get :projects
     get :activity
   end
-
-  ## EE-specific
-  collection do
-    get :autocomplete
-  end
-  ## EE-specific
 
   scope module: :groups do
     ## EE-specific
