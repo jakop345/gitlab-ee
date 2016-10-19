@@ -15,8 +15,8 @@
     Approvers
   .col-sm-10
     - author = issuable.author || current_user
-    - skip_users = issuable.all_approvers_including_groups + [author]
-    = users_select_tag("merge_request[approver_ids]", multiple: true, class: 'input-large', scope: :all, email_user: true, skip_users: skip_users)
+    - skip_user_ids = issuable.all_approver_ids_including_groups + [author.id]
+    = users_select_tag("merge_request[approver_ids]", multiple: true, class: 'input-large', scope: :all, email_user: true, skip_user_ids: skip_user_ids)
     .help-block
       This merge request must be approved by these users.
       You can override the project settings by setting your own list of approvers.
@@ -31,7 +31,7 @@
       .panel-heading
         Approvers
       %ul.well-list.approver-list
-        - if issuable.all_approvers_including_groups.empty?
+        - if issuable.all_approver_ids_including_groups.empty?
           %li.no-approvers There are no approvers
         - else
           - unsaved_approvers = !issuable.approvers_overwritten?

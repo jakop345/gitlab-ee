@@ -495,7 +495,7 @@ describe MergeRequest, models: true do
     end
   end
 
-  describe '#all_approvers_including_groups' do
+  describe '#all_approver_ids_including_groups' do
     it 'returns correct set of users' do
       user = create :user
       user1 = create :user
@@ -514,7 +514,7 @@ describe MergeRequest, models: true do
 
       create(:approver, user: user2, target: merge_request)
 
-      expect(merge_request.all_approvers_including_groups).to match_array([user1, user2])
+      expect(merge_request.all_approver_ids_including_groups).to match_array([user1.id, user2.id])
     end
   end
 

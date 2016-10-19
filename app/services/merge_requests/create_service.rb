@@ -21,6 +21,7 @@ module MergeRequests
       notification_service.new_merge_request(issuable, current_user)
       todo_service.new_merge_request(issuable, current_user)
       issuable.cache_merge_request_closes_issues!(current_user)
+      issuable.approvable_expire_state
     end
   end
 end

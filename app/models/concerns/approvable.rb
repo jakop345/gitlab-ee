@@ -21,8 +21,13 @@ module Approvable
       ].max
     end
 
-    def expire_approvals_left
+    # Expire internal memoized state, introduced to reduce database queries, that should
+    # be called after we update/create the merge request approval configuration or when
+    # some user approve the merge request.
+    def approvable_expire_state
       @approvals_left = nil
+      @approver_ids_including_groups = nil
+      @approvers_overwritten = nil
     end
 
     def approvals_required
@@ -41,14 +46,9 @@ module Approvable
     def number_of_potential_approvers
       has_access = ['access_level > ?', Member::REPORTER]
       wheres = [
-        "id IN (#{project.members.where(has_access).select(:user_id).to_sql})"
+        "id IN (#{project.members.where(has_access).select(:user_id).to_sql})",
+        "id IN (#{all_approver_ids_including_groups_relation.to_sql})"
       ]
-
-      all_approvers = all_approvers_including_groups
-
-      if all_approvers.any?
-        wheres << "id IN (#{all_approvers.map(&:id).join(', ')})"
-      end
 
       if project.group
         wheres << "id IN (#{project.group.members.where(has_access).select(:user_id).to_sql})"
@@ -65,7 +65,10 @@ module Approvable
     # Memoized because it's used a lot of times during a request.
     #
     def approvers_left
-      @approvers_left ||= User.where(id: all_approvers_including_groups.map(&:id)).where.not(id: approvals.select(:user_id)).to_a
+      @approvers_left ||=
+        User.where("id IN (#{all_approver_ids_including_groups_relation.to_sql})").
+          where.not(id: approvals.select(:user_id)).
+          to_a
     end
 
     def approvers_left_names
@@ -90,33 +93,28 @@ module Approvable
       approvers_overwritten? ? approver_groups : target_project.approver_groups
     end
 
-    def all_approvers_including_groups
-      @all_approvers_including_groups ||= begin
-        # Approvers from direct assignment
-        [approvers_from_users, approvers_from_groups].flatten
-      end
+    def all_approver_ids_including_groups
+      @approver_ids_including_groups ||= User.where("id IN (#{all_approver_ids_including_groups_relation.to_sql})").pluck(:id)
     end
 
-    def approvers_from_users
-      overall_approvers.map(&:user)
+    def all_approver_ids_including_groups_relation
+      overall_approver_ids = overall_approvers.select(:user_id)
+
+      overall_approver_ids_from_groups = overall_approver_groups.joins(group: :group_members)
+      overall_approver_ids_from_groups = overall_approver_ids_from_groups.where("members.user_id != ?", author.id) if author
+      overall_approver_ids_from_groups = overall_approver_ids_from_groups.select("DISTINCT members.user_id")
+
+      Gitlab::SQL::Union.new([
+        overall_approver_ids,
+        overall_approver_ids_from_groups
+      ])
     end
-
-    def approvers_from_groups
-      group_approvers = []
-
-      overall_approver_groups.each do |approver_group|
-        group_approvers << approver_group.users
-      end
-
-      group_approvers.flatten!
-
-      group_approvers.delete(author)
-
-      group_approvers
-    end
+    private :all_approver_ids_including_groups_relation
 
     def approvers_overwritten?
-      approvers.any? || approver_groups.any?
+      return @approvers_overwritten if defined?(@approvers_overwritten) && !@approvers_overwritten.nil?
+
+      @approvers_overwritten = approvers.any? || approver_groups.any?
     end
 
     def can_approve?(user)
