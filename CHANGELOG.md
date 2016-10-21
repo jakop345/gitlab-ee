@@ -44,6 +44,7 @@ Please view this file on the master branch, on stable branches it's out of date.
   - Speed-up group milestones show page
   - Fix inconsistent options dropdown caret on mobile viewports (ClemMakesApps)
   - Extract project#update_merge_requests and SystemHooks to its own worker from GitPushService
+  - Fix discussion thread from emails for merge requests. !7010
   - Don't include archived projects when creating group milestones. !4940 (Jeroen Jacobs)
   - Add tag shortcut from the Commit page. !6543
   - Keep refs for each deployment
@@ -140,6 +141,7 @@ Please view this file on the master branch, on stable branches it's out of date.
   - Fix buggy iOS tooltip layering behavior.
   - Make guests unable to view MRs on private projects
   - Fix broken Project API docs (Takuya Noguchi)
+  - Migrate invalid project members (owner -> master)
 
 ## 8.12.7
 
