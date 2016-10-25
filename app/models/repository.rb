@@ -475,6 +475,17 @@ class Repository
     @exists = nil
   end
 
+  # expire cache that doesn't depend on repository data (when expiring)
+  def expire_content_cache
+    expire_tags_cache
+    expire_tag_count_cache
+    expire_branches_cache
+    expire_branch_count_cache
+    expire_root_ref_cache
+    expire_emptiness_caches
+    expire_exists_cache
+  end
+
   # Runs code after a repository has been created.
   def after_create
     expire_exists_cache
@@ -490,14 +501,7 @@ class Repository
 
     expire_cache if exists?
 
-    # expire cache that don't depend on repository data (when expiring)
-    expire_tags_cache
-    expire_tag_count_cache
-    expire_branches_cache
-    expire_branch_count_cache
-    expire_root_ref_cache
-    expire_emptiness_caches
-    expire_exists_cache
+    expire_content_cache
 
     repository_event(:remove_repository)
   end
@@ -529,14 +533,13 @@ class Repository
   end
 
   def before_import
-    expire_emptiness_caches
-    expire_exists_cache
+    expire_content_cache
   end
 
   # Runs code after a repository has been forked/imported.
   def after_import
-    expire_emptiness_caches
-    expire_exists_cache
+    expire_content_cache
+    build_cache
   end
 
   # Runs code after a new commit has been pushed.

@@ -1,8 +1,28 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
-## 8.14.0 (2016-11-22)
-  - Adds user project membership expired event to clarify why user was removed (Callum Dryden)
-  - Simpler arguments passed to named_route on toggle_award_url helper method
+## 8.13.1 (2016-10-25)
+
+  - Fix branch protection API. !6215
+  - Fix hidden pipeline graph on commit and MR page. !6895
+  - Fix Cycle analytics not showing correct data when filtering by date. !6906
+  - Ensure custom provider tab labels don't break layout. !6993
+  - Fix issue boards user link when in subdirectory. !7018
+  - Refactor and add new environment functionality to CI yaml reference. !7026
+  - Fix typo in project settings that prevents users from enabling container registry. !7037
+  - Fix events order in `users/:id/events` endpoint. !7039
+  - Remove extra line for empty issue description. !7045
+  - Don't append issue/MR templates to any existing text. !7050
+  - Fix error in generating labels. !7055
+  - Stop clearing the database cache on `rake cache:clear`. !7056
+  - Only show register tab if signup enabled. !7058
+  - Expire and build repository cache after project import. !7064
+  - Fix bug where labels would be assigned to issues that were moved. !7065
+  - Fix reply-by-email not working due to queue name mismatch. !7068
+  - Fix 404 for group pages when GitLab setup uses relative url. !7071
+  - Fix `User#to_reference`. !7088
+  - Reduce overhead of `LabelFinder` by avoiding `#presence` call. !7094
+  - Fix unauthorized users dragging on issue boards. !7096
+  - Only schedule `ProjectCacheWorker` jobs when needed. !7099
 
 ## 8.13.0 (2016-10-22)
 
