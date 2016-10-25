@@ -11,6 +11,17 @@ describe Users::ActivityService, services: true do
 
         expect(user.last_activity_at).not_to be_nil
       end
+
+      context 'with disabled user activity setting' do
+        before do
+          stub_application_setting(user_activity_enabled: false)
+          service.execute
+        end
+
+        it 'does not update the user activity' do
+          expect(user.last_activity_at).to be_nil
+        end
+      end
     end
 
     context 'when activity_at is not nil' do

@@ -6,12 +6,16 @@ module Users
     end
 
     def execute
-      return unless @author && @author.is_a?(User)
+      return unless current_application_settings.user_activity_enabled && has_author?
 
       record_activity
     end
 
     private
+
+    def has_author?
+      @author && @author.is_a?(User)
+    end
 
     def record_activity
       user_activity.touch
