@@ -75,6 +75,13 @@ The total number of the following is sent back to GitLab Inc.:
 - Remote mirrors
 - Web hooks
 
+## User activities
+
+Simply updates a timestamp in the *user_activities* table every time a user
+logs in into GitLab or does any Git operation.
+
+This feature is useful to check for user activity in GitLab.
+
 ## Privacy policy
 
 GitLab Inc. does **not** collect any sensitive information, like project names
