@@ -2,8 +2,8 @@ Please view this file on the master branch, on stable branches it's out of date.
 
 ## 8.13.1 (2016-10-25)
 
-  - Fix Elasticsearch::Transport::Transport::Errors::BadRequest when ES is enabled. !818
   - Hide multiple board actions if user doesnt have permissions. !816
+  - Fix Elasticsearch::Transport::Transport::Errors::BadRequest when ES is enabled. !818
 
 ## 8.13.0 (2016-10-22)
 
