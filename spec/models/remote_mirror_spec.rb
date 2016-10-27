@@ -84,6 +84,17 @@ describe RemoteMirror do
     end
   end
 
+  context 'with missing project' do
+    it 'can be marked as failed' do
+      mirror = create(:remote_mirror)
+      mirror.update!(enabled: true, project_id: nil)
+
+      mirror.reload.mark_as_failed('missing project')
+
+      expect(mirror.reload.last_error).to eq 'missing project'
+    end
+  end
+
   def create_mirror(params)
     project = FactoryGirl.create(:project)
     project.remote_mirrors.create!(params)
