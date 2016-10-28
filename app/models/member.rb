@@ -95,7 +95,7 @@ class Member < ActiveRecord::Base
           source.members.build(invite_email: user)
         end
 
-      return member unless can_update_member?(current_user, member)
+      return member unless ldap || can_update_member?(current_user, member)
 
       member.attributes = {
         created_by: member.created_by || current_user,
