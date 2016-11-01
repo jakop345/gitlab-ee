@@ -2,7 +2,7 @@ image: "ruby:2.1"
 
 services:
   - mysql:latest
-  - elasticsearch:latest
+  - elasticsearch:2.4.1
   - redis:alpine
 
 cache:
