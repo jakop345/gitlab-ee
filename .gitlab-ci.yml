@@ -67,7 +67,7 @@ update-knapsack:
 .use-db: &use-db
   services:
     - mysql:latest
-    - elasticsearch:latest
+    - elasticsearch:2.4.1
     - redis:alpine
 
 .rspec-knapsack: &rspec-knapsack
