@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 8.13.3 (2016-11-02)
+
+- No EE-specific changes
+
 ## 8.13.2 (2016-10-31)
 
 - Don't pass a current user to Member#add_user in LDAP group sync. !830
