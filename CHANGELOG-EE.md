@@ -1,5 +1,9 @@
 Please view this file on the master branch, on stable branches it's out of date.
 
+## 8.13.4
+
+- Weight dropdown in issue filter form does not stay selected. !826
+
 ## 8.13.3 (2016-11-02)
 
 - No EE-specific changes
