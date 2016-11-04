@@ -154,7 +154,7 @@ module API
       expose :name
 
       expose :commit do |repo_branch, options|
-        options[:project].repository.commit(repo_branch.target)
+        options[:project].repository.commit(repo_branch.dereferenced_target)
       end
 
       expose :protected do |repo_branch, options|
@@ -542,6 +542,7 @@ module API
       expose :after_sign_out_path
       expose :container_registry_token_expire_delay
       expose :repository_storage
+      expose :repository_storages
       expose :koding_enabled
       expose :koding_url
     end
@@ -555,7 +556,7 @@ module API
       expose :name, :message
 
       expose :commit do |repo_tag, options|
-        options[:project].repository.commit(repo_tag.target)
+        options[:project].repository.commit(repo_tag.dereferenced_target)
       end
 
       expose :release, using: Entities::Release do |repo_tag, options|

@@ -26,8 +26,13 @@ class Project < ActiveRecord::Base
   default_value_for :archived, false
   default_value_for :visibility_level, gitlab_config_features.visibility_level
   default_value_for :container_registry_enabled, gitlab_config_features.container_registry
-  default_value_for(:repository_storage) { current_application_settings.repository_storage }
+  default_value_for(:repository_storage) { current_application_settings.pick_repository_storage }
   default_value_for(:shared_runners_enabled) { current_application_settings.shared_runners_enabled }
+  default_value_for :issues_enabled, gitlab_config_features.issues
+  default_value_for :merge_requests_enabled, gitlab_config_features.merge_requests
+  default_value_for :builds_enabled, gitlab_config_features.builds
+  default_value_for :wiki_enabled, gitlab_config_features.wiki
+  default_value_for :snippets_enabled, gitlab_config_features.snippets
 
   after_create :ensure_dir_exist
   after_create :create_project_feature, unless: :project_feature
@@ -218,9 +223,40 @@ class Project < ActiveRecord::Base
   scope :with_push, -> { joins(:events).where('events.action = ?', Event::PUSHED) }
   scope :with_remote_mirrors, -> { joins(:remote_mirrors).where(remote_mirrors: { enabled: true }).distinct }
 
-  scope :with_builds_enabled, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id').where('project_features.builds_access_level IS NULL or project_features.builds_access_level > 0') }
-  scope :with_issues_enabled, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id').where('project_features.issues_access_level IS NULL or project_features.issues_access_level > 0') }
+  scope :with_project_feature, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id') }
+
+  # "enabled" here means "not disabled". It includes private features!
+  scope :with_feature_enabled, ->(feature) {
+    access_level_attribute = ProjectFeature.access_level_attribute(feature)
+    with_project_feature.where(project_features: { access_level_attribute => [nil, ProjectFeature::PRIVATE, ProjectFeature::ENABLED] })
+  }
+
+  # Picks a feature where the level is exactly that given.
+  scope :with_feature_access_level, ->(feature, level) {
+    access_level_attribute = ProjectFeature.access_level_attribute(feature)
+    with_project_feature.where(project_features: { access_level_attribute => level })
+  }
+
+  scope :with_builds_enabled, -> { with_feature_enabled(:builds) }
+  scope :with_issues_enabled, -> { with_feature_enabled(:issues) }
+
   scope :with_wiki_enabled, -> { joins('LEFT JOIN project_features ON projects.id = project_features.project_id').where('project_features.wiki_access_level IS NULL or project_features.wiki_access_level > 0') }
+
+  # project features may be "disabled", "internal" or "enabled". If "internal",
+  # they are only available to team members. This scope returns projects where
+  # the feature is either enabled, or internal with permission for the user.
+  def self.with_feature_available_for_user(feature, user)
+    return with_feature_enabled(feature) if user.try(:admin?)
+
+    unconditional = with_feature_access_level(feature, [nil, ProjectFeature::ENABLED])
+    return unconditional if user.nil?
+
+    conditional = with_feature_access_level(feature, ProjectFeature::PRIVATE)
+    authorized = user.authorized_projects.merge(conditional.reorder(nil))
+
+    union = Gitlab::SQL::Union.new([unconditional.select(:id), authorized.select(:id)])
+    where(arel_table[:id].in(Arel::Nodes::SqlLiteral.new(union.to_sql)))
+  end
 
   scope :active, -> { joins(:issues, :notes, :merge_requests).order('issues.created_at, notes.created_at, merge_requests.created_at DESC') }
   scope :abandoned, -> { where('projects.last_activity_at < ?', 6.months.ago) }
@@ -423,7 +459,7 @@ class Project < ActiveRecord::Base
     end
 
     def group_ids
-      joins(:namespace).where(namespaces: { type: 'Group' }).pluck(:namespace_id)
+      joins(:namespace).where(namespaces: { type: 'Group' }).select(:namespace_id)
     end
   end
 
@@ -1170,10 +1206,6 @@ class Project < ActiveRecord::Base
 
   def forks_count
     forks.count
-  end
-
-  def find_label(name)
-    labels.find_by(name: name)
   end
 
   def origin_merge_requests
