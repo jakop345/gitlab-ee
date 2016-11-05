@@ -75,7 +75,7 @@ LDAP group link in their group **Settings -> LDAP Groups** page. Multiple LDAP
 groups can be linked with a single GitLab group. When the link is created, an
 access level/role is specified (Guest, Reporter, Developer, Master, or Owner).
 
-## Administrator Sync
+### Administrator Sync
 
 As an extension of group sync, you can automatically manage your global GitLab
 administrators. Specify a group CN for `admin_group` and all members of the
