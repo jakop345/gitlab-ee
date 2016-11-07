@@ -250,9 +250,7 @@ class Repository
 
   def remote_tags(remote)
     gitlab_shell.list_remote_tags(storage_path, path_with_namespace, remote).map do |name, target|
-      # Is the tag annotated or lightweight?
-      object = target.is_a?(Rugged::Tag::Annotation) ? target : nil
-      Gitlab::Git::Tag.new(raw_repository, object, name, target)
+      Gitlab::Git::Tag.new(raw_repository, name, target)
     end
   end
 

@@ -1527,7 +1527,7 @@ describe Repository, models: true do
 
   describe '#remote_tags' do
     it 'gets the remote tags' do
-      masterrev = repository.find_branch('master').target.id
+      masterrev = repository.find_branch('master').dereferenced_target.id
 
       expect_any_instance_of(Gitlab::Shell).to receive(:list_remote_tags).
         with(repository.storage_path, repository.path_with_namespace, 'upstream').
@@ -1537,13 +1537,13 @@ describe Repository, models: true do
 
       expect(tags.first).to be_an_instance_of(Gitlab::Git::Tag)
       expect(tags.first.name).to eq('v0.0.1')
-      expect(tags.first.target.id).to eq(masterrev)
+      expect(tags.first.dereferenced_target.id).to eq(masterrev)
     end
   end
 
   describe '#local_branches' do
     it 'returns the local branches' do
-      masterrev = repository.find_branch('master').target
+      masterrev = repository.find_branch('master').dereferenced_target
       create_remote_branch('joe', 'remote_branch', masterrev)
       repository.add_branch(user, 'local_branch', masterrev)
 
@@ -1554,7 +1554,7 @@ describe Repository, models: true do
 
   describe '#remote_branches' do
     it 'returns the remote branches' do
-      masterrev = repository.find_branch('master').target
+      masterrev = repository.find_branch('master').dereferenced_target
       create_remote_branch('joe', 'remote_branch', masterrev)
       repository.add_branch(user, 'local_branch', masterrev)
 
@@ -1565,7 +1565,7 @@ describe Repository, models: true do
 
   describe '#upstream_branches' do
     it 'returns branches from the upstream remote' do
-      masterrev = repository.find_branch('master').target
+      masterrev = repository.find_branch('master').dereferenced_target
       create_remote_branch('upstream', 'upstream_branch', masterrev)
 
       expect(repository.upstream_branches.size).to eq(1)
