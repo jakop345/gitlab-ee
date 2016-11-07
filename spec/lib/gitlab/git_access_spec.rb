@@ -637,7 +637,7 @@ describe Gitlab::GitAccess, lib: true do
           project.create_push_rule
           project.push_rule.update(commit_message_regex: "@only.com")
 
-          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.not_to raise_error
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/tags/v1') }.not_to raise_error
         end
 
         it 'allows githook for new branch with an old bad commit' do
