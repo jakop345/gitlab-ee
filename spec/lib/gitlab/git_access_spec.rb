@@ -156,7 +156,7 @@ describe Gitlab::GitAccess, lib: true do
       context 'pull code' do
         subject { access.download_access_check }
 
-        it { expect(subject.allowed?).to be_truthy }
+        it { expect { subject }.not_to raise_error }
       end
     end
 
@@ -167,7 +167,7 @@ describe Gitlab::GitAccess, lib: true do
         let(:project) { create(:project, namespace: user.namespace) }
 
         context 'pull code' do
-          it { expect(subject).to be_allowed }
+          it { expect { subject }.not_to raise_error }
         end
       end
 
@@ -175,7 +175,7 @@ describe Gitlab::GitAccess, lib: true do
         before { project.team << [user, :reporter] }
 
         context 'pull code' do
-          it { expect(subject).to be_allowed }
+          it { expect { subject }.not_to raise_error }
         end
       end
 
@@ -186,13 +186,13 @@ describe Gitlab::GitAccess, lib: true do
           before { project.team << [user, :reporter] }
 
           context 'pull code' do
-            it { expect(subject).to be_allowed }
+            it { expect { subject }.not_to raise_error }
           end
         end
 
         context 'when is not member of the project' do
           context 'pull code' do
-            it { expect(subject).not_to be_allowed }
+            it { expect { subject }.not_to raise_error }
           end
         end
       end
@@ -249,7 +249,13 @@ describe Gitlab::GitAccess, lib: true do
               context action do
                 subject { access.push_access_check(changes[action]) }
 
-                it { expect(subject.allowed?).to allowed ? be_truthy : be_falsey }
+                it do
+                  if allowed
+                    expect { subject }.not_to raise_error
+                  else
+                    expect { subject }.to raise_error(Gitlab::GitAccess::UnauthorizedError)
+                  end
+                end
               end
             end
           end
@@ -271,7 +277,13 @@ describe Gitlab::GitAccess, lib: true do
             context action do
               subject { access.push_access_check(changes[action]) }
 
-              it { expect(subject.allowed?).to allowed ? be_truthy : be_falsey }
+              it do
+                if allowed
+                  expect { subject }.not_to raise_error
+                else
+                  expect { subject }.to raise_error(Gitlab::GitAccess::UnauthorizedError)
+                end
+              end
             end
           end
         end
@@ -526,20 +538,20 @@ describe Gitlab::GitAccess, lib: true do
           allow(Gitlab::Geo).to receive(:secondary?) { true }
         end
 
-        it { expect(access.push_access_check(git_annex_changes)).not_to be_allowed }
+        it { expect { access.push_access_check(git_annex_changes) }.to raise_error(described_class::UnauthorizedError) }
       end
 
       describe 'and git hooks unset' do
         describe 'git annex enabled' do
           before { allow(Gitlab.config.gitlab_shell).to receive(:git_annex_enabled).and_return(true) }
 
-          it { expect(access.push_access_check(git_annex_changes)).to be_allowed }
+          it { expect { access.push_access_check(git_annex_changes) }.not_to raise_error }
         end
 
         describe 'git annex disabled' do
           before { allow(Gitlab.config.gitlab_shell).to receive(:git_annex_enabled).and_return(false) }
 
-          it { expect(access.push_access_check(git_annex_changes)).to be_allowed }
+          it { expect { access.push_access_check(git_annex_changes) }.not_to raise_error }
         end
       end
 
@@ -554,7 +566,7 @@ describe Gitlab::GitAccess, lib: true do
           describe 'git annex enabled' do
             before { allow(Gitlab.config.gitlab_shell).to receive(:git_annex_enabled).and_return(true) }
 
-            it { expect(access.push_access_check(git_annex_changes)).to be_allowed }
+            it { expect { access.push_access_check(git_annex_changes) }.not_to raise_error }
           end
 
           describe 'git annex enabled, push to master branch' do
@@ -563,7 +575,7 @@ describe Gitlab::GitAccess, lib: true do
               allow_any_instance_of(Commit).to receive(:safe_message) { 'git-annex in me@host:~/repo' }
             end
 
-            it { expect(access.push_access_check(git_annex_master_changes)).to be_allowed }
+            it { expect { access.push_access_check(git_annex_master_changes) }.not_to raise_error }
           end
 
           describe 'git annex disabled' do
@@ -571,7 +583,7 @@ describe Gitlab::GitAccess, lib: true do
               allow(Gitlab.config.gitlab_shell).to receive(:git_annex_enabled).and_return(false)
             end
 
-            it { expect(access.push_access_check(git_annex_changes)).not_to be_allowed }
+            it { expect { access.push_access_check(git_annex_changes) }.to raise_error(described_class::UnauthorizedError) }
           end
         end
 
@@ -585,7 +597,7 @@ describe Gitlab::GitAccess, lib: true do
             before { allow(Gitlab.config.gitlab_shell).to receive(:git_annex_enabled).and_return(true) }
 
             it { expect(access.check('git-annex-shell', git_annex_changes).allowed?).to be_truthy }
-            it { expect(access.push_access_check(git_annex_changes)).to be_allowed }
+            it { expect { access.push_access_check(git_annex_changes) }.not_to raise_error }
           end
 
           describe 'git annex disabled' do
@@ -594,7 +606,7 @@ describe Gitlab::GitAccess, lib: true do
             end
 
             it { expect(access.check('git-annex-shell', git_annex_changes).allowed?).to be_falsey }
-            it { expect(access.push_access_check(git_annex_changes)).not_to be_allowed }
+            it { expect { access.push_access_check(git_annex_changes) }.to raise_error(described_class::UnauthorizedError) }
           end
         end
       end
@@ -611,19 +623,21 @@ describe Gitlab::GitAccess, lib: true do
 
       describe "author email check" do
         it 'returns true' do
-          expect(access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master')).to be_truthy
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.not_to raise_error
         end
 
         it 'returns false' do
           project.create_push_rule
           project.push_rule.update(commit_message_regex: "@only.com")
-          expect(access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master')).not_to be_allowed
+
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.to raise_error(described_class::UnauthorizedError)
         end
 
         it 'returns true for tags' do
           project.create_push_rule
           project.push_rule.update(commit_message_regex: "@only.com")
-          expect(access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/tags/v1')).to be_allowed
+
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.not_to raise_error
         end
 
         it 'allows githook for new branch with an old bad commit' do
@@ -636,7 +650,7 @@ describe Gitlab::GitAccess, lib: true do
           project.push_rule.update(commit_message_regex: "Change some files")
 
           # push to new branch, so use a blank old rev and new ref
-          expect(access.push_access_check("#{Gitlab::Git::BLANK_SHA} 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/new-branch")).to be_allowed
+          expect { access.push_access_check("#{Gitlab::Git::BLANK_SHA} 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/new-branch") }.not_to raise_error
         end
 
         it 'allows githook for any change with an old bad commit' do
@@ -649,7 +663,7 @@ describe Gitlab::GitAccess, lib: true do
           project.push_rule.update(commit_message_regex: "Change some files")
 
           # push to new branch, so use a blank old rev and new ref
-          expect(access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master')).to be_allowed
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.not_to raise_error
         end
 
         it 'does not allow any change from Web UI with bad commit' do
@@ -664,7 +678,7 @@ describe Gitlab::GitAccess, lib: true do
           project.push_rule.update(commit_message_regex: "Change some files")
 
           # push to new branch, so use a blank old rev and new ref
-          expect(access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master')).not_to be_allowed
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.to raise_error(described_class::UnauthorizedError)
         end
       end
 
@@ -675,12 +689,13 @@ describe Gitlab::GitAccess, lib: true do
         end
 
         it 'returns false for non-member user' do
-          expect(access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master')).not_to be_allowed
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.to raise_error(described_class::UnauthorizedError)
         end
 
         it 'returns true if committer is a gitlab member' do
           create(:user, email: 'dmitriy.zaporozhets@gmail.com')
-          expect(access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master')).to be_allowed
+
+          expect { access.push_access_check('6f6d7e7ed97bb5f0054f2b1df789b39ca89b6ff9 570e7b2abdd848b95f2f578043fc23bd6f6fd24d refs/heads/master') }.not_to raise_error
         end
       end
 
@@ -694,13 +709,15 @@ describe Gitlab::GitAccess, lib: true do
         it 'returns false when filename is prohibited' do
           project.create_push_rule
           project.push_rule.update(file_name_regex: "jpg$")
-          expect(access.push_access_check('913c66a37b4a45b9769037c55c2d238bd0942d2e 33f3729a45c02fc67d00adb1b8bca394b0e761d9 refs/heads/master')).not_to be_allowed
+
+          expect { access.push_access_check('913c66a37b4a45b9769037c55c2d238bd0942d2e 33f3729a45c02fc67d00adb1b8bca394b0e761d9 refs/heads/master') }.to raise_error(described_class::UnauthorizedError)
         end
 
         it 'returns true if file name is allowed' do
           project.create_push_rule
           project.push_rule.update(file_name_regex: "exe$")
-          expect(access.push_access_check('913c66a37b4a45b9769037c55c2d238bd0942d2e 33f3729a45c02fc67d00adb1b8bca394b0e761d9 refs/heads/master')).to be_allowed
+
+          expect { access.push_access_check('913c66a37b4a45b9769037c55c2d238bd0942d2e 33f3729a45c02fc67d00adb1b8bca394b0e761d9 refs/heads/master') }.not_to raise_error
         end
       end
 
@@ -712,20 +729,23 @@ describe Gitlab::GitAccess, lib: true do
         it "returns false when size is too large" do
           project.create_push_rule
           project.push_rule.update(max_file_size: 1)
-          expect(access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master')).not_to be_allowed
+
+          expect { access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master') }.to raise_error(described_class::UnauthorizedError)
         end
 
         it "returns true when size is allowed" do
           project.create_push_rule
           project.push_rule.update(max_file_size: 2)
-          expect(access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master')).to be_allowed
+
+          expect { access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master') }.not_to raise_error
         end
 
         it "returns true when size is nil" do
           allow_any_instance_of(Gitlab::Git::Blob).to receive(:size).and_return(nil)
           project.create_push_rule
           project.push_rule.update(max_file_size: 2)
-          expect(access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master')).to be_allowed
+
+          expect { access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master') }.not_to raise_error
         end
       end
 
@@ -737,13 +757,13 @@ describe Gitlab::GitAccess, lib: true do
         it 'returns false when blob is too big' do
           allow_any_instance_of(Gitlab::Git::Blob).to receive(:size).and_return(100.megabytes.to_i)
 
-          expect(access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master')).not_to be_allowed
+          expect { access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master') }.to raise_error(described_class::UnauthorizedError)
         end
 
         it 'returns true when blob is just right' do
           allow_any_instance_of(Gitlab::Git::Blob).to receive(:size).and_return(2.megabytes.to_i)
 
-          expect(access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master')).to be_allowed
+          expect { access.push_access_check('cfe32cf61b73a0d5e9f13e774abde7ff789b1660 913c66a37b4a45b9769037c55c2d238bd0942d2e refs/heads/master') }.not_to raise_error
         end
       end
     end

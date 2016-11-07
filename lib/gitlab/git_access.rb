@@ -33,9 +33,7 @@ module Gitlab
       check_project_accessibility!
       check_command_existence!(cmd)
 
-      if Gitlab::Geo.secondary? && !Gitlab::Geo.license_allows?
-        return build_status_object(false, 'Your current license does not have GitLab Geo add-on enabled.')
-      end
+      check_geo_license!
 
       case cmd
       when *DOWNLOAD_COMMANDS
@@ -61,14 +59,14 @@ module Gitlab
 
     def push_access_check(changes)
       if project.repository_read_only?
-        return build_status_object(false, 'The repository is temporarily read-only. Please try again later.')
+        raise UnauthorizedError, 'The repository is temporarily read-only. Please try again later.'
       end
 
       if Gitlab::Geo.secondary?
-        return build_status_object(false, "You can't push code on a secondary GitLab Geo node.")
+        raise UnauthorizedError, "You can't push code on a secondary GitLab Geo node."
       end
 
-      return build_status_object(true) if git_annex_branch_sync?(changes)
+      return if git_annex_branch_sync?(changes)
 
       if user
         user_push_access_check(changes)
@@ -110,7 +108,7 @@ module Gitlab
 
       if ::License.block_changes?
         message = ::LicenseHelper.license_message(signed_in: true, is_admin: (user && user.is_admin?))
-        return build_status_object(false, message)
+        raise UnauthorizedError, message
       end
 
       changes_list = Gitlab::ChangesList.new(changes)
@@ -131,7 +129,7 @@ module Gitlab
       end
 
       if project.changes_will_exceed_size_limit?(push_size_in_bytes.to_mb)
-        return build_status_object(false, Gitlab::RepositorySizeError.new(project).new_changes_error)
+        raise UnauthorizedError, Gitlab::RepositorySizeError.new(project).new_changes_error
       end
     end
 
@@ -166,6 +164,12 @@ module Gitlab
     def check_command_existence!(cmd)
       unless ALL_COMMANDS.include?(cmd)
         raise UnauthorizedError, "The command you're trying to execute is not allowed."
+      end
+    end
+
+    def check_geo_license!
+      if Gitlab::Geo.secondary? && !Gitlab::Geo.license_allows?
+        raise UnauthorizedError, 'Your current license does not have GitLab Geo add-on enabled.'
       end
     end
 
@@ -245,24 +249,22 @@ module Gitlab
     end
 
     def git_annex_access_check(project, changes)
-      return build_status_object(false, "git-annex is disabled") unless Gitlab.config.gitlab_shell.git_annex_enabled
+      raise UnauthorizedError, "git-annex is disabled" unless Gitlab.config.gitlab_shell.git_annex_enabled
 
       unless user && user_access.allowed?
-        return build_status_object(false, "You don't have access")
+        raise UnauthorizedError, "You don't have access"
       end
 
       unless project.repository.exists?
-        return build_status_object(false, "Repository does not exist")
+        raise UnauthorizedError, "Repository does not exist"
       end
 
       if Gitlab::Geo.enabled? && Gitlab::Geo.secondary?
-        return build_status_object(false, "You can't use git-annex with a secondary GitLab Geo node.")
+        raise UnauthorizedError, "You can't use git-annex with a secondary GitLab Geo node."
       end
 
-      if user.can?(:push_code, project)
-        build_status_object(true)
-      else
-        build_status_object(false, "You don't have permission")
+      unless user.can?(:push_code, project)
+        raise UnauthorizedError, "You don't have permission"
       end
     end
 
