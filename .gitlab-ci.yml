@@ -9,7 +9,7 @@ variables:
   MYSQL_ALLOW_EMPTY_PASSWORD: "1"
   # retry tests only in CI environment
   RSPEC_RETRY_RETRY_COUNT: "3"
-  ELASTIC_HOST: "dev-gitlab-org:5005-gitlab-test-elastic-image"
+  ELASTIC_HOST: "gitlabcibuild-test-elastic-image"
   RAILS_ENV: "test"
   SIMPLECOV: "true"
   SETUP_DB: "true"
@@ -70,7 +70,7 @@ update-knapsack:
   services:
     - mysql:latest
     - redis:alpine
-    - dev.gitlab.org:5005/gitlab/test-elastic-image
+    - gitlabcibuild/test-elastic-image
 
 .rspec-knapsack: &rspec-knapsack
   stage: test
