@@ -15,9 +15,13 @@
         DNS
       %td
         %p
-          To access the domain create a new DNS record:
+          To access it from your domain create a new DNS A record:
         %pre
-          #{@domain.domain} CNAME #{@domain.project.namespace.path}.#{Settings.pages.host}.
+          #{@domain.domain} A PUT-IN-IP
+        %p
+          To access it from a subdomain create a new DNS CNAME record:
+        %pre
+          PUT-IN-DUMMYSUBDOMAIN #{@domain.domain} CNAME #{@domain.project.namespace.path}.#{Settings.pages.host}.
     %tr
       %td
         Certificate
