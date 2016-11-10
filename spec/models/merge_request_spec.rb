@@ -31,6 +31,7 @@ describe MergeRequest, models: true do
   describe 'validation' do
     it { is_expected.to validate_presence_of(:target_branch) }
     it { is_expected.to validate_presence_of(:source_branch) }
+    it { is_expected.to validate_presence_of(:author) }
 
     context "Validation of merge user with Merge When Build succeeds" do
       it "allows user to be nil when the feature is disabled" do
