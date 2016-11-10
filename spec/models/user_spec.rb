@@ -21,9 +21,9 @@ describe User, models: true do
     it { is_expected.to have_many(:keys).dependent(:destroy) }
     it { is_expected.to have_many(:events).dependent(:destroy) }
     it { is_expected.to have_many(:recent_events).class_name('Event') }
-    it { is_expected.to have_many(:issues).dependent(:destroy) }
+    it { is_expected.to have_many(:issues).dependent(:nullify) }
     it { is_expected.to have_many(:notes).dependent(:destroy) }
-    it { is_expected.to have_many(:assigned_issues).dependent(:destroy) }
+    it { is_expected.to have_many(:assigned_issues).dependent(:nullify) }
     it { is_expected.to have_many(:merge_requests).dependent(:destroy) }
     it { is_expected.to have_many(:assigned_merge_requests).dependent(:destroy) }
     it { is_expected.to have_many(:identities).dependent(:destroy) }
@@ -1274,6 +1274,42 @@ describe User, models: true do
       projects = user.projects_with_reporter_access_limited_to(project2.id)
 
       expect(projects).to be_empty
+    end
+  end
+
+  describe 'when the user is deleted' do
+    let(:user) { create :user }
+    let(:project) { create :project }
+
+    before do
+      project.team << [user, :developer]
+    end
+
+    context "for an issue the user has created" do
+      it 'does not delete the issue' do
+        issue = create(:issue, project: project, author: user)
+
+        user.destroy
+
+        expect(Issue.find_by_id(issue.id)).to be_present
+      end
+
+      it 'does not return `nil` for `issue.author`' do
+        issue = create(:issue, project: project, author: user)
+
+        user.destroy
+
+        expect(issue.reload.author).to be_present
+        expect(issue.reload.author).to be_a DeletedUser
+      end
+    end
+
+    it 'does not delete issues the user is assigned to' do
+      issue = create(:issue, project: project, assignee: user)
+
+      user.destroy
+
+      expect(Issue.find_by_id(issue.id)).to be_present
     end
   end
 end

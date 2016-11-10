@@ -22,7 +22,9 @@ module ProjectsHelper
     default_opts = { avatar: true, name: true, size: 16, author_class: 'author', title: ":name", tooltip: false }
     opts = default_opts.merge(opts)
 
-    return "(deleted)" unless author
+    if author_deleted?(author)
+      return opts[:avatar] ? '' : '(deleted)'
+    end
 
     author_html =  ""
 
@@ -488,5 +490,9 @@ module ProjectsHelper
 
   def project_child_container_class(view_path)
     view_path == "projects/issues/issues" ? "prepend-top-default" : "project-show-#{view_path}"
+  end
+
+  def author_deleted?(author)
+    author.nil? || author.is_a?(DeletedUser)
   end
 end

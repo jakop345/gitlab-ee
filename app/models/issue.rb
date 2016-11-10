@@ -292,6 +292,13 @@ class Issue < ActiveRecord::Base
     end
   end
 
+  # Override the `author` association so we can
+  # return a `DeletedUser` if the author has been
+  # deleted.
+  def author
+    super || DeletedUser.new
+  end
+
   private
 
   # Returns `true` if the given User can read the current Issue.
