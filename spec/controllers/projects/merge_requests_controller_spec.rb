@@ -39,7 +39,6 @@ describe Projects::MergeRequestsController do
     end
   end
 
-<<<<<<< HEAD
   describe 'POST #create' do
     def create_merge_request(overrides = {})
       params = {
@@ -123,7 +122,9 @@ describe Projects::MergeRequestsController do
       it 'shows the #new form' do
         expect(create_merge_request(title: nil)).to render_template(:new)
       end
-=======
+    end
+  end
+
   shared_examples "loads labels" do |action|
     it "loads labels into the @labels variable" do
       get action,
@@ -132,7 +133,6 @@ describe Projects::MergeRequestsController do
           id: merge_request.iid,
           format: 'html'
       expect(assigns(:labels)).not_to be_nil
->>>>>>> ce/8-14-stable
     end
   end
 
