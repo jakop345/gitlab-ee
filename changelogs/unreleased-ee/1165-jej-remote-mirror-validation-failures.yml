@@ -1,0 +1,4 @@
+---
+title: Fix UpdateAllRemoteMirrorsWorker failing when remote mirror has no project
+merge_request: 
+author: 
