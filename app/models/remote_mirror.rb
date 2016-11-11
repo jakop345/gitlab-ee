@@ -39,9 +39,15 @@ class RemoteMirror < ActiveRecord::Base
       transition failed: :started
     end
 
-    state :started
+    state :started do
+      validates_presence_of :project
+    end
+
     state :finished
-    state :failed
+
+    state :failed do
+      validates_presence_of :project
+    end
 
     after_transition any => :started, do: :schedule_update_job
 
@@ -80,8 +86,9 @@ class RemoteMirror < ActiveRecord::Base
   end
 
   def mark_as_failed(error_message)
-    update_fail
-    update_column(:last_error, Gitlab::UrlSanitizer.sanitize(error_message))
+    error_message = errors.full_messages.first unless update_fail
+
+    update_columns(last_error: Gitlab::UrlSanitizer.sanitize(error_message), update_status: 'failed')
   end
 
   def url=(value)
@@ -109,7 +116,7 @@ class RemoteMirror < ActiveRecord::Base
   private
 
   def url_availability
-    if project.import_url == url && project.mirror?
+    if project && project.import_url == url && project.mirror?
       errors.add(:url, 'is already in use')
     end
   end

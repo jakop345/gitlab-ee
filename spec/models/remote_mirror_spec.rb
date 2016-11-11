@@ -85,13 +85,20 @@ describe RemoteMirror do
   end
 
   context 'with missing project' do
-    it 'can be marked as failed' do
-      mirror = create(:remote_mirror)
-      mirror.update!(enabled: true, project_id: nil)
+    let(:mirror) { create(:remote_mirror, update_status: 'started') }
+
+    before do
+      mirror.update_columns(enabled: true, project_id: nil)
 
       mirror.reload.mark_as_failed('missing project')
+    end
 
-      expect(mirror.reload.last_error).to eq 'missing project'
+    it 'sets the last error' do
+      expect(mirror.reload.last_error).to include("Project can't be blank")
+    end
+
+    it 'is marked as failed' do
+      expect(mirror.reload.update_status).to eq('failed')
     end
   end
 

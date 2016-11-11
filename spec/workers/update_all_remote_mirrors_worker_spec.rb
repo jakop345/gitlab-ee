@@ -10,15 +10,15 @@ describe UpdateAllRemoteMirrorsWorker do
       it 'are transitioned to failure state' do
         worker.perform
 
-        expect(mirror.reload.update_status).to eq 'failed'
+        expect(mirror.reload.update_status).to eq('failed')
       end
 
       it 'handles enabled mirrors with missing project' do
-        mirror.update!(project: nil, enabled: true)
+        mirror.update_attributes(project_id: nil, enabled: true)
 
         worker.perform
 
-        expect(mirror.reload.update_status).to eq 'failed'
+        expect(mirror.reload.update_status).to eq('failed')
       end
     end
   end
