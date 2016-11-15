@@ -104,13 +104,13 @@ logins opened on all nodes as we will be moving back and forth.
 
 1. The secondary nodes need to know the SSH fingerprint of the primary node that
    will be used for the Git clone/fetch operations. In order to add it to the
-   `known_hosts` file, run the following command and type `yes` when asked:
+   `known_hosts` file, run the following command and type `yes` when asked.
+    Replace `<primary-node-url>` with the FQDN of the primary node **NOT** the
+    IP address.
 
     ```
     sudo -u git -H ssh git@<primary-node-url>
     ```
-
-    Replace `<primary-node-url>` with the FQDN of the primary node.
 
 1. Verify that the fingerprint was added by checking `known_hosts`:
 
@@ -276,6 +276,10 @@ correctly identified as a secondary Geo node and if Geo is enabled.
 
 If your installation isn't working properly, check the
 [troubleshooting](#troubleshooting) section.
+
+Remember that users will need to setup the Git push URL of the repositories that
+are cloned from the secondary to point to the primary server. Read the
+[after setup](README.md#after-setup) instructions on how to achieve that.
 
 ## Adding another secondary Geo node
 
