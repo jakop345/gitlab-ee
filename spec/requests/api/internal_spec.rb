@@ -9,6 +9,7 @@ describe API::API, api: true  do
 
   describe "GET /internal/check", no_db: true do
     it do
+      puts "describe GET /internal/check: secret token is #{secret_token}"
       get api("/internal/check"), secret_token: secret_token
 
       expect(response).to have_http_status(200)

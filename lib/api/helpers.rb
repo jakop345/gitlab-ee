@@ -129,7 +129,9 @@ module API
 
     def authenticate_by_gitlab_shell_token!
       input = params['secret_token'].try(:chomp)
+      puts "authenticate_by_gitlab_shell_token!: Devise.secure_compare(#{secret_token.inspect}, #{input.inspect}): #{Devise.secure_compare(secret_token, input)}"
       unless Devise.secure_compare(secret_token, input)
+        puts "authenticate_by_gitlab_shell_token!: oh no unauthorized!"
         unauthorized!
       end
     end
