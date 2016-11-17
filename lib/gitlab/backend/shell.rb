@@ -42,17 +42,22 @@ module Gitlab
 
       # Create (if necessary) and link the secret token file
       def generate_and_link_secret_token
+        puts "Gitlab.generate_and_link_secret_token: called from:"
+        puts caller
         secret_file = Gitlab.config.gitlab_shell.secret_file
         shell_path = Gitlab.config.gitlab_shell.path
 
         unless File.size?(secret_file)
           # Generate a new token of 16 random hexadecimal characters and store it in secret_file.
           @secret_token = SecureRandom.hex(16)
+          puts "Gitlab.generate_and_link_secret_token: writting token #{@secret_token}"
           File.write(secret_file, @secret_token)
         end
 
         link_path = File.join(shell_path, '.gitlab_shell_secret')
+        puts "Gitlab.generate_and_link_secret_token: File.exist?(#{shell_path}) && !File.exist?(#{link_path}) = #{File.exist?(shell_path)} && #{!File.exist?(link_path)}"
         if File.exist?(shell_path) && !File.exist?(link_path)
+          puts "Gitlab.generate_and_link_secret_token:linking file"
           FileUtils.symlink(secret_file, link_path)
         end
       end
@@ -286,11 +291,14 @@ module Gitlab
       unless File.size?(secret_file)
         # Generate a new token of 16 random hexadecimal characters and store it in secret_file.
         token = SecureRandom.hex(16)
+        puts "Gitlab#generate_and_link_secret_token: writting token #{token}"
         File.write(secret_file, token)
       end
 
       link_path = File.join(gitlab_shell_path, '.gitlab_shell_secret')
+      puts "Gitlab#generate_and_link_secret_token: File.exist?(#{gitlab_shell_path}) && !File.exist?(#{link_path}) = #{File.exist?(gitlab_shell_path)} && #{!File.exist?(link_path)}"
       if File.exist?(gitlab_shell_path) && !File.exist?(link_path)
+        puts "Gitlab#generate_and_link_secret_token:linking file"
         FileUtils.symlink(secret_file, link_path)
       end
     end
