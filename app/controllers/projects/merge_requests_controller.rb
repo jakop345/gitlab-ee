@@ -14,7 +14,7 @@ class Projects::MergeRequestsController < Projects::ApplicationController
     :approve, :rebase
   ]
   before_action :validates_merge_request, only: [:show, :diffs, :commits, :builds, :pipelines]
-  before_action :define_show_vars, only: [:show, :diffs, :commits, :conflicts, :conflict_for_path, :builds, :pipelines]
+  before_action :define_show_vars, only: [:show, :diffs, :new_diffs, :commits, :conflicts, :conflict_for_path, :builds, :pipelines]
   before_action :define_widget_vars, only: [:merge, :cancel_merge_when_build_succeeds, :merge_check]
   before_action :define_commit_vars, only: [:diffs]
   before_action :define_diff_comment_vars, only: [:diffs]
