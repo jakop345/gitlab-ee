@@ -202,7 +202,7 @@ class IssuableFinder
     when 'opened'
       items.opened
     else
-      raise 'You must specify default state'
+      items
     end
   end
 
