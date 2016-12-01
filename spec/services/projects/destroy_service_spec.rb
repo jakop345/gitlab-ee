@@ -21,7 +21,6 @@ describe Projects::DestroyService, services: true do
       Sidekiq::Testing.inline! { destroy_project(project, user, {}) }
     end
 
-<<<<<<< HEAD
     it { expect(Project.all).not_to include(project) }
     it { expect(Dir.exist?(path)).to be_falsey }
     it { expect(Dir.exist?(remove_path)).to be_falsey }
@@ -38,9 +37,8 @@ describe Projects::DestroyService, services: true do
         expect(RemoteMirror.count).to eq(0)
       end
     end
-=======
+
     it_behaves_like 'deleting the project'
->>>>>>> ce/8-14-stable
   end
 
   context 'Sidekiq fake' do
