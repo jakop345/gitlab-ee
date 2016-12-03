@@ -9,6 +9,8 @@ class Projects::HooksController < Projects::ApplicationController
   def index
     @hooks = @project.hooks
     @hook = ProjectHook.new
+
+    @services = @project.find_or_initialize_services
   end
 
   def create

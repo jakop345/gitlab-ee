@@ -1,4 +1,5 @@
 class Projects::ProtectedBranchesController < Projects::ApplicationController
+  include ProtectedBranchesHelper
   # Authorize
   before_action :require_non_empty_project
   before_action :authorize_admin_project!
@@ -8,18 +9,17 @@ class Projects::ProtectedBranchesController < Projects::ApplicationController
   layout "project_settings"
 
   def index
-    @protected_branch = @project.protected_branches.new
-    load_gon_index
+    redirect_to namespace_project_deploy_keys_path(@project.namespace, @project)
   end
 
   def create
     @protected_branch = ::ProtectedBranches::CreateService.new(@project, current_user, protected_branch_params).execute
 
     if @protected_branch.persisted?
-      redirect_to namespace_project_protected_branches_path(@project.namespace, @project)
+      redirect_to_protected_branches
     else
       load_protected_branches
-      load_gon_index
+      load_gon_index(@project)
       render :index
     end
   end
@@ -46,7 +46,7 @@ class Projects::ProtectedBranchesController < Projects::ApplicationController
     @protected_branch.destroy
 
     respond_to do |format|
-      format.html { redirect_to namespace_project_protected_branches_path }
+      format.html { redirect_to redirect_to_protected_branches }
       format.js { head :ok }
     end
   end
@@ -65,6 +65,15 @@ class Projects::ProtectedBranchesController < Projects::ApplicationController
 
   def load_protected_branches
     @protected_branches = @project.protected_branches.order(:name).page(params[:page])
+  end
+
+  def redirect_to_protected_branches
+    if Rails.application.routes.recognize_path(request.referer)[:controller] == 'projects/deploy_keys'
+      path = namespace_project_protected_branches_path(@project.namespace, @project)
+    else
+      path = namespace_project_deploy_keys_path(@project.namespace, @project)
+    end
+    redirect_to path
   end
 
   def access_levels_options

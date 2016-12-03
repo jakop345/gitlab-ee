@@ -187,9 +187,7 @@ module ProjectsHelper
       nav_tabs << :environments
     end
 
-    if can?(current_user, :admin_project, project)
-      nav_tabs << :settings
-    end
+    nav_tabs << :settings
 
     if can?(current_user, :read_project_member, project)
       nav_tabs << :team

@@ -159,14 +159,16 @@
           new NotificationsDropdown();
           break;
         case 'groups:group_members:index':
-          new gl.MemberExpirationDate();
+          new gl.MemberExpirationDate('.js-access-expiration-date-groups');
           new gl.Members();
           new UsersSelect();
           break;
         case 'projects:project_members:index':
           new gl.MemberExpirationDate();
+          new gl.MemberExpirationDate('.js-access-expiration-date-groups');
           new gl.Members();
           new UsersSelect();
+          new GroupsSelect();
           break;
         case 'groups:new':
         case 'groups:edit':
@@ -209,13 +211,10 @@
         case 'projects:artifacts:browse':
           new BuildArtifacts();
           break;
-        case 'projects:group_links:index':
-          new gl.MemberExpirationDate();
-          new GroupsSelect();
-          break;
         case 'search:show':
           new Search();
           break;
+        case 'projects:deploy_keys:index':
         case 'projects:mirrors:show':
         case 'projects:mirrors:update':
           new UsersSelect();
@@ -227,7 +226,7 @@
           new gl.ProtectedBranchCreate();
           new gl.ProtectedBranchEditList();
           break;
-        case 'projects:variables:index':
+        case 'projects:runners:index':
           new gl.ProjectVariables();
           break;
       }
@@ -302,11 +301,9 @@
             case 'forks':
             case 'milestones':
             case 'project_members':
-            case 'deploy_keys':
             case 'builds':
             case 'hooks':
             case 'services':
-            case 'protected_branches':
               shortcut_handler = new ShortcutsNavigation();
           }
       }

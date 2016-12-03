@@ -1,4 +1,5 @@
 - page_title "Members"
+= render "projects/settings/head"
 
 - if membership_locked?
   .alert.alert-warning
@@ -31,3 +32,7 @@
 
   = render 'team', members: @project_members
   = paginate @project_members, theme: "gitlab"
+
+- if can?(current_user, :admin_project, @project)
+  %hr
+  = render "projects/group_links/index"

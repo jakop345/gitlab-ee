@@ -35,12 +35,10 @@ feature 'Projects > Members > User requests access', feature: true do
     click_link 'Request Access'
 
     expect(project.requesters.exists?(user_id: user)).to be_truthy
+    click_link 'Settings'
 
-    open_project_settings_menu
-    click_link 'Members'
-
-    visit namespace_project_project_members_path(project.namespace, project)
-    page.within('.content') do
+    # The settings tab takes us to members by default if we lack permissions
+    page.within(".content") do
       expect(page).not_to have_content(user.name)
     end
   end

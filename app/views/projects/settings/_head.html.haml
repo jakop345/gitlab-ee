@@ -1,0 +1,36 @@
+= content_for :sub_nav do
+  .scrolling-tabs-container.sub-nav-scroll
+    = render 'shared/nav_scroll'
+    .nav-links.sub-nav.scrolling-tabs
+      %ul{ class: (container_class) }
+        - can_edit = can?(current_user, :admin_project, @project)
+        -if can_edit
+          = nav_link(path: 'projects#edit') do
+            = link_to edit_project_path(@project), title: 'General' do
+              %span
+                General
+        = nav_link(path: 'project_members#index') do
+          = link_to namespace_project_project_members_path(@project.namespace, @project), title: 'Community' do
+            %span
+              Members
+        -if can_edit
+          = nav_link(path: 'hooks#index') do
+            = link_to namespace_project_hooks_path(@project.namespace, @project), title: 'Connections' do
+              %span
+                Integrations
+          = nav_link(path: 'deploy_keys#index') do
+            = link_to namespace_project_deploy_keys_path(@project.namespace, @project), title: 'Permissions' do
+              %span
+                Repository
+          = nav_link(path: 'audit_events#index') do
+            = link_to namespace_project_audit_events_path(@project.namespace, @project), title: 'Audit Events' do
+              %span
+                Audit Events
+          = nav_link(path: 'runners#index') do
+            = link_to namespace_project_runners_path(@project.namespace, @project), title: 'Automation' do
+              %span
+                Automation / CI
+          = nav_link(path: 'pages#show') do
+            = link_to namespace_project_pages_path(@project.namespace, @project), title: 'Pages' do
+              %span
+                Pages

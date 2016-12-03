@@ -26,7 +26,7 @@ feature 'Protected Branches', feature: true, js: true do
 
   describe "explicit protected branches" do
     it "allows creating explicit protected branches" do
-      visit namespace_project_protected_branches_path(project.namespace, project)
+      visit namespace_project_deploy_keys_path(project.namespace, project)
       set_protected_branch_name('some-branch')
       set_allowed_to('merge')
       set_allowed_to('push')
@@ -41,7 +41,7 @@ feature 'Protected Branches', feature: true, js: true do
       commit = create(:commit, project: project)
       project.repository.add_branch(user, 'some-branch', commit.id)
 
-      visit namespace_project_protected_branches_path(project.namespace, project)
+      visit namespace_project_deploy_keys_path(project.namespace, project)
       set_protected_branch_name('some-branch')
       set_allowed_to('merge')
       set_allowed_to('push')
@@ -51,7 +51,7 @@ feature 'Protected Branches', feature: true, js: true do
     end
 
     it "displays an error message if the named branch does not exist" do
-      visit namespace_project_protected_branches_path(project.namespace, project)
+      visit namespace_project_deploy_keys_path(project.namespace, project)
       set_protected_branch_name('some-branch')
       set_allowed_to('merge')
       set_allowed_to('push')
@@ -63,7 +63,7 @@ feature 'Protected Branches', feature: true, js: true do
 
   describe "wildcard protected branches" do
     it "allows creating protected branches with a wildcard" do
-      visit namespace_project_protected_branches_path(project.namespace, project)
+      visit namespace_project_deploy_keys_path(project.namespace, project)
       set_protected_branch_name('*-stable')
       set_allowed_to('merge')
       set_allowed_to('push')
@@ -78,7 +78,7 @@ feature 'Protected Branches', feature: true, js: true do
       project.repository.add_branch(user, 'production-stable', 'master')
       project.repository.add_branch(user, 'staging-stable', 'master')
 
-      visit namespace_project_protected_branches_path(project.namespace, project)
+      visit namespace_project_deploy_keys_path(project.namespace, project)
       set_protected_branch_name('*-stable')
       set_allowed_to('merge')
       set_allowed_to('push')
@@ -92,13 +92,13 @@ feature 'Protected Branches', feature: true, js: true do
       project.repository.add_branch(user, 'staging-stable', 'master')
       project.repository.add_branch(user, 'development', 'master')
 
-      visit namespace_project_protected_branches_path(project.namespace, project)
+      visit namespace_project_deploy_keys_path(project.namespace, project)
       set_protected_branch_name('*-stable')
       set_allowed_to('merge')
       set_allowed_to('push')
       click_on "Protect"
 
-      visit namespace_project_protected_branches_path(project.namespace, project)
+      visit namespace_project_deploy_keys_path(project.namespace, project)
       click_on "2 matching branches"
 
       within(".protected-branches-list") do
