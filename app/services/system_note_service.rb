@@ -466,6 +466,11 @@ module SystemNoteService
     create_note(noteable: noteable, project: noteable.project, author: user, note: body)
   end
 
+  def unapprove_mr(noteable, user)
+    body = "Unapproved this merge request"
+    create_note(noteable: noteable, project: noteable.project, author: user, note: body)
+  end
+
   private
 
   def notes_for_mentioner(mentioner, noteable, notes)
