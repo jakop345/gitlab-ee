@@ -52,6 +52,10 @@ class IssuableFinder
     execute.find_by(*params)
   end
 
+  def find_by!(*params)
+    execute.find_by!(*params)
+  end
+
   def group
     return @group if defined?(@group)
 
