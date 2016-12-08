@@ -211,7 +211,9 @@ rake scss_lint: *exec
 rake brakeman: *exec
 rake flay: *exec
 license_finder: *exec
-rake downtime_check: *exec
+rake downtime_check:
+  <<: *exec
+  allow_failure: yes
 
 rake db:migrate:reset:
   stage: test
