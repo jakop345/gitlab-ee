@@ -1,4 +1,6 @@
 class CreateGitHooks < ActiveRecord::Migration
+  DOWNTIME = false
+
   def change
     create_table :git_hooks do |t|
       t.string :force_push_regex
