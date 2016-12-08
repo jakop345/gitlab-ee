@@ -1,4 +1,6 @@
 class CreateAppearances < ActiveRecord::Migration
+  DOWNTIME = false
+
   def change
     # GitLab CE may already have created this table, so to preserve
     # the upgrade path from CE -> EE we only create this if necessary.

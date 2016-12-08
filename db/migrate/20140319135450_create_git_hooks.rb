@@ -1,5 +1,5 @@
 class CreateGitHooks < ActiveRecord::Migration
-  DOWNTIME=false
+  DOWNTIME = false
 
   def change
     create_table :git_hooks do |t|
