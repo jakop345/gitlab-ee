@@ -215,7 +215,9 @@ rake flay:
   <<: *exec
   allow_failure: yes
 license_finder: *exec
-rake downtime_check: *exec
+rake downtime_check:
+  <<: *exec
+  allow_failure: yes
 
 rake db:migrate:reset:
   stage: test
