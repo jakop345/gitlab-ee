@@ -32,7 +32,7 @@ class Spinach::Features::ProjectFfMergeRequests < Spinach::FeatureSteps
 
   step 'I accept this merge request' do
     page.within '.mr-state-widget' do
-      click_button "Accept Merge Request"
+      click_button "Merge"
     end
   end
 

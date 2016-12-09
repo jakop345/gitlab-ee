@@ -51,7 +51,7 @@ create the [merge request](merge_requests.md).
 ![Selecting branches](forking/branch_select.png)
 
 You can then assign the merge request to someone to have them review
-your changes. Upon pressing the 'Accept Merge Request' button, your
+your changes. Upon pressing the 'Merge' button, your
 changes will be added to the repository and branch you're merging into.
 
 ![New merge request](forking/merge_request.png)

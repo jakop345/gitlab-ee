@@ -4,7 +4,7 @@ Feature: Revert Merge Requests
     Given There is an open Merge Request
       And I am signed in as a developer of the project
       And I am on the Merge Request detail page
-      And I click on Accept Merge Request
+      And I click on Merge
 
   @javascript
   Scenario: I revert a merge request
